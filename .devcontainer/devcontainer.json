@@ -1,0 +1,43 @@
+{
+  "name": "Baltic Foot — Dev",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "lts"
+    }
+  },
+  "mounts": [
+    "source=${localEnv:USERPROFILE}/.claude,target=/home/vscode/.claude,type=bind,consistency=cached"
+  ],
+  "onCreateCommand": "sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-16 postgresql-client-16 && sudo sed -i 's/scram-sha-256/trust/g; s/peer/trust/g; s/md5/trust/g' /etc/postgresql/16/main/pg_hba.conf && sudo service postgresql start && createdb -h 127.0.0.1 -U postgres podologija",
+  "postStartCommand": "sudo service postgresql start || true",
+  "postCreateCommand": "npm install",
+  "forwardPorts": [3000, 5432],
+  "portsAttributes": {
+    "3000": {
+      "label": "Next.js Dev",
+      "onAutoForward": "openBrowser"
+    },
+    "5432": {
+      "label": "PostgreSQL",
+      "onAutoForward": "ignore"
+    }
+  },
+  "remoteEnv": {
+    "WATCHPACK_POLLING": "true",
+    "DATABASE_URI": "postgresql://postgres@localhost:5432/podologija",
+    "PAYLOAD_SECRET": "local-dev-secret-change-in-production"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "esbenp.prettier-vscode",
+        "bradlc.vscode-tailwindcss"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "editor.formatOnSave": true
+      }
+    }
+  }
+}
