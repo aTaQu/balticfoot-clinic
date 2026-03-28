@@ -1,0 +1,194 @@
+.about {
+  background: var(--soil);
+  padding: 8rem 0;
+}
+
+.about h2,
+.about h3,
+.about h4 {
+  color: var(--sand);
+}
+
+.about :global(.section-label) {
+  color: rgba(138, 158, 140, 0.8);
+}
+.about :global(.section-label)::before {
+  background: rgba(138, 158, 140, 0.5);
+}
+
+/* Section header */
+.aboutSectionHeader {
+  margin-bottom: 5rem;
+}
+.aboutSectionHeader h2 {
+  margin-bottom: 0.75rem;
+}
+.aboutSectionIntro {
+  font-size: 0.95rem;
+  color: rgba(212, 201, 190, 0.75);
+  max-width: 520px;
+  line-height: 1.7;
+}
+
+/* Specialist grid */
+.aboutGrid {
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  gap: 6rem;
+  align-items: center;
+}
+
+.aboutGridReversed {
+  grid-template-columns: 1.1fr 1fr;
+}
+
+/* Divider between specialists */
+.aboutDivider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.07);
+  margin: 6rem 0;
+}
+
+/* Photo Frame */
+.aboutPhotoFrame {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(
+    145deg,
+    rgba(138, 158, 140, 0.15) 0%,
+    rgba(181, 103, 61, 0.08) 60%,
+    rgba(255, 255, 255, 0.04) 100%
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+}
+
+.aboutPhotoInner {
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.aboutPhotoPlaceholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  color: rgba(138, 158, 140, 0.6);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.aboutPhotoPlaceholder svg {
+  width: 64px;
+  height: 64px;
+  opacity: 0.5;
+}
+
+.aboutBadge {
+  position: absolute;
+  bottom: -1.5rem;
+  right: -1.5rem;
+  background: var(--terra);
+  color: #fff;
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  line-height: 1.25;
+  box-shadow: 0 8px 24px rgba(181, 103, 61, 0.35);
+}
+.aboutBadgeMain {
+  font-family: var(--font-cormorant), 'Cormorant Garamond', serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  display: block;
+}
+.aboutBadgeSub {
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+/* Content */
+.aboutContent h3 {
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+  margin-bottom: 1.5rem;
+}
+
+.aboutBodyText {
+  color: rgba(212, 201, 190, 0.85);
+  font-size: 0.95rem;
+  line-height: 1.75;
+  margin-bottom: 1.1rem;
+}
+
+.aboutCreds {
+  list-style: none;
+  margin: 1.75rem 0 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.aboutCreds li {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.9rem;
+  color: rgba(212, 201, 190, 0.85);
+}
+.aboutCreds li::before {
+  content: '';
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--sage);
+  flex-shrink: 0;
+}
+
+.aboutContactRow {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.aboutPhone {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: rgba(212, 201, 190, 0.75);
+  transition: color 0.2s;
+}
+.aboutPhone:hover {
+  color: var(--sand);
+}
+.aboutPhone svg {
+  color: var(--sage);
+  flex-shrink: 0;
+}
+
+@media (max-width: 900px) {
+  .aboutGrid,
+  .aboutGridReversed {
+    grid-template-columns: 1fr;
+    gap: 4rem;
+  }
+  .aboutGridReversed > *:first-child {
+    order: 2;
+  }
+  .aboutGridReversed > *:last-child {
+    order: 1;
+  }
+  .aboutPhotoFrame {
+    max-width: 400px;
+    margin: 0 auto;
+  }
+  .aboutBadge { right: 0; }
+}

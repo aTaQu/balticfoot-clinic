@@ -1,0 +1,2416 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Baltic Foot — Venetos Liaudanskienės podologijos kabinetai</title>
+  <meta name="description" content="Profesionali podologijos priežiūra Lietuvoje. Saugus aparatinis pedikiūras, įaugusio nago korekcija Titano Siūlu, probleminių pėdų procedūros. Registruokitės: +370 699 80980">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    /* ── Reset ─────────────────────────────────────────────── */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* ── Design Tokens ─────────────────────────────────────── */
+    :root {
+      --sand:  #E8DDD0;
+      --stone: #6B5E52;
+      --terra: #B5673D;
+      --sage:  #8A9E8C;
+      --cream: #FAF7F4;
+      --soil:  #2C2420;
+    }
+
+    /* ── Base ───────────────────────────────────────────────── */
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--sand);
+      color: var(--stone);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    h1, h2, h3, h4 {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 400;
+      color: var(--soil);
+      line-height: 1.15;
+    }
+
+    h1 { font-size: clamp(2.8rem, 6vw, 5rem); }
+    h2 { font-size: clamp(2rem, 4vw, 3.2rem); }
+    h3 { font-size: clamp(1.3rem, 2.5vw, 1.8rem); }
+    h4 { font-size: clamp(1.1rem, 2vw, 1.35rem); }
+
+    a { color: inherit; text-decoration: none; }
+
+    img { display: block; max-width: 100%; }
+
+    /* ── Layout ─────────────────────────────────────────────── */
+    .container {
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    /* ── Section Label ──────────────────────────────────────── */
+    .section-label {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--sage);
+      margin-bottom: 1.25rem;
+    }
+    .section-label::before {
+      content: '';
+      display: block;
+      width: 2rem;
+      height: 1px;
+      background: var(--sage);
+      flex-shrink: 0;
+    }
+
+    /* ── Buttons ────────────────────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.875rem 2rem;
+      border-radius: 4px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 500;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    }
+
+    .btn-primary {
+      background: var(--terra);
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background: #9e5530;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(181,103,61,0.32);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--stone);
+      border: 1.5px solid rgba(107, 94, 82, 0.3);
+    }
+    .btn-ghost:hover {
+      border-color: var(--stone);
+      background: rgba(107, 94, 82, 0.06);
+    }
+
+    /* ── Reveal Animations ──────────────────────────────────── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+                  transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+    .reveal-delay-5 { transition-delay: 0.5s; }
+
+
+    /* ══════════════════════════════════════════════════════════
+       NAVIGATION
+    ══════════════════════════════════════════════════════════ */
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 1.5rem 0;
+      transition: background 0.35s ease, padding 0.35s ease, box-shadow 0.35s ease;
+    }
+    .nav.scrolled {
+      background: rgba(250, 247, 244, 0.95);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding: 0.875rem 0;
+      border-bottom: 1px solid rgba(107, 94, 82, 0.12);
+      box-shadow: 0 2px 20px rgba(44, 36, 32, 0.06);
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+    }
+
+    .nav-logo {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.1;
+      text-decoration: none;
+    }
+    .nav-logo-main {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem;
+      font-weight: 500;
+      color: var(--soil);
+      letter-spacing: 0.02em;
+    }
+    .nav-logo-sub {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--sage);
+    }
+
+    .nav-links {
+      display: flex;
+      list-style: none;
+      gap: 2.5rem;
+      align-items: center;
+    }
+    .nav-links a {
+      font-size: 0.88rem;
+      font-weight: 400;
+      color: var(--stone);
+      position: relative;
+      padding-bottom: 3px;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 1px;
+      background: var(--terra);
+      transition: width 0.3s ease;
+    }
+    .nav-links a:hover { color: var(--soil); }
+    .nav-links a:hover::after { width: 100%; }
+
+    /* Hamburger */
+    #hamburger {
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      gap: 5px;
+      width: 36px;
+      height: 36px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+      z-index: 200;
+    }
+    #hamburger span {
+      display: block;
+      width: 100%;
+      height: 1.5px;
+      background: var(--soil);
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      transform-origin: center;
+    }
+    #hamburger.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+    #hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    #hamburger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+    /* Mobile overlay */
+    #nav-mobile {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: var(--cream);
+      z-index: 150;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2.5rem;
+    }
+    #nav-mobile.open {
+      display: flex;
+    }
+    #nav-mobile a {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2rem, 6vw, 3rem);
+      font-weight: 400;
+      color: var(--soil);
+      letter-spacing: 0.02em;
+      transition: color 0.2s;
+    }
+    #nav-mobile a:hover { color: var(--terra); }
+    #nav-mobile .nav-mobile-cta {
+      margin-top: 1rem;
+    }
+
+
+    /* ══════════════════════════════════════════════════════════
+       HERO
+    ══════════════════════════════════════════════════════════ */
+    .hero {
+      position: relative;
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 60% at 80% 15%, rgba(138, 158, 140, 0.18) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 50% at 10% 85%, rgba(181, 103, 61, 0.10) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    .hero-orb {
+      position: absolute;
+      right: -10%;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 55vw;
+      aspect-ratio: 1 / 1;
+      background: linear-gradient(
+        135deg,
+        rgba(138, 158, 140, 0.22) 0%,
+        rgba(181, 103, 61, 0.10) 50%,
+        rgba(232, 221, 208, 0.30) 100%
+      );
+      animation: morphOrb 14s infinite ease-in-out;
+      pointer-events: none;
+    }
+    @keyframes morphOrb {
+      0%   { border-radius: 60% 40% 55% 45% / 55% 45% 60% 40%; }
+      33%  { border-radius: 42% 58% 38% 62% / 48% 62% 38% 52%; }
+      66%  { border-radius: 58% 42% 62% 38% / 40% 55% 45% 60%; }
+      100% { border-radius: 60% 40% 55% 45% / 55% 45% 60% 40%; }
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 640px;
+      padding-top: 6rem;
+    }
+
+    .hero-eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--sage);
+      margin-bottom: 1.5rem;
+    }
+    .hero-eyebrow::before {
+      content: '';
+      display: block;
+      width: 2rem;
+      height: 1px;
+      background: var(--sage);
+    }
+
+    .hero h1 {
+      margin-bottom: 1.25rem;
+    }
+    .hero h1 em {
+      font-style: italic;
+      color: var(--terra);
+    }
+
+    .hero-body {
+      font-size: 1.05rem;
+      line-height: 1.7;
+      color: var(--stone);
+      max-width: 520px;
+      margin-bottom: 2.5rem;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      flex-wrap: wrap;
+      margin-bottom: 3.5rem;
+    }
+
+    .hero-phone {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--stone);
+      transition: color 0.2s;
+    }
+    .hero-phone:hover { color: var(--terra); }
+    .hero-phone svg { flex-shrink: 0; }
+
+    .hero-stats {
+      display: flex;
+      gap: 3rem;
+      padding-top: 2rem;
+      border-top: 1px solid rgba(107, 94, 82, 0.2);
+      flex-wrap: wrap;
+    }
+
+    .hero-stat-value {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.4rem;
+      font-weight: 400;
+      color: var(--soil);
+      line-height: 1;
+      margin-bottom: 0.3rem;
+    }
+    .hero-stat-label {
+      font-size: 0.78rem;
+      letter-spacing: 0.06em;
+      color: var(--sage);
+      text-transform: uppercase;
+    }
+
+
+    /* ══════════════════════════════════════════════════════════
+       SERVICES
+    ══════════════════════════════════════════════════════════ */
+    .services {
+      background: var(--cream);
+      padding: 8rem 0;
+    }
+
+    .services-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 2rem;
+      margin-bottom: 4rem;
+    }
+    .services-header-left { flex: 1; }
+    .services-header-left h2 { margin-bottom: 0.75rem; }
+    .services-header-left p {
+      color: var(--stone);
+      font-size: 0.95rem;
+      max-width: 420px;
+    }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .service-card {
+      background: var(--cream);
+      border: 1px solid rgba(107, 94, 82, 0.12);
+      border-radius: 12px;
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .service-card::before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--terra);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.35s ease;
+    }
+    .service-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 36px rgba(44, 36, 32, 0.1);
+    }
+    .service-card:hover::before {
+      transform: scaleX(1);
+    }
+
+    .service-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      background: rgba(138, 158, 140, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.25rem;
+      color: var(--sage);
+      transition: background 0.25s ease, color 0.25s ease;
+    }
+    .service-card:hover .service-icon {
+      background: rgba(181, 103, 61, 0.12);
+      color: var(--terra);
+    }
+
+    .service-card h3 {
+      margin-bottom: 0.6rem;
+      font-size: clamp(1.1rem, 2vw, 1.35rem);
+    }
+    .service-card p {
+      font-size: 0.88rem;
+      line-height: 1.65;
+      color: var(--stone);
+    }
+
+
+    /* ══════════════════════════════════════════════════════════
+       TRUST
+    ══════════════════════════════════════════════════════════ */
+    .trust {
+      background: var(--sand);
+      padding: 8rem 0;
+    }
+
+    .trust-intro {
+      text-align: center;
+      max-width: 560px;
+      margin: 0 auto 4rem;
+    }
+    .trust-intro .section-label {
+      justify-content: center;
+    }
+    .trust-intro .section-label::before { display: none; }
+    .trust-intro h2 { margin-bottom: 0.75rem; }
+    .trust-intro p {
+      font-size: 0.95rem;
+      color: var(--stone);
+    }
+
+    .trust-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 2.5rem;
+    }
+
+    .trust-item {
+      text-align: center;
+      padding: 2.5rem 1.5rem;
+    }
+
+    .trust-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: rgba(138, 158, 140, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem;
+      color: var(--sage);
+    }
+
+    .trust-item h4 {
+      margin-bottom: 0.6rem;
+    }
+    .trust-item p {
+      font-size: 0.88rem;
+      line-height: 1.7;
+      color: var(--stone);
+    }
+
+
+    /* ══════════════════════════════════════════════════════════
+       ABOUT
+    ══════════════════════════════════════════════════════════ */
+    .about {
+      background: var(--soil);
+      padding: 8rem 0;
+    }
+
+    .about h1, .about h2, .about h3, .about h4 {
+      color: var(--sand);
+    }
+
+    .about-body-text {
+      color: rgba(212, 201, 190, 0.85);
+    }
+
+    .about .section-label {
+      color: rgba(138, 158, 140, 0.8);
+    }
+    .about .section-label::before {
+      background: rgba(138, 158, 140, 0.5);
+    }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.1fr;
+      gap: 6rem;
+      align-items: center;
+    }
+
+    /* Photo Frame */
+    .about-photo-frame {
+      position: relative;
+      aspect-ratio: 4 / 5;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: linear-gradient(
+        145deg,
+        rgba(138,158,140,0.15) 0%,
+        rgba(181,103,61,0.08) 60%,
+        rgba(255,255,255,0.04) 100%
+      );
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: visible;
+    }
+
+    .about-photo-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      color: rgba(138,158,140,0.6);
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .about-photo-placeholder svg {
+      width: 64px;
+      height: 64px;
+      opacity: 0.5;
+    }
+
+    .about-badge {
+      position: absolute;
+      bottom: -1.5rem;
+      right: -1.5rem;
+      background: var(--terra);
+      color: #fff;
+      border-radius: 12px;
+      padding: 1rem 1.5rem;
+      line-height: 1.25;
+      box-shadow: 0 8px 24px rgba(181,103,61,0.35);
+    }
+    .about-badge-main {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+      display: block;
+    }
+    .about-badge-sub {
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      opacity: 0.85;
+    }
+
+    /* About content */
+    .about-content h2 {
+      margin-bottom: 1.5rem;
+    }
+    .about-content p {
+      color: rgba(212, 201, 190, 0.85);
+      font-size: 0.95rem;
+      line-height: 1.75;
+      margin-bottom: 1.1rem;
+    }
+
+    .about-creds {
+      list-style: none;
+      margin: 1.75rem 0 2.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+    .about-creds li {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.9rem;
+      color: rgba(212, 201, 190, 0.85);
+    }
+    .about-creds li::before {
+      content: '';
+      display: block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--sage);
+      flex-shrink: 0;
+    }
+
+
+    /* ══════════════════════════════════════════════════════════
+       BOOKING WIZARD
+    ══════════════════════════════════════════════════════════ */
+    .booking {
+      background: var(--cream);
+      padding: 8rem 0;
+    }
+
+    .booking-header {
+      text-align: center;
+      max-width: 600px;
+      margin: 0 auto 3.5rem;
+    }
+    .booking-header .section-label {
+      justify-content: center;
+    }
+    .booking-header .section-label::before { display: none; }
+    .booking-header h2 { margin-bottom: 0.6rem; }
+    .booking-header p {
+      font-size: 0.95rem;
+      color: var(--stone);
+    }
+
+    /* ── Wizard shell */
+    .wizard {
+      max-width: 860px;
+      margin: 0 auto;
+      background: var(--sand);
+      border: 1px solid rgba(107,94,82,0.12);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 8px 40px rgba(44,36,32,0.08);
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%       { transform: translateX(-7px); }
+      40%       { transform: translateX(7px); }
+      60%       { transform: translateX(-4px); }
+      80%       { transform: translateX(4px); }
+    }
+
+    /* ── Progress bar */
+    .wizard-progress {
+      display: flex;
+      align-items: flex-start;
+      padding: 1.75rem 2.5rem;
+      background: var(--cream);
+      border-bottom: 1px solid rgba(107,94,82,0.1);
+    }
+    .wizard-step-indicator {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      flex: 1;
+      position: relative;
+    }
+    .wizard-step-indicator:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      top: 15px;
+      left: calc(50% + 18px);
+      right: calc(-50% + 18px);
+      height: 1px;
+      background: rgba(107,94,82,0.18);
+      transition: background 0.4s ease;
+    }
+    .wizard-step-indicator.done:not(:last-child)::after {
+      background: var(--terra);
+      opacity: 0.5;
+    }
+    .wizard-step-num {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(107,94,82,0.22);
+      background: var(--cream);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--stone);
+      position: relative;
+      z-index: 1;
+      transition: background 0.3s, border-color 0.3s, color 0.3s;
+    }
+    .wizard-step-indicator.active .wizard-step-num {
+      background: var(--terra);
+      border-color: var(--terra);
+      color: #fff;
+    }
+    .wizard-step-indicator.done .wizard-step-num {
+      background: var(--terra);
+      border-color: var(--terra);
+      color: #fff;
+    }
+    .wizard-step-label {
+      font-size: 0.68rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(107,94,82,0.45);
+      text-align: center;
+      transition: color 0.3s;
+    }
+    .wizard-step-indicator.active .wizard-step-label { color: var(--terra); }
+    .wizard-step-indicator.done  .wizard-step-label { color: var(--stone); }
+
+    /* ── Step panels */
+    .wizard-body { padding: 2.5rem; }
+    .wizard-panel { display: none; }
+    .wizard-panel.active { display: block; }
+    .wizard-panel-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.4rem, 3vw, 1.9rem);
+      font-weight: 400;
+      color: var(--soil);
+      margin-bottom: 0.35rem;
+    }
+    .wizard-panel-sub {
+      font-size: 0.85rem;
+      color: var(--stone);
+      margin-bottom: 2rem;
+    }
+
+    /* ── Step 1: service cards */
+    .svc-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 0.875rem;
+    }
+    .svc-option {
+      border: 1.5px solid rgba(107,94,82,0.14);
+      border-radius: 12px;
+      padding: 1.125rem 1rem;
+      cursor: pointer;
+      background: var(--cream);
+      transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+      position: relative;
+      user-select: none;
+    }
+    .svc-option:hover {
+      border-color: rgba(181,103,61,0.4);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(44,36,32,0.07);
+    }
+    .svc-option.selected {
+      border-color: var(--terra);
+      box-shadow: 0 0 0 3px rgba(181,103,61,0.12);
+    }
+    .svc-option.selected::after {
+      content: '';
+      position: absolute;
+      top: 9px;
+      right: 9px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--terra) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='8' viewBox='0 0 10 8'%3E%3Cpolyline points='1,4 3.5,6.5 9,1' stroke='white' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat center;
+    }
+    .svc-option-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      background: rgba(138,158,140,0.14);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--sage);
+      margin-bottom: 0.75rem;
+      transition: background 0.2s, color 0.2s;
+    }
+    .svc-option.selected .svc-option-icon {
+      background: rgba(181,103,61,0.12);
+      color: var(--terra);
+    }
+    .svc-option-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--soil);
+      line-height: 1.3;
+    }
+
+    /* ── Step 2: date + time */
+    .dt-grid {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 2rem;
+      align-items: start;
+    }
+    .cal {
+      background: var(--cream);
+      border: 1px solid rgba(107,94,82,0.12);
+      border-radius: 14px;
+      padding: 1.25rem;
+      min-width: 252px;
+    }
+    .cal-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+    .cal-nav-btn {
+      width: 28px;
+      height: 28px;
+      border: 1px solid rgba(107,94,82,0.18);
+      border-radius: 6px;
+      background: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--stone);
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .cal-nav-btn:hover:not(:disabled) {
+      background: rgba(107,94,82,0.08);
+      border-color: rgba(107,94,82,0.4);
+    }
+    .cal-nav-btn:disabled { opacity: 0.3; cursor: default; }
+    .cal-month {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.05rem;
+      font-weight: 500;
+      color: var(--soil);
+    }
+    .cal-weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 2px;
+      margin-bottom: 4px;
+    }
+    .cal-weekday {
+      font-size: 0.63rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--sage);
+      text-align: center;
+      padding: 3px 0;
+    }
+    .cal-days {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 2px;
+    }
+    .cal-day {
+      aspect-ratio: 1/1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.82rem;
+      border-radius: 7px;
+      cursor: pointer;
+      color: var(--soil);
+      transition: background 0.15s, color 0.15s;
+    }
+    .cal-day:hover:not(.disabled):not(.selected):not(.empty) {
+      background: rgba(181,103,61,0.1);
+    }
+    .cal-day.today { font-weight: 600; color: var(--terra); }
+    .cal-day.selected { background: var(--terra); color: #fff; }
+    .cal-day.disabled { color: rgba(107,94,82,0.22); cursor: default; }
+    .cal-day.empty    { cursor: default; }
+
+    /* Time slots */
+    .time-section { }
+    .time-section-label {
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--sage);
+      margin-bottom: 0.875rem;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .time-placeholder {
+      font-size: 0.88rem;
+      color: rgba(107,94,82,0.45);
+      padding: 0.5rem 0;
+      font-style: italic;
+    }
+    .time-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.5rem;
+    }
+    .time-slot {
+      padding: 0.5rem 0.25rem;
+      text-align: center;
+      border: 1.5px solid rgba(107,94,82,0.14);
+      border-radius: 8px;
+      font-size: 0.82rem;
+      cursor: pointer;
+      color: var(--soil);
+      background: var(--cream);
+      transition: border-color 0.15s, background 0.15s, color 0.15s;
+      user-select: none;
+    }
+    .time-slot:hover:not(.unavailable):not(.selected) {
+      border-color: rgba(181,103,61,0.5);
+      background: rgba(181,103,61,0.07);
+    }
+    .time-slot.selected {
+      background: var(--terra);
+      border-color: var(--terra);
+      color: #fff;
+    }
+    .time-slot.unavailable {
+      color: rgba(107,94,82,0.2);
+      border-color: rgba(107,94,82,0.07);
+      cursor: not-allowed;
+      text-decoration: line-through;
+      background: transparent;
+    }
+
+    /* ── Step 3: contact form */
+    .wiz-form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 0;
+    }
+    .wiz-form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      margin-bottom: 1rem;
+    }
+    .wiz-form-group label {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--stone);
+      letter-spacing: 0.03em;
+    }
+    .wiz-form-group input,
+    .wiz-form-group textarea {
+      width: 100%;
+      background: var(--cream);
+      border: 1.5px solid rgba(107,94,82,0.18);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.88rem;
+      color: var(--soil);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    .wiz-form-group textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+    .wiz-form-group input:focus,
+    .wiz-form-group textarea:focus {
+      border-color: var(--terra);
+      box-shadow: 0 0 0 3px rgba(181,103,61,0.12);
+    }
+    .wiz-form-group input::placeholder,
+    .wiz-form-group textarea::placeholder {
+      color: rgba(107,94,82,0.38);
+    }
+    .wiz-form-group input.error,
+    .wiz-form-group textarea.error {
+      border-color: var(--terra);
+      box-shadow: 0 0 0 3px rgba(181,103,61,0.12);
+    }
+
+    /* SMS toggle */
+    .sms-toggle {
+      display: flex;
+      align-items: center;
+      gap: 0.875rem;
+      background: var(--cream);
+      border: 1px solid rgba(107,94,82,0.12);
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+      cursor: pointer;
+      user-select: none;
+      transition: border-color 0.2s;
+    }
+    .sms-toggle:hover { border-color: rgba(107,94,82,0.3); }
+    .sms-toggle-switch {
+      width: 40px;
+      height: 22px;
+      border-radius: 11px;
+      background: rgba(107,94,82,0.2);
+      position: relative;
+      flex-shrink: 0;
+      transition: background 0.25s;
+    }
+    .sms-toggle-switch::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #fff;
+      transition: transform 0.25s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+    }
+    .sms-toggle.on .sms-toggle-switch { background: var(--terra); }
+    .sms-toggle.on .sms-toggle-switch::after { transform: translateX(18px); }
+    .sms-toggle-text strong {
+      display: block;
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--soil);
+      margin-bottom: 0.1rem;
+    }
+    .sms-toggle-text span {
+      font-size: 0.76rem;
+      color: var(--stone);
+    }
+
+    /* ── Step 4: confirmation */
+    .confirm-summary {
+      background: var(--cream);
+      border: 1px solid rgba(107,94,82,0.12);
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+    }
+    .confirm-summary-header {
+      background: var(--terra);
+      padding: 1.1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .confirm-summary-header h4 {
+      color: #fff;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.2rem;
+    }
+    .confirm-summary-header p {
+      color: rgba(255,255,255,0.7);
+      font-size: 0.78rem;
+    }
+    .confirm-rows {
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .confirm-row {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+      font-size: 0.88rem;
+    }
+    .confirm-row-label {
+      min-width: 110px;
+      color: var(--sage);
+      font-size: 0.73rem;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      padding-top: 2px;
+      flex-shrink: 0;
+    }
+    .confirm-row-value { color: var(--soil); }
+
+    /* BDAR */
+    .bdar-notice {
+      background: rgba(138,158,140,0.1);
+      border: 1px solid rgba(138,158,140,0.22);
+      border-radius: 10px;
+      padding: 1.125rem 1.25rem;
+      margin-bottom: 1.25rem;
+      font-size: 0.8rem;
+      color: var(--stone);
+      line-height: 1.65;
+    }
+    .bdar-notice strong {
+      color: var(--soil);
+      font-weight: 500;
+      display: block;
+      margin-bottom: 0.35rem;
+    }
+    .bdar-check {
+      display: flex;
+      gap: 0.75rem;
+      align-items: flex-start;
+      margin-bottom: 1.5rem;
+      cursor: pointer;
+      font-size: 0.85rem;
+      color: var(--stone);
+      line-height: 1.55;
+      user-select: none;
+      border-radius: 6px;
+      padding: 2px;
+      transition: outline 0.2s;
+    }
+    .bdar-check input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      margin-top: 2px;
+      accent-color: var(--terra);
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+
+    /* ── Wizard footer */
+    .wizard-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.25rem 2.5rem;
+      border-top: 1px solid rgba(107,94,82,0.1);
+      background: var(--cream);
+      gap: 1rem;
+    }
+    .wizard-footer-right {
+      display: flex;
+      align-items: center;
+      gap: 0.875rem;
+      margin-left: auto;
+    }
+    .wiz-back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: none;
+      border: none;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.88rem;
+      color: var(--stone);
+      cursor: pointer;
+      padding: 0.4rem 0;
+      transition: color 0.2s;
+    }
+    .wiz-back-btn:hover { color: var(--soil); }
+    .wiz-step-counter {
+      font-size: 0.76rem;
+      color: rgba(107,94,82,0.45);
+    }
+
+    /* ── Success */
+    .wizard-success {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 4rem 2.5rem;
+      gap: 1.25rem;
+    }
+    .wizard-success.active { display: flex; }
+    .wizard-success-icon {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: rgba(138,158,140,0.14);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--sage);
+    }
+    .wizard-success h3 { font-size: clamp(1.6rem, 3vw, 2.2rem); }
+    .wizard-success p {
+      font-size: 0.92rem;
+      color: var(--stone);
+      max-width: 380px;
+    }
+    .wizard-success-detail {
+      background: var(--cream);
+      border: 1px solid rgba(107,94,82,0.12);
+      border-radius: 10px;
+      padding: 1rem 1.5rem;
+      font-size: 0.85rem;
+      color: var(--stone);
+      line-height: 1.75;
+    }
+
+    .btn-full { width: 100%; justify-content: center; }
+
+
+    /* ══════════════════════════════════════════════════════════
+       FOOTER
+    ══════════════════════════════════════════════════════════ */
+    footer {
+      background: var(--soil);
+      padding: 5rem 0 2.5rem;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr;
+      gap: 4rem;
+      margin-bottom: 3rem;
+    }
+
+    .footer-logo {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 1.1rem;
+    }
+    .footer-logo-main {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem;
+      font-weight: 500;
+      color: var(--sand);
+      letter-spacing: 0.02em;
+    }
+    .footer-logo-sub {
+      font-size: 0.65rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--sage);
+    }
+    .footer-tagline {
+      font-size: 0.85rem;
+      line-height: 1.65;
+      color: rgba(212, 201, 190, 0.65);
+      max-width: 280px;
+    }
+
+    .footer-col h4 {
+      color: var(--sand);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 1.25rem;
+    }
+
+    .footer-col ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+    }
+    .footer-col ul a {
+      font-size: 0.88rem;
+      color: rgba(212, 201, 190, 0.65);
+      transition: color 0.2s;
+    }
+    .footer-col ul a:hover { color: var(--sand); }
+
+    .footer-contact-item {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      font-size: 0.88rem;
+      color: rgba(212, 201, 190, 0.65);
+      margin-bottom: 0.65rem;
+    }
+    .footer-contact-item a {
+      color: rgba(212, 201, 190, 0.65);
+      transition: color 0.2s;
+    }
+    .footer-contact-item a:hover { color: var(--sand); }
+    .footer-contact-item svg {
+      flex-shrink: 0;
+      color: var(--sage);
+    }
+
+    .footer-bottom {
+      border-top: 1px solid rgba(255,255,255,0.07);
+      padding-top: 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.78rem;
+      color: rgba(212, 201, 190, 0.4);
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+
+    /* ══════════════════════════════════════════════════════════
+       RESPONSIVE
+    ══════════════════════════════════════════════════════════ */
+    @media (max-width: 900px) {
+      .about-grid {
+        grid-template-columns: 1fr;
+        gap: 4rem;
+      }
+      .about-photo-frame {
+        max-width: 400px;
+        margin: 0 auto;
+      }
+      .about-badge {
+        right: 0;
+      }
+      .footer-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      .footer-grid > .footer-col:first-child {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .nav-links,
+      .nav-cta {
+        display: none;
+      }
+      #hamburger {
+        display: flex;
+      }
+      .services-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .footer-grid {
+        grid-template-columns: 1fr;
+        gap: 2.5rem;
+      }
+      .dt-grid {
+        grid-template-columns: 1fr;
+      }
+      .wiz-form-row {
+        grid-template-columns: 1fr;
+      }
+      .time-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .wizard-body { padding: 1.75rem; }
+      .wizard-footer { padding: 1.1rem 1.75rem; }
+      .wizard-progress { padding: 1.5rem; }
+      .wizard-step-label { display: none; }
+    }
+
+    @media (max-width: 480px) {
+      .svc-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      .time-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .confirm-row {
+        flex-direction: column;
+        gap: 0.15rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .hero-actions {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .hero-stats {
+        gap: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════════════════════════
+       NAVIGATION
+  ══════════════════════════════════════════════════════════ -->
+  <nav class="nav" id="nav" aria-label="Pagrindinis meniu">
+    <div class="container">
+      <div class="nav-inner">
+        <a href="#virsus" class="nav-logo" aria-label="Baltic Foot pradžia">
+          <span class="nav-logo-main">Baltic Foot</span>
+          <span class="nav-logo-sub">Podologijos kabinetai</span>
+        </a>
+
+        <ul class="nav-links" role="list">
+          <li><a href="#paslaugos">Paslaugos</a></li>
+          <li><a href="#apie">Apie mus</a></li>
+          <li><a href="#kontaktai">Kontaktai</a></li>
+        </ul>
+
+        <a href="#registracija" class="btn btn-primary nav-cta">Registruotis</a>
+
+        <button id="hamburger" aria-label="Atidaryti meniu" aria-expanded="false" aria-controls="nav-mobile">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Mobile overlay -->
+  <div id="nav-mobile" role="dialog" aria-label="Mobilusis meniu" aria-modal="true">
+    <a href="#paslaugos">Paslaugos</a>
+    <a href="#apie">Apie mus</a>
+    <a href="#kontaktai">Kontaktai</a>
+    <a href="#registracija" class="btn btn-primary nav-mobile-cta">Registruotis vizitui</a>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════════════
+       HERO
+  ══════════════════════════════════════════════════════════ -->
+  <section class="hero" id="virsus" aria-labelledby="hero-heading">
+    <div class="hero-bg" aria-hidden="true"></div>
+    <div class="hero-orb" aria-hidden="true"></div>
+
+    <div class="container">
+      <div class="hero-content">
+        <div class="hero-eyebrow reveal">Profesionali podologijos priežiūra</div>
+
+        <h1 id="hero-heading" class="reveal reveal-delay-1">
+          Sveikos pėdos —<br>
+          <em>sveika gyvensena</em>
+        </h1>
+
+        <div class="hero-body reveal reveal-delay-2">
+          <p>Venetos Liaudanskienės podologijos kabinetuose rūpinamės jūsų pėdų sveikata su šiluma, profesionalumu ir individualia priežiūra — nuo higienos iki sudėtingų korekcijų.</p>
+        </div>
+
+        <div class="hero-actions reveal reveal-delay-3">
+          <a href="#registracija" class="btn btn-primary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+            Registruotis vizitui
+          </a>
+          <a href="tel:+37069980980" class="hero-phone">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.01 1.18 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"></path>
+            </svg>
+            +370 699 80980
+          </a>
+        </div>
+
+        <div class="hero-stats reveal reveal-delay-4">
+          <div class="hero-stat">
+            <div class="hero-stat-value">10+</div>
+            <div class="hero-stat-label">Metų patirtis</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-value">5</div>
+            <div class="hero-stat-label">Procedūros</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-value">100%</div>
+            <div class="hero-stat-label">Higiena</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════════════════════════
+       SERVICES
+  ══════════════════════════════════════════════════════════ -->
+  <section class="services" id="paslaugos" aria-labelledby="services-heading">
+    <div class="container">
+      <div class="services-header reveal">
+        <div class="services-header-left">
+          <div class="section-label">Mūsų paslaugos</div>
+          <h2 id="services-heading">Profesionali pėdų priežiūra</h2>
+          <p>Visos procedūros atliekamos steriliai, specializuotais aparatais, individualiai kiekvienam pacientui.</p>
+        </div>
+        <a href="#registracija" class="btn btn-ghost">Registruotis →</a>
+      </div>
+
+      <div class="services-grid">
+
+        <!-- Card 1 -->
+        <article class="service-card reveal reveal-delay-1">
+          <div class="service-icon" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+              <line x1="9" y1="9" x2="9.01" y2="9"></line>
+              <line x1="15" y1="9" x2="15.01" y2="9"></line>
+            </svg>
+          </div>
+          <h3>Saugus aparatinis pedikiūras</h3>
+          <p>Profesionalus nagų ir odos priežiūra specializuotais aparatais. Saugi ir higieninė procedūra kiekvienam.</p>
+        </article>
+
+        <!-- Card 2 -->
+        <article class="service-card reveal reveal-delay-2">
+          <div class="service-icon" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"></path>
+            </svg>
+          </div>
+          <h3>Higieninis pedikiūras</h3>
+          <p>Pėdų valymas, minkštinimas ir priežiūra — procedūra sveikoms ir gražioms pėdoms.</p>
+        </article>
+
+        <!-- Card 3 -->
+        <article class="service-card reveal reveal-delay-3">
+          <div class="service-icon" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8h1a4 4 0 010 8h-1"></path>
+              <path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"></path>
+              <line x1="6" y1="1" x2="6" y2="4"></line>
+              <line x1="10" y1="1" x2="10" y2="4"></line>
+              <line x1="14" y1="1" x2="14" y2="4"></line>
+            </svg>
+          </div>
+          <h3>Probleminių pėdų procedūra</h3>
+          <p>Nuospaudų, kietėjimų, įtrūkimų ir kitų pėdų problemų sprendimas.</p>
+        </article>
+
+        <!-- Card 4 -->
+        <article class="service-card reveal reveal-delay-4">
+          <div class="service-icon" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+              <polyline points="9 12 11 14 15 10"></polyline>
+            </svg>
+          </div>
+          <h3>Įaugusio nago korekcija Titano Siūlu</h3>
+          <p>Minimaliai invazyvus metodas įaugusio nago problemai spręsti — be operacijos (1 nagui).</p>
+        </article>
+
+        <!-- Card 5 -->
+        <article class="service-card reveal reveal-delay-5">
+          <div class="service-icon" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+            </svg>
+          </div>
+          <h3>Konsultacija</h3>
+          <p>Individualus pėdų būklės įvertinimas su rekomendacijomis ir gydymo planu.</p>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════════════════════════
+       TRUST
+  ══════════════════════════════════════════════════════════ -->
+  <section class="trust" aria-labelledby="trust-heading">
+    <div class="container">
+      <div class="trust-intro reveal">
+        <div class="section-label">Kodėl Baltic Foot</div>
+        <h2 id="trust-heading">Profesionalumas su šiluma</h2>
+        <p>Rūpinamės kiekvienu pacientu kaip unikaliu žmogumi — su dėmesiu, kompetencija ir tikru rūpesčiu.</p>
+      </div>
+
+      <div class="trust-grid">
+
+        <div class="trust-item reveal reveal-delay-1">
+          <div class="trust-icon" aria-hidden="true">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+              <polyline points="9 12 11 14 15 10"></polyline>
+            </svg>
+          </div>
+          <h4>Sertifikuota specialistė</h4>
+          <p>Veneta Liaudanskienė — sertifikuota podologė su ilgamete patirtimi.</p>
+        </div>
+
+        <div class="trust-item reveal reveal-delay-2">
+          <div class="trust-icon" aria-hidden="true">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+              <line x1="9" y1="9" x2="9.01" y2="9"></line>
+              <line x1="15" y1="9" x2="15.01" y2="9"></line>
+            </svg>
+          </div>
+          <h4>Individualus požiūris</h4>
+          <p>Kiekvienam pacientui — atskiras dėmesys ir tinkamiausias sprendimas.</p>
+        </div>
+
+        <div class="trust-item reveal reveal-delay-3">
+          <div class="trust-icon" aria-hidden="true">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path>
+              <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+          </div>
+          <h4>Higieninė aplinka</h4>
+          <p>Sterili įranga, vienkartinės priemonės, medicininiai standartai.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════════════════════════
+       ABOUT
+  ══════════════════════════════════════════════════════════ -->
+  <section class="about" id="apie" aria-labelledby="about-heading">
+    <div class="container">
+      <div class="about-grid">
+
+        <!-- Photo side -->
+        <div class="reveal">
+          <div class="about-photo-frame">
+            <div class="about-photo-placeholder">
+              <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="32" cy="22" r="12"></circle>
+                <path d="M8 56c0-13.255 10.745-24 24-24s24 10.745 24 24"></path>
+              </svg>
+              <span>Specialistės nuotrauka</span>
+            </div>
+            <div class="about-badge" aria-hidden="true">
+              <span class="about-badge-main">Baltic Foot</span>
+              <span class="about-badge-sub">Podologijos kabinetai</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Content side -->
+        <div class="about-content reveal reveal-delay-2">
+          <div class="section-label">Apie specialistę</div>
+          <h2 id="about-heading">Veneta Liaudanskienė</h2>
+
+          <p class="about-body-text">Veneta yra sertifikuota podologė su daugiau nei dešimtmečio patirtimi. Ji specializuojasi saugiame aparatiniame pedikiūre, probleminių pėdų priežiūroje bei moderniose nago korekcijos technikose — įskaitant Titano Siūlo metodą be operacijos.</p>
+
+          <p class="about-body-text">Kiekvieną pacientą ji sutinka su šiluma ir profesionalumu. Venetos filosofija paprasta: sveikos pėdos — tai ne tik grožis, bet sveikata ir judėjimo laisvė, kuri leidžia mėgautis gyvenimu pilnai.</p>
+
+          <ul class="about-creds">
+            <li>Sertifikuota podologė</li>
+            <li>Titano Siūlo korekcijos specialistė</li>
+            <li>Higieninis ir aparatinis pedikiūras</li>
+            <li>Diabetinių pėdų priežiūra</li>
+          </ul>
+
+          <a href="#registracija" class="btn btn-primary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+            Registruotis vizitui
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════════════════════════
+       BOOKING WIZARD
+  ══════════════════════════════════════════════════════════ -->
+  <section class="booking" id="registracija" aria-labelledby="booking-heading">
+    <div class="container">
+
+      <div class="booking-header reveal">
+        <div class="section-label">Rezervacija</div>
+        <h2 id="booking-heading">Rezervuokite savo vizitą</h2>
+        <p>Paprastas 4 žingsnių procesas — pasirinkite paslaugą, datą ir laiką, įveskite duomenis ir patvirtinkite.</p>
+      </div>
+
+      <div class="wizard reveal reveal-delay-1" id="booking-wizard">
+
+        <!-- ── Progress bar -->
+        <div class="wizard-progress" aria-label="Rezervacijos eiga">
+          <div class="wizard-step-indicator active" data-step="1">
+            <div class="wizard-step-num">1</div>
+            <div class="wizard-step-label">Paslauga</div>
+          </div>
+          <div class="wizard-step-indicator" data-step="2">
+            <div class="wizard-step-num">2</div>
+            <div class="wizard-step-label">Data ir laikas</div>
+          </div>
+          <div class="wizard-step-indicator" data-step="3">
+            <div class="wizard-step-num">3</div>
+            <div class="wizard-step-label">Jūsų duomenys</div>
+          </div>
+          <div class="wizard-step-indicator" data-step="4">
+            <div class="wizard-step-num">4</div>
+            <div class="wizard-step-label">Patvirtinimas</div>
+          </div>
+        </div>
+
+        <!-- ── Panels -->
+        <div class="wizard-body">
+
+          <!-- Success state (hidden initially) -->
+          <div class="wizard-success" id="wizard-success" aria-live="polite" aria-atomic="true">
+            <div class="wizard-success-icon" aria-hidden="true">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 11.08V12a10 10 0 11-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+            </div>
+            <h3>Vizitas rezervuotas!</h3>
+            <p>Gavome jūsų užklausą. Susisieksime per 24 val. ir patvirtinsime vizito laiką.</p>
+            <div class="wizard-success-detail" id="success-detail"></div>
+          </div>
+
+          <!-- Step 1 — Paslauga -->
+          <div class="wizard-panel active" id="step-1" role="group" aria-labelledby="step1-title">
+            <div class="wizard-panel-title" id="step1-title">Pasirinkite paslaugą</div>
+            <div class="wizard-panel-sub">Kurią procedūrą norėtumėte rezervuoti?</div>
+
+            <div class="svc-grid" role="radiogroup" aria-label="Paslaugų pasirinkimas">
+
+              <div class="svc-option" data-service="Saugus aparatinis pedikiūras" role="radio" aria-checked="false" tabindex="0">
+                <div class="svc-option-icon" aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+                    <line x1="9" y1="9" x2="9.01" y2="9"></line>
+                    <line x1="15" y1="9" x2="15.01" y2="9"></line>
+                  </svg>
+                </div>
+                <div class="svc-option-name">Saugus aparatinis pedikiūras</div>
+              </div>
+
+              <div class="svc-option" data-service="Higieninis pedikiūras" role="radio" aria-checked="false" tabindex="0">
+                <div class="svc-option-icon" aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"></path>
+                  </svg>
+                </div>
+                <div class="svc-option-name">Higieninis pedikiūras</div>
+              </div>
+
+              <div class="svc-option" data-service="Probleminių pėdų procedūra" role="radio" aria-checked="false" tabindex="0">
+                <div class="svc-option-icon" aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 8h1a4 4 0 010 8h-1"></path>
+                    <path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"></path>
+                    <line x1="6" y1="1" x2="6" y2="4"></line>
+                    <line x1="10" y1="1" x2="10" y2="4"></line>
+                    <line x1="14" y1="1" x2="14" y2="4"></line>
+                  </svg>
+                </div>
+                <div class="svc-option-name">Probleminių pėdų procedūra</div>
+              </div>
+
+              <div class="svc-option" data-service="Įaugusio nago korekcija Titano Siūlu" role="radio" aria-checked="false" tabindex="0">
+                <div class="svc-option-icon" aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    <polyline points="9 12 11 14 15 10"></polyline>
+                  </svg>
+                </div>
+                <div class="svc-option-name">Įaugusio nago korekcija Titano Siūlu</div>
+              </div>
+
+              <div class="svc-option" data-service="Konsultacija" role="radio" aria-checked="false" tabindex="0">
+                <div class="svc-option-icon" aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                  </svg>
+                </div>
+                <div class="svc-option-name">Konsultacija</div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Step 2 — Data ir laikas -->
+          <div class="wizard-panel" id="step-2" role="group" aria-labelledby="step2-title">
+            <div class="wizard-panel-title" id="step2-title">Pasirinkite datą ir laiką</div>
+            <div class="wizard-panel-sub">Laisvi laikai rodomi pasirinkus datą. Savaitgaliai nedarbo dienos.</div>
+
+            <div class="dt-grid">
+              <!-- Calendar -->
+              <div>
+                <div class="cal" id="calendar" aria-label="Datų kalendorius">
+                  <div class="cal-nav">
+                    <button class="cal-nav-btn" id="cal-prev" aria-label="Ankstesnis mėnuo">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                    </button>
+                    <span class="cal-month" id="cal-month-label"></span>
+                    <button class="cal-nav-btn" id="cal-next" aria-label="Kitas mėnuo">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    </button>
+                  </div>
+                  <div class="cal-weekdays">
+                    <div class="cal-weekday">Pr</div>
+                    <div class="cal-weekday">An</div>
+                    <div class="cal-weekday">Tr</div>
+                    <div class="cal-weekday">Kt</div>
+                    <div class="cal-weekday">Pn</div>
+                    <div class="cal-weekday">Šš</div>
+                    <div class="cal-weekday">Sk</div>
+                  </div>
+                  <div class="cal-days" id="cal-days"></div>
+                </div>
+              </div>
+
+              <!-- Time slots -->
+              <div class="time-section">
+                <div class="time-section-label">Laisvi laikai</div>
+                <div id="time-slots-container">
+                  <p class="time-placeholder">Pirmiausia pasirinkite datą.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 3 — Jūsų duomenys -->
+          <div class="wizard-panel" id="step-3" role="group" aria-labelledby="step3-title">
+            <div class="wizard-panel-title" id="step3-title">Jūsų kontaktiniai duomenys</div>
+            <div class="wizard-panel-sub">Reikalinga informacija vizitui patvirtinti. Duomenys naudojami tik rezervacijos tikslais.</div>
+
+            <div class="wiz-form-row">
+              <div class="wiz-form-group">
+                <label for="wiz-name">Vardas ir pavardė *</label>
+                <input type="text" id="wiz-name" name="wiz-name" placeholder="Jūsų vardas" autocomplete="name">
+              </div>
+              <div class="wiz-form-group">
+                <label for="wiz-phone">Telefono numeris *</label>
+                <input type="tel" id="wiz-phone" name="wiz-phone" placeholder="+370 ..." autocomplete="tel">
+              </div>
+            </div>
+
+            <div class="wiz-form-group">
+              <label for="wiz-email">El. pašto adresas *</label>
+              <input type="email" id="wiz-email" name="wiz-email" placeholder="jusu@pastas.lt" autocomplete="email">
+            </div>
+
+            <div class="wiz-form-group">
+              <label for="wiz-notes">Pastabos <span style="color:var(--sage);font-weight:400;">(neprivaloma)</span></label>
+              <textarea id="wiz-notes" name="wiz-notes" placeholder="Aprašykite savo situaciją arba užduokite klausimą specialistei..."></textarea>
+            </div>
+
+            <div class="sms-toggle" id="sms-toggle" role="switch" aria-checked="false" tabindex="0" aria-label="SMS priminimas">
+              <div class="sms-toggle-switch" aria-hidden="true"></div>
+              <div class="sms-toggle-text">
+                <strong>SMS priminimas</strong>
+                <span>Gausite pranešimą dieną prieš vizitą</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 4 — Patvirtinimas -->
+          <div class="wizard-panel" id="step-4" role="group" aria-labelledby="step4-title">
+            <div class="wizard-panel-title" id="step4-title">Patvirtinkite rezervaciją</div>
+            <div class="wizard-panel-sub">Patikrinkite informaciją ir patvirtinkite vizitą.</div>
+
+            <div class="confirm-summary">
+              <div class="confirm-summary-header">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                <div>
+                  <h4>Vizito informacija</h4>
+                  <p>Baltic Foot — Podologijos kabinetai</p>
+                </div>
+              </div>
+              <div class="confirm-rows" id="confirm-rows">
+                <!-- populated by JS -->
+              </div>
+            </div>
+
+            <div class="bdar-notice">
+              <strong>Duomenų apsaugos informacija (BDAR / GDPR)</strong>
+              Jūsų pateikti asmens duomenys (vardas, telefono numeris, el. paštas) bus tvarkomi tik vizito rezervacijos tikslais. Duomenys saugomi ne ilgiau kaip vienus metus ir neperduodami trečiosioms šalims. Turite teisę bet kada susipažinti su savo duomenimis, juos ištaisyti arba ištrinti.
+            </div>
+
+            <label class="bdar-check" id="bdar-check-label">
+              <input type="checkbox" id="bdar-consent" aria-required="true">
+              <span>Sutinku su <strong>asmens duomenų tvarkymo sąlygomis</strong> ir suprantu, kad mano duomenys bus naudojami vizito rezervacijai.</span>
+            </label>
+          </div>
+
+        </div><!-- /.wizard-body -->
+
+        <!-- ── Footer nav -->
+        <div class="wizard-footer" id="wizard-footer">
+          <button class="wiz-back-btn" id="wiz-back" hidden aria-label="Grįžti atgal">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            Atgal
+          </button>
+          <div class="wizard-footer-right">
+            <span class="wiz-step-counter" id="wiz-step-counter">1 / 4</span>
+            <button class="btn btn-primary" id="wiz-next">
+              Tęsti
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </button>
+          </div>
+        </div>
+
+      </div><!-- /.wizard -->
+
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════════════════════════
+       FOOTER
+  ══════════════════════════════════════════════════════════ -->
+  <footer id="kontaktai" aria-label="Puslapio apačia">
+    <div class="container">
+      <div class="footer-grid">
+
+        <!-- Col 1 — Brand -->
+        <div class="footer-col">
+          <div class="footer-logo">
+            <span class="footer-logo-main">Baltic Foot</span>
+            <span class="footer-logo-sub">Podologijos kabinetai</span>
+          </div>
+          <p class="footer-tagline">Profesionali pėdų priežiūra su šiluma ir rūpesčiu. Venetos Liaudanskienės kabinetas — jūsų pėdų sveikatai.</p>
+        </div>
+
+        <!-- Col 2 — Navigation -->
+        <div class="footer-col">
+          <h4>Navigacija</h4>
+          <ul>
+            <li><a href="#virsus">Pradžia</a></li>
+            <li><a href="#paslaugos">Paslaugos</a></li>
+            <li><a href="#apie">Apie mus</a></li>
+            <li><a href="#registracija">Registracija</a></li>
+          </ul>
+        </div>
+
+        <!-- Col 3 — Contact -->
+        <div class="footer-col">
+          <h4>Kontaktai</h4>
+          <div class="footer-contact-item">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.01 1.18 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"></path>
+            </svg>
+            <a href="tel:+37069980980">+370 699 80980</a>
+          </div>
+          <div class="footer-contact-item">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            <span>Pr–Pt 9:00–18:00</span>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="footer-bottom">
+        <span>&copy; 2024 Baltic Foot. Visos teisės saugomos.</span>
+        <span>Sukurta su rūpestingumu</span>
+      </div>
+    </div>
+  </footer>
+
+
+  <!-- ══════════════════════════════════════════════════════════
+       JAVASCRIPT
+  ══════════════════════════════════════════════════════════ -->
+  <script>
+    // 1. Nav scroll effect
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', window.scrollY > 50);
+    }, { passive: true });
+
+    // 2. Hamburger mobile menu
+    const hamburger = document.getElementById('hamburger');
+    const navMobile = document.getElementById('nav-mobile');
+
+    hamburger.addEventListener('click', () => {
+      const isOpen = navMobile.classList.toggle('open');
+      hamburger.classList.toggle('open');
+      hamburger.setAttribute('aria-expanded', isOpen);
+      document.body.style.overflow = isOpen ? 'hidden' : '';
+    });
+
+    navMobile.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+      hamburger.classList.remove('open');
+      navMobile.classList.remove('open');
+      hamburger.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
+    }));
+
+    // 3. Reveal on scroll
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // 4. Booking Wizard
+    (function () {
+      const ALL_SLOTS = [
+        '9:00','9:30','10:00','10:30','11:00','11:30',
+        '12:00','12:30','13:00','13:30','14:00','14:30',
+        '15:00','15:30','16:00','16:30','17:00','17:30'
+      ];
+
+      // Hardcoded unavailable slots by day-of-week (1=Mon … 5=Fri)
+      const UNAVAIL_BY_DOW = {
+        1: ['9:00','10:30','14:00','16:30'],
+        2: ['11:00','11:30','13:30','17:00'],
+        3: ['9:30','12:00','15:00','17:30'],
+        4: ['10:00','13:00','15:30','16:00'],
+        5: ['9:00','11:00','14:30','17:00']
+      };
+
+      const LT_MONTHS = ['Sausis','Vasaris','Kovas','Balandis','Gegužė',
+        'Birželis','Liepa','Rugpjūtis','Rugsėjis','Spalis','Lapkritis','Gruodis'];
+      const LT_DAYS = ['sekmadienis','pirmadienis','antradienis',
+        'trečiadienis','ketvirtadienis','penktadienis','šeštadienis'];
+
+      // State
+      let currentStep = 1;
+      const state = { service: null, date: null, time: null,
+                      name: '', phone: '', email: '', notes: '', sms: false };
+
+      const today = new Date();
+      today.setHours(0,0,0,0);
+      let calYear = today.getFullYear();
+      let calMonth = today.getMonth();
+
+      // DOM refs
+      const wizard      = document.getElementById('booking-wizard');
+      const successEl   = document.getElementById('wizard-success');
+      const backBtn     = document.getElementById('wiz-back');
+      const nextBtn     = document.getElementById('wiz-next');
+      const footerEl    = document.getElementById('wizard-footer');
+      const stepCounter = document.getElementById('wiz-step-counter');
+      const indicators  = document.querySelectorAll('.wizard-step-indicator');
+
+      // ── Progress indicators
+      function updateProgress () {
+        indicators.forEach((ind, i) => {
+          const n = i + 1;
+          ind.classList.remove('active', 'done');
+          if (n < currentStep) {
+            ind.classList.add('done');
+            ind.querySelector('.wizard-step-num').innerHTML =
+              `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+          } else {
+            ind.querySelector('.wizard-step-num').textContent = n;
+            if (n === currentStep) ind.classList.add('active');
+          }
+        });
+        stepCounter.textContent = `${currentStep} / 4`;
+      }
+
+      // ── Show step panel
+      function showStep (n) {
+        document.querySelectorAll('.wizard-panel').forEach(p => p.classList.remove('active'));
+        const panel = document.getElementById(`step-${n}`);
+        if (panel) panel.classList.add('active');
+
+        backBtn.hidden = n === 1;
+        if (n === 4) {
+          nextBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg> Siųsti rezervaciją`;
+        } else {
+          nextBtn.innerHTML = `Tęsti <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"></polyline></svg>`;
+        }
+        nextBtn.disabled = false;
+        updateProgress();
+        // Scroll wizard top into view softly
+        wizard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      // ── Validation
+      function validateStep (n) {
+        if (n === 1) {
+          if (!state.service) { shake(); return false; }
+        }
+        if (n === 2) {
+          if (!state.date || !state.time) { shake(); return false; }
+        }
+        if (n === 3) {
+          const nameEl  = document.getElementById('wiz-name');
+          const phoneEl = document.getElementById('wiz-phone');
+          const emailEl = document.getElementById('wiz-email');
+          let ok = true;
+          [nameEl, phoneEl, emailEl].forEach(el => {
+            if (!el.value.trim()) { flashErr(el); ok = false; }
+          });
+          if (!ok) return false;
+          state.name  = nameEl.value.trim();
+          state.phone = phoneEl.value.trim();
+          state.email = emailEl.value.trim();
+          state.notes = document.getElementById('wiz-notes').value.trim();
+        }
+        if (n === 4) {
+          const cb = document.getElementById('bdar-consent');
+          if (!cb.checked) {
+            const lbl = document.getElementById('bdar-check-label');
+            lbl.style.outline = '2px solid var(--terra)';
+            lbl.style.borderRadius = '6px';
+            setTimeout(() => { lbl.style.outline = ''; }, 2200);
+            return false;
+          }
+        }
+        return true;
+      }
+
+      function flashErr (el) {
+        el.classList.add('error');
+        el.focus();
+        setTimeout(() => el.classList.remove('error'), 2500);
+      }
+
+      function shake () {
+        wizard.style.animation = 'none';
+        wizard.offsetHeight; // force reflow
+        wizard.style.animation = 'shake 0.4s ease';
+        setTimeout(() => { wizard.style.animation = ''; }, 450);
+      }
+
+      // ── Next / Back
+      nextBtn.addEventListener('click', () => {
+        if (!validateStep(currentStep)) return;
+        if (currentStep === 3) buildConfirmation();
+        if (currentStep === 4) { submitWizard(); return; }
+        currentStep++;
+        showStep(currentStep);
+      });
+
+      backBtn.addEventListener('click', () => {
+        if (currentStep <= 1) return;
+        currentStep--;
+        showStep(currentStep);
+      });
+
+      // ── Submit (prototype mock)
+      function submitWizard () {
+        nextBtn.textContent = 'Siunčiama...';
+        nextBtn.disabled = true;
+        backBtn.hidden = true;
+
+        setTimeout(() => {
+          // Swap body content to success
+          document.querySelector('.wizard-body').appendChild(successEl);
+          document.querySelectorAll('.wizard-panel').forEach(p => p.classList.remove('active'));
+          successEl.classList.add('active');
+          footerEl.style.display = 'none';
+          document.querySelector('.wizard-progress').style.display = 'none';
+
+          const dateStr = state.date ? formatDate(state.date) : '—';
+          document.getElementById('success-detail').innerHTML =
+            `<strong>${state.service}</strong><br>
+             ${dateStr}, ${state.time}<br>
+             ${state.name} &middot; ${state.phone}
+             ${state.sms ? '<br><small style="color:var(--sage)">SMS priminimas įjungtas</small>' : ''}`;
+        }, 1400);
+      }
+
+      // ── Step 1: Service selection
+      document.querySelectorAll('.svc-option').forEach(opt => {
+        opt.addEventListener('click', () => selectService(opt.dataset.service));
+        opt.addEventListener('keydown', e => {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectService(opt.dataset.service); }
+        });
+      });
+
+      function selectService (name) {
+        state.service = name;
+        document.querySelectorAll('.svc-option').forEach(o => {
+          const sel = o.dataset.service === name;
+          o.classList.toggle('selected', sel);
+          o.setAttribute('aria-checked', sel);
+        });
+      }
+
+      // Pre-select service from the services section cards
+      document.querySelectorAll('.service-card').forEach(card => {
+        const h3 = card.querySelector('h3');
+        if (!h3) return;
+        card.setAttribute('title', 'Spustelėkite norėdami rezervuoti');
+        card.addEventListener('click', () => {
+          selectService(h3.textContent.trim());
+          document.getElementById('registracija').scrollIntoView({ behavior: 'smooth' });
+          setTimeout(() => { currentStep = 1; showStep(1); }, 350);
+        });
+      });
+
+      // ── Calendar
+      function buildCalendar () {
+        document.getElementById('cal-month-label').textContent =
+          `${LT_MONTHS[calMonth]} ${calYear}`;
+
+        const prevBtn = document.getElementById('cal-prev');
+        prevBtn.disabled = (calYear === today.getFullYear() && calMonth === today.getMonth());
+
+        const daysEl = document.getElementById('cal-days');
+        daysEl.innerHTML = '';
+
+        // Leading empty cells (Mon-based)
+        const firstDow = new Date(calYear, calMonth, 1).getDay();
+        const offset   = (firstDow + 6) % 7;
+        for (let i = 0; i < offset; i++) {
+          const e = document.createElement('div');
+          e.className = 'cal-day empty';
+          daysEl.appendChild(e);
+        }
+
+        const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+        for (let d = 1; d <= daysInMonth; d++) {
+          const cell = document.createElement('div');
+          cell.className = 'cal-day';
+          cell.textContent = d;
+
+          const date = new Date(calYear, calMonth, d);
+          date.setHours(0,0,0,0);
+          const dow = date.getDay();
+          const isPast       = date <= today;
+          const isWeekend    = dow === 0 || dow === 6;
+          const isFullyBooked = (d % 9 === 0); // demo: every 9th day fully booked
+
+          if (date.getTime() === today.getTime()) cell.classList.add('today');
+
+          if (isPast || isWeekend || isFullyBooked) {
+            cell.classList.add('disabled');
+          } else {
+            cell.setAttribute('tabindex', '0');
+            cell.setAttribute('role', 'button');
+            cell.setAttribute('aria-label', `${d} ${LT_MONTHS[calMonth]}`);
+            if (state.date &&
+                state.date.getFullYear() === calYear &&
+                state.date.getMonth()    === calMonth &&
+                state.date.getDate()     === d) {
+              cell.classList.add('selected');
+            }
+            cell.addEventListener('click', () => pickDate(date));
+            cell.addEventListener('keydown', e => {
+              if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pickDate(date); }
+            });
+          }
+          daysEl.appendChild(cell);
+        }
+      }
+
+      function pickDate (date) {
+        state.date = date;
+        state.time = null;
+        buildCalendar();
+        renderTimeSlots(date);
+      }
+
+      function renderTimeSlots (date) {
+        const container = document.getElementById('time-slots-container');
+        const unavail   = UNAVAIL_BY_DOW[date.getDay()] || [];
+        const grid = document.createElement('div');
+        grid.className = 'time-grid';
+        grid.setAttribute('role', 'radiogroup');
+        grid.setAttribute('aria-label', 'Laiko pasirinkimas');
+
+        ALL_SLOTS.forEach(slot => {
+          const btn = document.createElement('div');
+          btn.className = 'time-slot';
+          btn.textContent = slot;
+          btn.setAttribute('role', 'radio');
+
+          if (unavail.includes(slot)) {
+            btn.classList.add('unavailable');
+            btn.setAttribute('aria-disabled', 'true');
+            btn.setAttribute('aria-label', `${slot} — užimta`);
+          } else {
+            const isSel = state.time === slot;
+            btn.setAttribute('aria-checked', isSel);
+            btn.setAttribute('tabindex', '0');
+            if (isSel) btn.classList.add('selected');
+            btn.addEventListener('click',   () => pickTime(slot));
+            btn.addEventListener('keydown', e => {
+              if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pickTime(slot); }
+            });
+          }
+          grid.appendChild(btn);
+        });
+
+        container.innerHTML = '';
+        container.appendChild(grid);
+      }
+
+      function pickTime (slot) {
+        state.time = slot;
+        document.querySelectorAll('.time-slot:not(.unavailable)').forEach(s => {
+          const sel = s.textContent === slot;
+          s.classList.toggle('selected', sel);
+          s.setAttribute('aria-checked', sel);
+        });
+      }
+
+      // Calendar navigation
+      document.getElementById('cal-prev').addEventListener('click', () => {
+        calMonth--; if (calMonth < 0) { calMonth = 11; calYear--; }
+        buildCalendar();
+      });
+      document.getElementById('cal-next').addEventListener('click', () => {
+        calMonth++; if (calMonth > 11) { calMonth = 0; calYear++; }
+        buildCalendar();
+      });
+
+      // ── Step 3: SMS toggle
+      const smsEl = document.getElementById('sms-toggle');
+      smsEl.addEventListener('click', () => {
+        state.sms = !state.sms;
+        smsEl.classList.toggle('on', state.sms);
+        smsEl.setAttribute('aria-checked', state.sms);
+      });
+      smsEl.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); smsEl.click(); }
+      });
+
+      // ── Step 4: Build confirmation summary
+      function buildConfirmation () {
+        const rows    = document.getElementById('confirm-rows');
+        const dateStr = state.date ? formatDate(state.date) : '—';
+        rows.innerHTML = `
+          <div class="confirm-row">
+            <span class="confirm-row-label">Paslauga</span>
+            <span class="confirm-row-value">${state.service}</span>
+          </div>
+          <div class="confirm-row">
+            <span class="confirm-row-label">Data</span>
+            <span class="confirm-row-value">${dateStr}</span>
+          </div>
+          <div class="confirm-row">
+            <span class="confirm-row-label">Laikas</span>
+            <span class="confirm-row-value">${state.time}</span>
+          </div>
+          <div class="confirm-row">
+            <span class="confirm-row-label">Vardas</span>
+            <span class="confirm-row-value">${state.name}</span>
+          </div>
+          <div class="confirm-row">
+            <span class="confirm-row-label">Telefonas</span>
+            <span class="confirm-row-value">${state.phone}</span>
+          </div>
+          <div class="confirm-row">
+            <span class="confirm-row-label">El. paštas</span>
+            <span class="confirm-row-value">${state.email}</span>
+          </div>
+          ${state.notes ? `<div class="confirm-row"><span class="confirm-row-label">Pastabos</span><span class="confirm-row-value">${state.notes}</span></div>` : ''}
+          <div class="confirm-row">
+            <span class="confirm-row-label">SMS</span>
+            <span class="confirm-row-value">${state.sms ? '✓ Įjungtas' : 'Išjungtas'}</span>
+          </div>`;
+      }
+
+      // ── Helpers
+      function formatDate (d) {
+        return `${d.getDate()} ${LT_MONTHS[d.getMonth()]} ${d.getFullYear()} (${LT_DAYS[d.getDay()]})`;
+      }
+
+      // ── Init
+      buildCalendar();
+      showStep(1);
+    })();
+  </script>
+
+</body>
+</html>

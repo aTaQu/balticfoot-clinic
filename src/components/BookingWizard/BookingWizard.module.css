@@ -1,0 +1,609 @@
+.booking {
+  background: var(--cream);
+  padding: 8rem 0;
+}
+
+.bookingHeader {
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto 3.5rem;
+}
+.bookingHeader h2 { margin-bottom: 0.6rem; }
+
+.bookingLabel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  font-family: var(--font-dm-sans), 'DM Sans', sans-serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--sage);
+  margin-bottom: 1.25rem;
+}
+.bookingHeader p {
+  font-size: 0.95rem;
+  color: var(--stone);
+}
+
+/* ── Wizard shell */
+.wizard {
+  max-width: 860px;
+  margin: 0 auto;
+  background: var(--sand);
+  border: 1px solid rgba(107, 94, 82, 0.12);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 8px 40px rgba(44, 36, 32, 0.08);
+}
+
+/* ── Progress bar */
+.wizardProgress {
+  display: flex;
+  align-items: flex-start;
+  padding: 1.75rem 2.5rem;
+  background: var(--cream);
+  border-bottom: 1px solid rgba(107, 94, 82, 0.1);
+}
+.wizardStepIndicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+  position: relative;
+}
+.wizardStepIndicator:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 15px;
+  left: calc(50% + 18px);
+  right: calc(-50% + 18px);
+  height: 1px;
+  background: rgba(107, 94, 82, 0.18);
+  transition: background 0.4s ease;
+}
+.wizardStepIndicator.done:not(:last-child)::after {
+  background: var(--terra);
+  opacity: 0.5;
+}
+.wizardStepNum {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(107, 94, 82, 0.22);
+  background: var(--cream);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--stone);
+  position: relative;
+  z-index: 1;
+  transition: background 0.3s, border-color 0.3s, color 0.3s;
+}
+.wizardStepIndicator.active .wizardStepNum,
+.wizardStepIndicator.done .wizardStepNum {
+  background: var(--terra);
+  border-color: var(--terra);
+  color: #fff;
+}
+.wizardStepLabel {
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(107, 94, 82, 0.45);
+  text-align: center;
+  transition: color 0.3s;
+}
+.wizardStepIndicator.active .wizardStepLabel { color: var(--terra); }
+.wizardStepIndicator.done .wizardStepLabel  { color: var(--stone); }
+
+/* ── Step panels */
+.wizardBody { padding: 2.5rem; }
+.wizardPanel { display: block; }
+.wizardPanelTitle {
+  font-family: var(--font-cormorant), 'Cormorant Garamond', serif;
+  font-size: clamp(1.4rem, 3vw, 1.9rem);
+  font-weight: 400;
+  color: var(--soil);
+  margin-bottom: 0.35rem;
+}
+.wizardPanelSub {
+  font-size: 0.85rem;
+  color: var(--stone);
+  margin-bottom: 2rem;
+}
+
+/* ── Step 1: service cards */
+.svcGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.875rem;
+}
+.svcOption {
+  border: 1.5px solid rgba(107, 94, 82, 0.14);
+  border-radius: 12px;
+  padding: 1.125rem 1rem;
+  cursor: pointer;
+  background: var(--cream);
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+  position: relative;
+  user-select: none;
+}
+.svcOption:hover {
+  border-color: rgba(181, 103, 61, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(44, 36, 32, 0.07);
+}
+.svcOption.selected {
+  border-color: var(--terra);
+  box-shadow: 0 0 0 3px rgba(181, 103, 61, 0.12);
+}
+.svcOption.selected::after {
+  content: '';
+  position: absolute;
+  top: 9px;
+  right: 9px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--terra) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='8' viewBox='0 0 10 8'%3E%3Cpolyline points='1,4 3.5,6.5 9,1' stroke='white' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat center;
+}
+.svcOptionHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  margin-bottom: 0.5rem;
+}
+.svcOptionIcon {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  background: rgba(138, 158, 140, 0.14);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--sage);
+  transition: background 0.2s, color 0.2s;
+}
+.svcOption.selected .svcOptionIcon {
+  background: rgba(181, 103, 61, 0.12);
+  color: var(--terra);
+}
+.svcOptionName {
+  font-family: var(--font-cormorant), 'Cormorant Garamond', serif;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--soil);
+  line-height: 1.3;
+}
+.svcOptionMeta {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--sage);
+  gap: 0.5rem;
+}
+.svcOption.selected .svcOptionMeta {
+  color: var(--terra);
+}
+
+/* ── Step 2: date + time */
+.dtGrid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+.cal {
+  background: var(--cream);
+  border: 1px solid rgba(107, 94, 82, 0.12);
+  border-radius: 14px;
+  padding: 1.25rem;
+  min-width: 252px;
+}
+.calNav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+.calNavBtn {
+  width: 28px;
+  height: 28px;
+  border: 1px solid rgba(107, 94, 82, 0.18);
+  border-radius: 6px;
+  background: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--stone);
+  transition: background 0.15s, border-color 0.15s;
+}
+.calNavBtn:hover:not(:disabled) {
+  background: rgba(107, 94, 82, 0.08);
+  border-color: rgba(107, 94, 82, 0.4);
+}
+.calNavBtn:disabled { opacity: 0.3; cursor: default; }
+.calMonth {
+  font-family: var(--font-cormorant), 'Cormorant Garamond', serif;
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: var(--soil);
+}
+.calWeekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  margin-bottom: 4px;
+}
+.calWeekday {
+  font-size: 0.63rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--sage);
+  text-align: center;
+  padding: 3px 0;
+}
+.calDays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+.calDay {
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.82rem;
+  border-radius: 7px;
+  cursor: pointer;
+  color: var(--soil);
+  transition: background 0.15s, color 0.15s;
+}
+.calDay:hover:not(.disabled):not(.selected):not(.empty) {
+  background: rgba(181, 103, 61, 0.1);
+}
+.calDay.today { font-weight: 600; color: var(--terra); }
+.calDay.selected { background: var(--terra); color: #fff; }
+.calDay.disabled { color: rgba(107, 94, 82, 0.22); cursor: default; }
+.calDay.empty { cursor: default; }
+
+/* Time slots */
+.timeSection {}
+.timeSectionLabel {
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--sage);
+  margin-bottom: 0.875rem;
+  font-family: var(--font-dm-sans), 'DM Sans', sans-serif;
+}
+.timePlaceholder {
+  font-size: 0.88rem;
+  color: rgba(107, 94, 82, 0.45);
+  padding: 0.5rem 0;
+  font-style: italic;
+}
+.timeGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+}
+.timeSlot {
+  padding: 0.5rem 0.25rem;
+  text-align: center;
+  border: 1.5px solid rgba(107, 94, 82, 0.14);
+  border-radius: 8px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  color: var(--soil);
+  background: var(--cream);
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+  user-select: none;
+}
+.timeSlot:hover:not(.unavailable):not(.timeSelected) {
+  border-color: rgba(181, 103, 61, 0.5);
+  background: rgba(181, 103, 61, 0.07);
+}
+.timeSlot.timeSelected {
+  background: var(--terra);
+  border-color: var(--terra);
+  color: #fff;
+}
+.timeSlot.unavailable {
+  color: rgba(107, 94, 82, 0.2);
+  border-color: rgba(107, 94, 82, 0.07);
+  cursor: not-allowed;
+  text-decoration: line-through;
+  background: transparent;
+}
+
+/* ── Step 3: contact form */
+.wizFormRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 0;
+}
+.wizFormGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+}
+.wizFormGroup label {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--stone);
+  letter-spacing: 0.03em;
+}
+.optional {
+  color: var(--sage);
+  font-weight: 400;
+}
+.wizFormGroup input,
+.wizFormGroup textarea {
+  width: 100%;
+  background: var(--cream);
+  border: 1.5px solid rgba(107, 94, 82, 0.18);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-family: var(--font-dm-sans), 'DM Sans', sans-serif;
+  font-size: 0.88rem;
+  color: var(--soil);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.wizFormGroup textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+.wizFormGroup input:focus,
+.wizFormGroup textarea:focus {
+  border-color: var(--terra);
+  box-shadow: 0 0 0 3px rgba(181, 103, 61, 0.12);
+}
+.wizFormGroup input::placeholder,
+.wizFormGroup textarea::placeholder {
+  color: rgba(107, 94, 82, 0.38);
+}
+.inputError {
+  border-color: var(--terra) !important;
+  box-shadow: 0 0 0 3px rgba(181, 103, 61, 0.12) !important;
+}
+
+/* SMS toggle */
+.smsToggle {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  background: var(--cream);
+  border: 1px solid rgba(107, 94, 82, 0.12);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  cursor: pointer;
+  user-select: none;
+  transition: border-color 0.2s;
+}
+.smsToggle:hover { border-color: rgba(107, 94, 82, 0.3); }
+.smsToggleSwitch {
+  width: 40px;
+  height: 22px;
+  border-radius: 11px;
+  background: rgba(107, 94, 82, 0.2);
+  position: relative;
+  flex-shrink: 0;
+  transition: background 0.25s;
+}
+.smsToggleSwitch::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.25s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+.smsToggle.on .smsToggleSwitch { background: var(--terra); }
+.smsToggle.on .smsToggleSwitch::after { transform: translateX(18px); }
+.smsToggleText strong {
+  display: block;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--soil);
+  margin-bottom: 0.1rem;
+}
+.smsToggleText span {
+  font-size: 0.76rem;
+  color: var(--stone);
+}
+
+/* ── Step 4: confirmation */
+.confirmSummary {
+  background: var(--cream);
+  border: 1px solid rgba(107, 94, 82, 0.12);
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+.confirmSummaryHeader {
+  background: var(--terra);
+  padding: 1.1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.confirmSummaryHeader h4 {
+  color: #fff;
+  font-family: var(--font-cormorant), 'Cormorant Garamond', serif;
+  font-size: 1.2rem;
+}
+.confirmSummaryHeader p {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.78rem;
+}
+.confirmRows {
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.confirmRow {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  font-size: 0.88rem;
+}
+.confirmRowLabel {
+  min-width: 110px;
+  color: var(--sage);
+  font-size: 0.73rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  padding-top: 2px;
+  flex-shrink: 0;
+}
+.confirmRowValue { color: var(--soil); }
+
+/* GDPR */
+.bdarNotice {
+  background: rgba(138, 158, 140, 0.1);
+  border: 1px solid rgba(138, 158, 140, 0.22);
+  border-radius: 10px;
+  padding: 1.125rem 1.25rem;
+  margin-bottom: 1.25rem;
+  font-size: 0.8rem;
+  color: var(--stone);
+  line-height: 1.65;
+}
+.bdarNotice strong {
+  color: var(--soil);
+  font-weight: 500;
+  display: block;
+  margin-bottom: 0.35rem;
+}
+.bdarCheck {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: var(--stone);
+  line-height: 1.55;
+  user-select: none;
+  border-radius: 6px;
+  padding: 2px;
+  transition: outline 0.2s;
+}
+.bdarCheck input[type='checkbox'] {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  accent-color: var(--terra);
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.bdarCheckError {
+  outline: 2px solid var(--terra);
+  border-radius: 6px;
+}
+
+/* ── Wizard footer */
+.wizardFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 2.5rem;
+  border-top: 1px solid rgba(107, 94, 82, 0.1);
+  background: var(--cream);
+  gap: 1rem;
+}
+.wizardFooterRight {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  margin-left: auto;
+}
+.wizBackBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: none;
+  border: none;
+  font-family: var(--font-dm-sans), 'DM Sans', sans-serif;
+  font-size: 0.88rem;
+  color: var(--stone);
+  cursor: pointer;
+  padding: 0.4rem 0;
+  transition: color 0.2s;
+}
+.wizBackBtn:hover { color: var(--soil); }
+.wizStepCounter {
+  font-size: 0.76rem;
+  color: rgba(107, 94, 82, 0.45);
+}
+
+/* ── Success */
+.wizardSuccess {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 4rem 2.5rem;
+  gap: 1.25rem;
+}
+.wizardSuccessIcon {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: rgba(138, 158, 140, 0.14);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--sage);
+}
+.wizardSuccess h3 { font-size: clamp(1.6rem, 3vw, 2.2rem); }
+.wizardSuccess p {
+  font-size: 0.92rem;
+  color: var(--stone);
+  max-width: 380px;
+}
+.wizardSuccessDetail {
+  background: var(--cream);
+  border: 1px solid rgba(107, 94, 82, 0.12);
+  border-radius: 10px;
+  padding: 1rem 1.5rem;
+  font-size: 0.85rem;
+  color: var(--stone);
+  line-height: 1.75;
+}
+
+/* ── Responsive */
+@media (max-width: 700px) {
+  .dtGrid { grid-template-columns: 1fr; }
+  .wizFormRow { grid-template-columns: 1fr; }
+  .timeGrid { grid-template-columns: repeat(3, 1fr); }
+  .wizardBody { padding: 1.75rem; }
+  .wizardFooter { padding: 1.1rem 1.75rem; }
+  .wizardProgress { padding: 1.5rem; }
+  .wizardStepLabel { display: none; }
+}
+
+@media (max-width: 480px) {
+  .svcGrid { grid-template-columns: 1fr 1fr; }
+  .timeGrid { grid-template-columns: repeat(3, 1fr); }
+  .confirmRow { flex-direction: column; gap: 0.15rem; }
+}

@@ -1,0 +1,37 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: podologija
+      POSTGRES_USER: payload
+      POSTGRES_PASSWORD: payload
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U payload -d podologija"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URI: postgresql://payload:payload@db:5432/podologija
+      PAYLOAD_SECRET: local-dev-secret-change-in-production
+      SEED_VENETA_PASSWORD: Veneta2024!
+      SEED_LINA_PASSWORD: Lina2024!
+      NODE_ENV: production
+      PORT: 3000
+      HOSTNAME: "0.0.0.0"
+    ports:
+      - "3000:3000"
+
+volumes:
+  pgdata:

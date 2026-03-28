@@ -1,0 +1,49 @@
+.trust {
+  background: var(--sand);
+  padding: 8rem 0;
+}
+
+.trustIntro {
+  text-align: center;
+  max-width: 560px;
+  margin: 0 auto 4rem;
+}
+.centeredLabel {
+  justify-content: center;
+}
+.centeredLabel::before { display: none; }
+.trustIntro h2 { margin-bottom: 0.75rem; }
+.trustIntro p {
+  font-size: 0.95rem;
+  color: var(--stone);
+}
+
+.trustGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 2.5rem;
+}
+
+.trustItem {
+  text-align: center;
+  padding: 2.5rem 1.5rem;
+}
+
+.trustIcon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(138, 158, 140, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+  color: var(--sage);
+}
+
+.trustItem h4 { margin-bottom: 0.6rem; }
+.trustItem p {
+  font-size: 0.88rem;
+  line-height: 1.7;
+  color: var(--stone);
+}

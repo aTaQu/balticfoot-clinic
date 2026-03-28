@@ -1,0 +1,121 @@
+.footer {
+  background: var(--soil);
+  padding: 5rem 0 2.5rem;
+}
+
+.footerGrid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr;
+  gap: 4rem;
+  margin-bottom: 3rem;
+}
+
+.footerLogo {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1.1rem;
+}
+.footerLogoMain {
+  font-family: var(--font-cormorant), 'Cormorant Garamond', serif;
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: var(--sand);
+  letter-spacing: 0.02em;
+}
+.footerLogoSub {
+  font-size: 0.65rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--sage);
+}
+.footerTagline {
+  font-size: 0.85rem;
+  line-height: 1.65;
+  color: rgba(212, 201, 190, 0.65);
+  max-width: 280px;
+  margin-bottom: 1.5rem;
+}
+
+.footerSocial {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.footerSocialLink {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(212, 201, 190, 0.6);
+  transition: background 0.2s, color 0.2s;
+}
+.footerSocialLink:hover {
+  background: rgba(181, 103, 61, 0.2);
+  color: var(--sand);
+}
+
+.footerCol h4 {
+  color: var(--sand);
+  font-family: var(--font-dm-sans), 'DM Sans', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 1.25rem;
+}
+
+.footerCol ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+.footerCol ul a {
+  font-size: 0.88rem;
+  color: rgba(212, 201, 190, 0.65);
+  transition: color 0.2s;
+}
+.footerCol ul a:hover { color: var(--sand); }
+
+.footerContactItem {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-size: 0.88rem;
+  color: rgba(212, 201, 190, 0.65);
+  margin-bottom: 0.65rem;
+}
+.footerContactItem a {
+  color: rgba(212, 201, 190, 0.65);
+  transition: color 0.2s;
+}
+.footerContactItem a:hover { color: var(--sand); }
+.footerContactItem svg { flex-shrink: 0; color: var(--sage); }
+
+.footerBottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  padding-top: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.78rem;
+  color: rgba(212, 201, 190, 0.4);
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+@media (max-width: 900px) {
+  .footerGrid { grid-template-columns: 1fr 1fr; }
+  .footerGrid > .footerCol:first-child { grid-column: 1 / -1; }
+}
+
+@media (max-width: 700px) {
+  .footerGrid {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+}

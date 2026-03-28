@@ -1,0 +1,136 @@
+/* ── Reset ─────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ── Design Tokens ─────────────────────────────────────── */
+:root {
+  --sand:  #E8DDD0;
+  --stone: #6B5E52;
+  --terra: #B5673D;
+  --sage:  #8A9E8C;
+  --cream: #FAF7F4;
+  --soil:  #2C2420;
+}
+
+/* ── Base ───────────────────────────────────────────────── */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-dm-sans), 'DM Sans', sans-serif;
+  background: var(--sand);
+  color: var(--stone);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-cormorant), 'Cormorant Garamond', serif;
+  font-weight: 400;
+  color: var(--soil);
+  line-height: 1.15;
+}
+
+h1 { font-size: clamp(2.8rem, 6vw, 5rem); }
+h2 { font-size: clamp(2rem, 4vw, 3.2rem); }
+h3 { font-size: clamp(1.3rem, 2.5vw, 1.8rem); }
+h4 { font-size: clamp(1.1rem, 2vw, 1.35rem); }
+
+a { color: inherit; text-decoration: none; }
+
+img { display: block; max-width: 100%; }
+
+/* ── Layout ─────────────────────────────────────────────── */
+.container {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+/* ── Section Label ──────────────────────────────────────── */
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: var(--font-dm-sans), 'DM Sans', sans-serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--sage);
+  margin-bottom: 1.25rem;
+}
+.section-label::before {
+  content: '';
+  display: block;
+  width: 2rem;
+  height: 1px;
+  background: var(--sage);
+  flex-shrink: 0;
+}
+
+/* ── Buttons ────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 2rem;
+  border-radius: 4px;
+  font-family: var(--font-dm-sans), 'DM Sans', sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease,
+    border-color 0.2s ease, color 0.2s ease;
+}
+
+.btn-primary {
+  background: var(--terra);
+  color: #fff;
+}
+.btn-primary:hover {
+  background: #9e5530;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(181, 103, 61, 0.32);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--stone);
+  border: 1.5px solid rgba(107, 94, 82, 0.3);
+}
+.btn-ghost:hover {
+  border-color: var(--stone);
+  background: rgba(107, 94, 82, 0.06);
+}
+
+/* ── Reveal Animations ──────────────────────────────────── */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+.reveal-delay-4 { transition-delay: 0.4s; }
+.reveal-delay-5 { transition-delay: 0.5s; }
+
+/* ── Shake animation ────────────────────────────────────── */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%       { transform: translateX(-7px); }
+  40%       { transform: translateX(7px); }
+  60%       { transform: translateX(-4px); }
+  80%       { transform: translateX(4px); }
+}

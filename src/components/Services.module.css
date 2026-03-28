@@ -1,0 +1,114 @@
+.services {
+  background: var(--cream);
+  padding: 8rem 0;
+}
+
+.servicesHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 2rem;
+  margin-bottom: 4rem;
+}
+.servicesHeaderLeft { flex: 1; }
+.servicesHeaderLeft h2 { margin-bottom: 0.75rem; }
+.servicesHeaderLeft p {
+  color: var(--stone);
+  font-size: 0.95rem;
+  max-width: 420px;
+}
+
+.servicesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.serviceCard {
+  background: var(--cream);
+  border: 1px solid rgba(107, 94, 82, 0.12);
+  border-radius: 12px;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+.serviceCard::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--terra);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.35s ease;
+}
+.serviceCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 36px rgba(44, 36, 32, 0.1);
+}
+.serviceCard:hover::before { transform: scaleX(1); }
+
+.serviceIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  background: rgba(138, 158, 140, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+  color: var(--sage);
+  transition: background 0.25s ease, color 0.25s ease;
+}
+.serviceCard:hover .serviceIcon {
+  background: rgba(181, 103, 61, 0.12);
+  color: var(--terra);
+}
+
+.serviceCard h3 {
+  margin-bottom: 0.6rem;
+  font-size: clamp(1.1rem, 2vw, 1.35rem);
+}
+.serviceCard p {
+  font-size: 0.88rem;
+  line-height: 1.65;
+  color: var(--stone);
+  flex: 1;
+}
+
+.serviceCardMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(107, 94, 82, 0.1);
+}
+
+.serviceCardDuration {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.78rem;
+  color: var(--stone);
+  opacity: 0.65;
+}
+
+.serviceCardPrice {
+  font-family: var(--font-cormorant), 'Cormorant Garamond', serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--terra);
+}
+
+@media (max-width: 700px) {
+  .servicesHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
