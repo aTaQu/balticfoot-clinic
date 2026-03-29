@@ -27,7 +27,8 @@
 - Phase 5 (Service Pages + SEO Structure): Complete 2026-03-29
 - Phase 6 (Notification Layer): Complete 2026-03-29
 - Phase 7 (Availability API): Complete 2026-03-29
-- Phase 8 (Booking Submission): Started 2026-03-29
+- Phase 8 (Booking Submission): Complete 2026-03-29
+- Phase 9 (Booking Admin Actions): Complete 2026-03-29
 
 ## Phase 4 decisions
 - `page.tsx` made async Server Component — fetches Services + ClinicSettings at request time (no static generation, ensures Payload changes reflect immediately on reload)
@@ -49,6 +50,12 @@
 - Integration tests use far-future dates (year 2099) — avoids interference with real clinic data in the dev DB
 - Test env vars injected via `docker exec -e` flags — `remoteEnv` in devcontainer.json is only available inside the VS Code terminal, not in plain `docker exec` shells
 - `slotIntervalMinutes` change reflected without restart — route uses `force-dynamic` + reads ClinicSettings fresh per request
+
+## Phase 9 decisions
+- Booking action logic extracted to `src/lib/bookingActions.ts` — pure functions taking a `Payload` instance, same pattern as `bookings.ts` and `availability.ts`; keeps route handlers thin
+- Admin action routes live under `src/app/(app)/api/admin/bookings/[id]/` — co-located with other app API routes, not under `(payload)/`; authenticated via `payload.auth({ headers })`
+- `BookingActionsAfterFields` rendered via Payload v3 `admin.components.edit.AfterFields` — Client Component using `useDocumentInfo()` to read current status; avoids custom admin page
+- AuditLog relationship queries in tests require `depth: 0` — Payload defaults to depth 2 which populates the `user` relation into a full object; tests assert on the raw ID
 
 ## Phase 5 decisions
 - Services reseeded with SEO-optimised slugs (`iaugusio-nago-gydymas` etc.) — old slugs (`aparatinis-pedikyuras` etc.) had no SEO signal; blocker discovered and resolved before building pages
