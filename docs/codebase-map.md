@@ -102,14 +102,28 @@ Pages use `export const dynamic = 'force-dynamic'` where data must reflect Paylo
 
 ---
 
-## What's NOT built yet (as of Phase 6)
+## Notification Layer (`src/lib/notifications/`)
+
+| File | Purpose |
+|------|---------|
+| `email.ts` | `sendEmail(template, to, data)` — renders + sends via Resend singleton |
+| `sms.ts` | `sendSms(to, message)` + `SMS` string constants |
+| `types.ts` | `EmailTemplate` union, `EmailData` variants |
+| `styles.ts` | Shared inline style tokens for all email templates |
+| `templates/` | 6 React Email components (received, confirmed, rejected, reminder, new-booking alert, cancelled alert) |
+| `smoke-test.ts` | Run with `npx tsx src/lib/notifications/smoke-test.ts` — no API keys needed |
+
+Both `sendEmail` and `sendSms` catch and log errors without rethrowing — notification failure never breaks a booking transaction.
+
+---
+
+## What's NOT built yet (as of Phase 7)
 
 - `/blog/` and `/blog/[slug]/` — Phase 13
 - `/privatumo-politika/` — Phase 14
-- Availability API (`GET /api/availability`) — Phase 7
+- Availability API (`GET /api/availability`) — **Phase 7 (in progress)**
 - Booking submission (`POST /api/bookings`) — Phase 8
 - BookingWizard wired to Payload (still uses `constants.ts`) — Phase 8
-- Notification layer (Resend + SMSAPI) — **Phase 6 (in progress)**
 - Admin booking actions (confirm/reject/cancel) — Phase 9
 - Sitemap + robots.txt — Phase 14
 - Footer navigation updated for multi-page structure — deferred (no phase assigned)
