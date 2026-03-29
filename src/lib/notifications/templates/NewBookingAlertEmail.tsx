@@ -3,6 +3,7 @@ import {
   Section, Text,
 } from '@react-email/components'
 import type { NewBookingAlertEmailData } from '../types'
+import { emailStyles as s } from '../styles'
 
 export function NewBookingAlertEmail({
   patientName, patientPhone, patientEmail,
@@ -12,45 +13,35 @@ export function NewBookingAlertEmail({
     <Html lang="lt">
       <Head />
       <Preview>Nauja vizito užklausa: {patientName} — {date} {time}</Preview>
-      <Body style={body}>
-        <Container style={container}>
-          <Heading style={heading}>Baltic Foot — nauja užklausa</Heading>
-          <Hr style={hr} />
+      <Body style={s.body}>
+        <Container style={s.container}>
+          <Heading style={s.headingMd}>Baltic Foot — nauja užklausa</Heading>
+          <Hr style={s.hr} />
           <Section>
-            <Text style={text}>Gauta nauja vizito užklausa. Peržiūrėkite ir patvirtinkite admin panelėje.</Text>
-            <Section style={detailsBox}>
-              <Text style={sectionLabel}>PACIENTAS</Text>
-              <Text style={detailRow}><strong>Vardas:</strong> {patientName}</Text>
-              <Text style={detailRow}><strong>Tel.:</strong> {patientPhone}</Text>
-              <Text style={detailRow}><strong>El. paštas:</strong> {patientEmail}</Text>
-              <Hr style={{ borderColor: '#d4c4b0', margin: '10px 0' }} />
-              <Text style={sectionLabel}>VIZITAS</Text>
-              <Text style={detailRow}><strong>Paslauga:</strong> {serviceName}</Text>
-              <Text style={detailRow}><strong>Data:</strong> {date}</Text>
-              <Text style={detailRow}><strong>Laikas:</strong> {time}</Text>
+            <Text style={s.text}>Gauta nauja vizito užklausa. Peržiūrėkite ir patvirtinkite admin panelėje.</Text>
+            <Section style={s.detailBoxPlain}>
+              <Text style={s.label}>PACIENTAS</Text>
+              <Text style={s.detailRow}><strong>Vardas:</strong> {patientName}</Text>
+              <Text style={s.detailRow}><strong>Tel.:</strong> {patientPhone}</Text>
+              <Text style={s.detailRow}><strong>El. paštas:</strong> {patientEmail}</Text>
+              <Hr style={s.hrInner} />
+              <Text style={s.label}>VIZITAS</Text>
+              <Text style={s.detailRow}><strong>Paslauga:</strong> {serviceName}</Text>
+              <Text style={s.detailRow}><strong>Data:</strong> {date}</Text>
+              <Text style={s.detailRow}><strong>Laikas:</strong> {time}</Text>
               {patientNotes && (
                 <>
-                  <Hr style={{ borderColor: '#d4c4b0', margin: '10px 0' }} />
-                  <Text style={sectionLabel}>PASTABOS</Text>
-                  <Text style={detailRow}>{patientNotes}</Text>
+                  <Hr style={s.hrInner} />
+                  <Text style={s.label}>PASTABOS</Text>
+                  <Text style={s.detailRow}>{patientNotes}</Text>
                 </>
               )}
             </Section>
           </Section>
-          <Hr style={hr} />
-          <Text style={footer}>Baltic Foot administracija</Text>
+          <Hr style={s.hr} />
+          <Text style={s.footer}>Baltic Foot administracija</Text>
         </Container>
       </Body>
     </Html>
   )
 }
-
-const body = { backgroundColor: '#f5f0eb', fontFamily: 'Georgia, serif' }
-const container = { maxWidth: '560px', margin: '0 auto', backgroundColor: '#ffffff', padding: '40px', borderRadius: '4px' }
-const heading = { fontSize: '20px', color: '#5c3d2e', letterSpacing: '0.05em', marginBottom: '4px' }
-const hr = { borderColor: '#d4c4b0', margin: '20px 0' }
-const text = { fontSize: '15px', lineHeight: '1.6', color: '#3a2e24', margin: '12px 0' }
-const detailsBox = { backgroundColor: '#f9f5f0', padding: '16px 20px', margin: '16px 0', borderRadius: '2px' }
-const sectionLabel = { fontSize: '11px', color: '#999', letterSpacing: '0.1em', margin: '0 0 6px 0' }
-const detailRow = { fontSize: '14px', color: '#3a2e24', margin: '6px 0' }
-const footer = { fontSize: '12px', color: '#999', textAlign: 'center' as const }

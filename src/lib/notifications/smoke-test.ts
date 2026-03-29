@@ -22,13 +22,22 @@ const BASE = {
   clinicPhone: '+370 699 80980',
 }
 
+const [r0, r1, r2, r3, r4, r5] = await Promise.all([
+  render(BookingReceivedEmail(BASE)),
+  render(BookingConfirmedEmail(BASE)),
+  render(BookingRejectedEmail({ ...BASE, rejectionReason: 'Pasirinktas laikas užimtas.' })),
+  render(BookingReminderEmail(BASE)),
+  render(NewBookingAlertEmail({ ...BASE, patientPhone: '+370 600 00001', patientEmail: 'jonas@example.com', patientNotes: 'Kairys didysis pirštas.' })),
+  render(BookingCancelledAlertEmail({ patientName: BASE.patientName, serviceName: BASE.serviceName, date: BASE.date, time: BASE.time })),
+])
+
 const templates = [
-  { name: 'BookingReceivedEmail',       html: await render(BookingReceivedEmail(BASE)) },
-  { name: 'BookingConfirmedEmail',       html: await render(BookingConfirmedEmail(BASE)) },
-  { name: 'BookingRejectedEmail',        html: await render(BookingRejectedEmail({ ...BASE, rejectionReason: 'Pasirinktas laikas užimtas.' })) },
-  { name: 'BookingReminderEmail',        html: await render(BookingReminderEmail(BASE)) },
-  { name: 'NewBookingAlertEmail',        html: await render(NewBookingAlertEmail({ patientName: BASE.patientName, patientPhone: '+370 600 00001', patientEmail: 'jonas@example.com', serviceName: BASE.serviceName, date: BASE.date, time: BASE.time, patientNotes: 'Kairys didysis pirštas.' })) },
-  { name: 'BookingCancelledAlertEmail',  html: await render(BookingCancelledAlertEmail({ patientName: BASE.patientName, serviceName: BASE.serviceName, date: BASE.date, time: BASE.time })) },
+  { name: 'BookingReceivedEmail',      html: r0 },
+  { name: 'BookingConfirmedEmail',      html: r1 },
+  { name: 'BookingRejectedEmail',       html: r2 },
+  { name: 'BookingReminderEmail',       html: r3 },
+  { name: 'NewBookingAlertEmail',       html: r4 },
+  { name: 'BookingCancelledAlertEmail', html: r5 },
 ]
 
 const smsStrings = [

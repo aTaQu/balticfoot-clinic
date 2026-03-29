@@ -8,6 +8,8 @@ import { BookingReminderEmail } from './templates/BookingReminderEmail'
 import { NewBookingAlertEmail } from './templates/NewBookingAlertEmail'
 import { BookingCancelledAlertEmail } from './templates/BookingCancelledAlertEmail'
 
+const resend = new Resend(process.env.RESEND_API_KEY)
+
 const SUBJECTS: Record<EmailTemplate, string> = {
   'booking-received':         'Vizito užklausa gauta — Baltic Foot',
   'booking-confirmed':        'Vizitas patvirtintas — Baltic Foot',
@@ -17,21 +19,15 @@ const SUBJECTS: Record<EmailTemplate, string> = {
   'booking-cancelled-alert':  'Vizitas atšauktas',
 }
 
-async function renderTemplate(template: EmailTemplate, data: EmailData): Promise<string> {
-  switch (template) {
-    case 'booking-received':
-      return render(BookingReceivedEmail(data as BookingEmailData))
-    case 'booking-confirmed':
-      return render(BookingConfirmedEmail(data as BookingEmailData))
-    case 'booking-rejected':
-      return render(BookingRejectedEmail(data as BookingRejectedEmailData))
-    case 'booking-reminder':
-      return render(BookingReminderEmail(data as BookingEmailData))
-    case 'new-booking-alert':
-      return render(NewBookingAlertEmail(data as NewBookingAlertEmailData))
-    case 'booking-cancelled-alert':
-      return render(BookingCancelledAlertEmail(data as BookingCancelledAlertEmailData))
-  }
+// Each template function is typed to its own data shape; callers pass the correct
+// data type via the EmailData union — the registry avoids per-case type assertions.
+const TEMPLATES: Record<EmailTemplate, (data: EmailData) => React.ReactElement> = {
+  'booking-received':        (d) => BookingReceivedEmail(d as BookingEmailData),
+  'booking-confirmed':       (d) => BookingConfirmedEmail(d as BookingEmailData),
+  'booking-rejected':        (d) => BookingRejectedEmail(d as BookingRejectedEmailData),
+  'booking-reminder':        (d) => BookingReminderEmail(d as BookingEmailData),
+  'new-booking-alert':       (d) => NewBookingAlertEmail(d as NewBookingAlertEmailData),
+  'booking-cancelled-alert': (d) => BookingCancelledAlertEmail(d as BookingCancelledAlertEmailData),
 }
 
 export async function sendEmail(
@@ -40,8 +36,7 @@ export async function sendEmail(
   data: EmailData,
 ): Promise<void> {
   try {
-    const html = await renderTemplate(template, data)
-    const resend = new Resend(process.env.RESEND_API_KEY)
+    const html = await render(TEMPLATES[template](data))
     await resend.emails.send({
       from: 'Baltic Foot <info@balticfoot.lt>',
       to,
@@ -49,7 +44,7 @@ export async function sendEmail(
       html,
     })
   } catch (err) {
-    console.error(`[notifications] sendEmail failed (template=${template}, to=${to}):`, err)
     // Intentionally not rethrowing — notification failure must never break a booking transaction
+    console.error(`[notifications] sendEmail failed (template=${template}, to=${to}):`, err)
   }
 }
