@@ -7,52 +7,49 @@ The following phases are complete:
 - **Phase 3 — Booking Collections Schema**: `Bookings`, `BlockedSlots`, and `AuditLog` collections defined. `endTime` auto-computed via `beforeChange` hook. `rejectionReason` conditionally visible. `AuditLog` is read-only in admin (access hooks block create/update/delete). Admin CSS fixed: `@payloadcms/next/css` imported in `(payload)/layout.tsx`.
 - **Phase 4 — CMS → Frontend Pipeline**: Homepage services section renders from Payload `Services` (active only). Footer, Hero, About, Contact components accept ClinicSettings props — no hardcoded phone/email/address remains. `LocalBusiness` JSON-LD injected in homepage `<head>` from ClinicSettings. `constants.ts` SERVICES deferred to Phase 8 (BookingWizard dependency).
 - **Phase 5 — Service Pages + SEO Structure**: All 5 `/paslaugos/[slug]/` pages live with `generateMetadata()` SEO titles from keyword brief, price/duration from Payload, CTA to `/rezervacija/?service=[slug]`. `/rezervacija/` shell page reads `?service=` param. Homepage H1 updated. Services reseeded with SEO-optimised slugs.
+- **Phase 6 — Notification Layer**: `sendEmail()` and `sendSms()` live in `src/lib/notifications/`. 6 React Email templates (Lithuanian text, clinic branding), 4 SMS strings, shared style tokens in `styles.ts`. Both functions catch and log errors without rethrowing. Smoke test: `npx tsx src/lib/notifications/smoke-test.ts`.
 
 ## Your task
 
-### Phase 6 — Notification Layer
+### Phase 7 — Availability API
 
-**User stories**: US 4–7 (patient notifications), implicit (Veneta new-booking alert)
+**User stories**: US 2 (service pre-selected), US 3 (duration-aware slots)
 
-Set up Resend and SMSAPI as isolated notification services. Write all email templates and SMS strings. Expose two internal functions: `sendEmail()` and `sendSms()`. No booking logic this phase — the deliverable is the notification infrastructure only.
+Implement `GET /api/availability?date=YYYY-MM-DD&service=<slug>` as a Next.js route handler. No UI changes this phase — the endpoint and its integration tests are the deliverable.
 
-**Email templates** (React Email components, Lithuanian text):
-- `BookingReceivedEmail` — to patient on submit
-- `BookingConfirmedEmail` — to patient on confirm
-- `BookingRejectedEmail` — to patient on reject (includes `rejectionReason`)
-- `BookingReminderEmail` — to patient 1 day before
-- `NewBookingAlertEmail` — to Veneta on new submission
-- `BookingCancelledAlertEmail` — to Veneta on cancellation
+**Algorithm:**
+1. Fetch `ClinicSettings` (workingHoursStart, workingHoursEnd, slotIntervalMinutes, openDays)
+2. Fetch service by slug — return 404 if not found or inactive
+3. Return `{ slots: [] }` if date falls outside `openDays`
+4. Query all `Bookings` for that date with `status IN (pending, confirmed)`
+5. Query all `BlockedSlots` for that date
+6. Generate candidate slots from workingHoursStart → workingHoursEnd at slotIntervalMinutes intervals
+7. Mark each slot unavailable if: any booking/block overlaps `[slot, slot+duration)`, or `slot+duration > workingHoursEnd`
+8. Return `{ slots: [{ time: "09:00", available: boolean }] }`
 
-**SMS strings** (Lithuanian, ≤160 chars each):
-- Submit: "Jūsų vizito užklausa gauta. Patvirtinsime netrukus. — Baltic Foot"
-- Confirm: "Vizitas patvirtintas: [date] [time], [service]. — Baltic Foot"
-- Reject: "Deja, negalime patvirtinti jūsų užklausos. Skambinkite: +370 699 80980"
-- Reminder: "Primename: rytoj [time] vizitas Baltic Foot klinikoje. — +370 699 80980"
-
-**Internal API:**
-```ts
-// src/lib/notifications/email.ts
-sendEmail(template: EmailTemplate, to: string, data: EmailData): Promise<void>
-
-// src/lib/notifications/sms.ts
-sendSms(to: string, message: string): Promise<void>
-```
-
-Both functions must handle API errors gracefully (log, don't throw) — a notification failure must never break a booking transaction.
+**Integration tests** (against real DB — no mocks):
+- Empty day → all slots available
+- PENDING booking blocks correct duration-aware range
+- CONFIRMED booking blocks correct duration-aware range
+- BlockedSlot blocks correct range
+- 2h service unavailable in last 90 min of working day
+- Full-day block → all slots unavailable
+- Date outside openDays → `{ slots: [] }`
+- Unknown/inactive service slug → 404
+- `slotIntervalMinutes` change in ClinicSettings reflected in response
 
 ## Acceptance criteria
 
-- [ ] `RESEND_API_KEY` and `SMSAPI_TOKEN` documented in `.env.example`
-- [ ] All 6 email templates render without errors
-- [ ] All 4 SMS strings are ≤160 characters
-- [ ] `sendEmail()` and `sendSms()` exist with typed parameters
-- [ ] Notification functions catch and log errors without rethrowing
-- [ ] Test script (or `console.log` smoke test) confirms templates render correctly
+- [ ] `GET /api/availability?date=&service=` exists at `src/app/(app)/api/availability/route.ts`
+- [ ] Returns `{ slots: [{ time: string, available: boolean }] }`
+- [ ] All integration tests pass
+- [ ] ClinicSettings changes (hours, interval) reflected without server restart
+- [ ] Unknown/inactive service returns 404
+- [ ] Date outside openDays returns `{ slots: [] }`
 
 ## Rules
 
 - Implement only this phase. Stop when all acceptance criteria are met.
 - Do not modify files outside the scope of this phase.
-- Check off each acceptance criterion as you verify it.
+- Integration tests run against the dev container DB — no mocks.
 - If you discover a blocker, stop and report it — do not improvise a workaround.
