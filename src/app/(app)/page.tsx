@@ -78,7 +78,7 @@ export default async function Home() {
         <Quote />
         <About phone={settings.phone} />
         <Gallery />
-        <BookingWizard />
+        <BookingWizard services={services} openDays={openDays as string[]} />
         <Contact
           phone={settings.phone}
           email={settings.email}
