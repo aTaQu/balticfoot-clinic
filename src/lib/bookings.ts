@@ -116,5 +116,6 @@ function formatDateLT(isoDate: string): string {
     'birželio', 'liepos', 'rugpjūčio', 'rugsėjo', 'spalio', 'lapkričio', 'gruodžio',
   ]
   const [y, m, d] = isoDate.split('-').map(Number)
-  return `${y} m. ${MONTHS_GEN[m - 1]} ${d} d.`
+  const month = MONTHS_GEN[m - 1] ?? isoDate  // fallback to raw string if month out of range
+  return `${y} m. ${month} ${d} d.`
 }

@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic'
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
+    const body = await request.json() as Record<string, unknown>
     const {
       serviceSlug, date, timeSlot,
       patientName, patientPhone, patientEmail,
@@ -19,6 +19,11 @@ export async function POST(request: NextRequest) {
         { error: 'serviceSlug, date, and timeSlot are required' },
         { status: 400 },
       )
+    }
+
+    // Reject slugs with unexpected characters before they reach the DB query
+    if (typeof serviceSlug !== 'string' || !/^[a-z0-9-]+$/.test(serviceSlug)) {
+      return NextResponse.json({ error: 'Invalid serviceSlug format' }, { status: 400 })
     }
 
     const payload = await getPayload({ config: configPromise })
