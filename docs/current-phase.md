@@ -8,51 +8,58 @@ The following phases are complete:
 - **Phase 4 — CMS → Frontend Pipeline**: Homepage services section renders from Payload `Services` (active only). Footer, Hero, About, Contact components accept ClinicSettings props — no hardcoded phone/email/address remains. `LocalBusiness` JSON-LD injected in homepage `<head>` from ClinicSettings. `constants.ts` SERVICES deferred to Phase 8 (BookingWizard dependency).
 - **Phase 5 — Service Pages + SEO Structure**: All 5 `/paslaugos/[slug]/` pages live with `generateMetadata()` SEO titles from keyword brief, price/duration from Payload, CTA to `/rezervacija/?service=[slug]`. `/rezervacija/` shell page reads `?service=` param. Homepage H1 updated. Services reseeded with SEO-optimised slugs.
 - **Phase 6 — Notification Layer**: `sendEmail()` and `sendSms()` live in `src/lib/notifications/`. 6 React Email templates (Lithuanian text, clinic branding), 4 SMS strings, shared style tokens in `styles.ts`. Both functions catch and log errors without rethrowing. Smoke test: `npx tsx src/lib/notifications/smoke-test.ts`.
-- **Phase 7 — Availability API**: `GET /api/availability?date=YYYY-MM-DD&service=<slug>` implemented with `force-dynamic`. Core algorithm in `src/lib/availability.ts` — duration-aware slot blocking, PENDING+CONFIRMED+BlockedSlots all block `[slot, slot+duration)`. 11 integration tests pass against real DB.
+- **Phase 7 — Availability API**: `GET /api/availability?date=YYYY-MM-DD&service=<slug>` implemented with `force-dynamic`. Core algorithm in `src/lib/availability.ts` — duration-aware slot blocking, PENDING+CONFIRMED+BlockedSlots all block `[slot, slot+duration)`. 12 integration tests pass against real DB.
+- **Phase 8 — Booking Submission**: `POST /api/bookings` validates input, re-checks availability (race condition guard → 409), creates `Booking` (status: `pending`), fires email+SMS notifications. `createBooking()` extracted to `src/lib/bookings.ts`. `BookingWizard` fully wired to Payload — live services, live slots, `openDays` calendar gating, GDPR controlled state, real submission. `constants.ts` hardcoded data removed. 20/20 integration tests pass.
 
 ## Your task
 
-### Phase 8 — Booking Submission
+### Phase 9 — Booking Admin Actions
 
-**User stories**: US 1 (services with prices), US 2 (service pre-selected), US 4 (SMS+email on submit), US 8 (SMS opt-in), US 9 (patient notes), US 10 (GDPR consent), US 11 (direct URL)
+**User stories**: US 6 (reject with reason notifies patient), US 21 (pending list sorted by date), US 22 (confirm with one click), US 23 (reject with typed reason), US 24 (cancel confirmed booking), US 25 (view patient details), US 27 (audit log)
 
-Wire the `/rezervacija/` booking wizard to the live availability API and implement `POST /api/bookings`. The wizard currently shows hardcoded time slots and reads services from `constants.ts` — this phase replaces both with real Payload data.
+Add confirm, reject, and cancel actions to the Payload booking admin. Each action is a custom button on the booking detail view. Every action writes an `AuditLog` entry and triggers the appropriate notification.
 
-**`POST /api/bookings` (new route handler):**
-1. Validate: `service` slug exists + active, `gdprConsent = true`, `patientName` + `patientPhone` + `patientEmail` required
-2. Re-check availability server-side (race condition guard — same algorithm as Phase 7)
-3. Create `Booking` with status `pending`
-4. Send `BookingReceivedEmail` + SMS to patient
-5. Send `NewBookingAlertEmail` to Veneta
-6. Return `{ booking: { id, service, date, timeSlot } }`
+**Confirm action:**
+- Status → `confirmed`
+- `sendEmail('booking-confirmed', patientEmail, {...})` + SMS to patient (if `smsOptIn`)
+- `AuditLog` entry: `action: 'confirmed'`, `user`, `booking`
 
-**BookingWizard changes:**
-- Step 1: fetch services from Payload (passed as Server Component props to the wizard)
-- Step 2: fetch slots from `GET /api/availability?date=&service=` on date/service change; mark unavailable slots unselectable
-- `?service=` query param pre-selects correct service in step 1 (already reads param, needs to wire to wizard state)
-- Step 3 (patient details): `smsOptIn` checkbox, `patientNotes` textarea, GDPR consent checkbox — all wired to submission payload
-- On submit: POST to `/api/bookings`, show success/error state
+**Reject action:**
+- Requires non-empty `rejectionReason` input before saving
+- Status → `rejected`, `rejectionReason` saved
+- `sendEmail('booking-rejected', patientEmail, { ...rejectionReason })` + SMS to patient
+- `AuditLog` entry: `action: 'rejected'`
+
+**Cancel action:**
+- Available only on `confirmed` bookings
+- Status → `cancelled`
+- `sendEmail('booking-cancelled-alert', venetaEmail, {...})` — Veneta only, no patient SMS
+- `AuditLog` entry: `action: 'cancelled'`
+
+**Implementation approach:**
+- Three internal API routes: `POST /api/admin/bookings/[id]/confirm`, `/reject`, `/cancel`
+- Called by custom Payload admin UI buttons (component overrides in the `Bookings` collection config)
+- Buttons conditionally rendered based on current `status` (confirm/reject: only on `pending`; cancel: only on `confirmed`)
+- All three handlers share a common `performBookingAction()` helper to avoid duplicating Payload fetch + AuditLog write
 
 **Integration tests:**
-- Valid submission creates `Booking` with status `pending` and triggers notification calls
-- Submitting without `gdprConsent` → 400
-- Submitting missing `patientName` or `patientPhone` → 400
-- Submitting inactive/unknown service → 404
-- Race condition: two simultaneous POSTs for same slot — only one succeeds (second gets 409)
-- `constants.ts` SERVICES array removed (BookingWizard no longer imports it)
+- Confirm: status → `confirmed`, AuditLog entry created with correct fields
+- Reject: requires `rejectionReason`, status → `rejected`, reason stored on booking
+- Cancel: status → `cancelled`, AuditLog entry created
+- Confirm already-confirmed booking → 409
+- Reject already-rejected booking → 409
 
 ## Acceptance criteria
 
-- [ ] `POST /api/bookings` exists at `src/app/(app)/api/bookings/route.ts`
-- [ ] BookingWizard step 1 fetches services from Payload (not `constants.ts`)
-- [ ] BookingWizard step 2 fetches live slots from `GET /api/availability`; unavailable slots are unselectable
-- [ ] `?service=` query param pre-selects service in step 1
-- [ ] Submitting valid booking creates `Booking` (status `pending`) in DB
-- [ ] Patient receives SMS + email on submit
-- [ ] Veneta receives email alert on submit
-- [ ] GDPR consent required; submitting without it returns 400
-- [ ] Race condition test: simultaneous same-slot POSTs — only one succeeds
-- [ ] `constants.ts` SERVICES array removed or replaced
+- [ ] `POST /api/admin/bookings/[id]/confirm` exists and sets status → `confirmed`
+- [ ] `POST /api/admin/bookings/[id]/reject` requires non-empty `rejectionReason`, sets status → `rejected`
+- [ ] `POST /api/admin/bookings/[id]/cancel` requires booking to be `confirmed`, sets status → `cancelled`
+- [ ] Each action writes an `AuditLog` entry with correct `user`, `action`, `booking` fields
+- [ ] Patient receives correct SMS + email for confirm and reject
+- [ ] Rejection email/SMS includes the typed reason
+- [ ] Custom buttons visible in Payload admin booking detail view, conditionally shown by status
+- [ ] Integration tests: confirm/reject/cancel produce correct status + AuditLog entry
+- [ ] Transitioning to an invalid status (e.g. confirming a rejected booking) returns 409
 
 ## Rules
 
