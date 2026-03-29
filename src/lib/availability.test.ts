@@ -19,12 +19,12 @@ const SVC_30 = 'iaugusio-nago-gydymas'
 const SVC_120 = 'medicininis-pedikiuras'
 
 let payload: Payload
-let adminUserId: string
+let adminUserId: number | string
 
 beforeAll(async () => {
   payload = await getPayload({ config: configPromise })
   const users = await payload.find({ collection: 'users', limit: 1 })
-  adminUserId = users.docs[0].id as string
+  adminUserId = users.docs[0].id
 })
 
 afterEach(async () => {
@@ -168,17 +168,16 @@ describe('getAvailability', () => {
   })
 
   it('inactive service returns 404', async () => {
-    // Temporarily deactivate a service
     const svc = await payload.find({ collection: 'services', where: { slug: { equals: SVC_30 } }, limit: 1 })
-    await payload.update({ collection: 'services', id: svc.docs[0].id, data: { active: false } })
-
-    const result = await getAvailability(payload, MON, SVC_30)
-
-    // Restore
-    await payload.update({ collection: 'services', id: svc.docs[0].id, data: { active: true } })
-
-    expect('error' in result).toBe(true)
-    if ('error' in result) expect(result.status).toBe(404)
+    const svcId = svc.docs[0].id
+    await payload.update({ collection: 'services', id: svcId, data: { active: false } })
+    try {
+      const result = await getAvailability(payload, MON, SVC_30)
+      expect('error' in result).toBe(true)
+      if ('error' in result) expect(result.status).toBe(404)
+    } finally {
+      await payload.update({ collection: 'services', id: svcId, data: { active: true } })
+    }
   })
 
   it('invalid date format returns 400', async () => {

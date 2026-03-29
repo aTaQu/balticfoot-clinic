@@ -10,12 +10,12 @@ export type AvailabilityOk = { slots: Slot[] }
 export type AvailabilityErr = { error: string; status: 400 | 404 }
 export type AvailabilityResult = AvailabilityOk | AvailabilityErr
 
-export function timeToMinutes(time: string): number {
+function timeToMinutes(time: string): number {
   const [h, m] = time.split(':').map(Number)
   return h * 60 + m
 }
 
-export function minutesToTime(minutes: number): string {
+function minutesToTime(minutes: number): string {
   const h = Math.floor(minutes / 60)
   const m = minutes % 60
   return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`
@@ -30,7 +30,7 @@ export async function getAvailability(
   date: string,
   serviceSlug: string,
 ): Promise<AvailabilityResult> {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || isNaN(new Date(date).getTime())) {
     return { error: 'Invalid date format. Use YYYY-MM-DD.', status: 400 }
   }
 
@@ -75,10 +75,10 @@ export async function getAvailability(
   ])
 
   const occupied: [number, number][] = [
-    ...bookingsResult.docs.map((b) => [
-      timeToMinutes(b.timeSlot as string),
-      timeToMinutes(b.endTime as string),
-    ] as [number, number]),
+    ...bookingsResult.docs.flatMap((b) => {
+      if (!b.timeSlot || !b.endTime) return []
+      return [[timeToMinutes(b.timeSlot), timeToMinutes(b.endTime)] as [number, number]]
+    }),
     ...blockedResult.docs.map((b) => [
       timeToMinutes(b.startTime as string),
       timeToMinutes(b.endTime as string),
