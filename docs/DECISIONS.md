@@ -27,7 +27,8 @@
 - Phase 5 (Service Pages + SEO Structure): Complete 2026-03-29
 - Phase 6 (Notification Layer): Complete 2026-03-29
 - Phase 7 (Availability API): Complete 2026-03-29
-- Phase 8 (Booking Submission): Started 2026-03-29
+- Phase 8 (Booking Submission): Complete 2026-03-29
+- Phase 9 (Booking Admin Actions): Started 2026-03-29
 
 ## Phase 4 decisions
 - `page.tsx` made async Server Component — fetches Services + ClinicSettings at request time (no static generation, ensures Payload changes reflect immediately on reload)
@@ -40,6 +41,17 @@
 - Shared email styles extracted to `styles.ts` — single source of truth for brand tokens across all 6 templates
 - SMS params sent in POST body with `Content-Type: application/x-www-form-urlencoded` — SMSAPI requires body, not query string
 - `SMS` strings and `sendSms` kept in same file for Phase 6 scope — can separate if Phase 9 expands SMS logic
+
+## Phase 8 decisions
+- `createBooking()` extracted to `src/lib/bookings.ts` — pure function taking a `Payload` instance; tested without HTTP; route handler is a thin wrapper
+- Availability re-checked server-side inside `createBooking` (same algorithm as Phase 7) — race condition guard; second simultaneous POST for same slot returns 409
+- `SERVICES`, `ALL_SLOTS`, `UNAVAIL_BY_DOW`, `ServiceName` removed from `constants.ts` — BookingWizard now reads live data from Payload
+- `BookingWizard` receives `services: Service[]` and `openDays: string[]` as Server Component props — no client-side Payload fetching
+- GDPR consent is controlled state (`useState`) in the wizard — was previously read from DOM via `getElementById`, which was fragile
+- `formatDateLT` uses `MONTHS_GEN[m-1] ?? isoDate` fallback — prevents `"undefined"` in notification emails if month index ever goes out of range
+- `body` in route handler cast as `Record<string, unknown>` — prevents implicit `any` from `request.json()` reaching business logic
+- `serviceSlug` validated against `/^[a-z0-9-]+$/` at route boundary — defence-in-depth before Payload query
+- Test script passes `RESEND_API_KEY` and `SMSAPI_TOKEN` with `:-test` fallbacks — Resend singleton throws at import time without a key; fallback lets tests run without real API credentials
 
 ## Phase 7 decisions
 - `getAvailability()` extracted to `src/lib/availability.ts` — pure function taking a `Payload` instance, testable without HTTP layer

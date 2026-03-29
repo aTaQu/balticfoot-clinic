@@ -14,6 +14,7 @@
 | `/rezervacija` | `src/app/(app)/rezervacija/page.tsx` | Dynamic, reads `?service=` param |
 | `/admin/[[...segments]]` | `src/app/(payload)/admin/[[...segments]]/page.tsx` | Payload admin UI |
 | `/api/availability` | `src/app/(app)/api/availability/route.ts` | `force-dynamic`, GET only |
+| `/api/bookings` | `src/app/(app)/api/bookings/route.ts` | `force-dynamic`, POST only |
 | `/api/[...slug]` | `src/app/(payload)/api/[...slug]/route.ts` | Payload REST + GraphQL |
 
 **Route groups:**
@@ -59,7 +60,7 @@ All components live in `src/components/`. Each has a co-located `.module.css`.
 | `Trust` | Trust signals strip | none |
 | `Quote` | Pull-quote block | none |
 | `Gallery` | Photo gallery | none |
-| `BookingWizard` | Multi-step booking form | none (still reads from `constants.ts` — Phase 8) |
+| `BookingWizard` | Multi-step booking form | `services: Service[]`, `preselectedSlug?: string\|null`, `openDays?: string[]` |
 | `ScrollRevealInit` | Mounts scroll-reveal animations | none |
 
 **Footer nav links** are currently homepage fragment links (`#paslaugos`, `#registracija`, etc.) — not yet updated for multi-page structure.
@@ -129,16 +130,28 @@ Both `sendEmail` and `sendSms` catch and log errors without rethrowing — notif
 
 **Tests:** `src/lib/availability.test.ts` — 11 integration tests against real DB, dates in year 2099, `fileParallelism: false` in vitest.config.ts.
 
-**Run tests:** `docker exec -e DATABASE_URI="..." -e PAYLOAD_SECRET="..." stoic_wing bash -c "cd /workspaces/podologija && npm test"`
+**Run tests:** `docker exec -e DATABASE_URI="..." -e PAYLOAD_SECRET="..." -e RESEND_API_KEY="test" -e SMSAPI_TOKEN="test" stoic_wing bash -c "cd /workspaces/podologija && npm test"`
 
 ---
 
-## What's NOT built yet (as of Phase 8)
+## Booking Layer (`src/lib/bookings.ts`)
+
+| Export | Signature | Purpose |
+|--------|-----------|---------|
+| `createBooking` | `(payload, input) → Promise<CreateBookingResult>` | Validate → re-check availability → create Booking → fire notifications |
+| `CreateBookingInput` | interface | `serviceSlug`, `date`, `timeSlot`, `patientName/Phone/Email`, `patientNotes?`, `smsOptIn`, `gdprConsent` |
+| `CreateBookingResult` | union | `{ booking: {...} }` or `{ error, status: 400\|404\|409 }` |
+
+Race condition guard: `getAvailability` re-called inside `createBooking` after validation; returns 409 if slot taken between page load and submit.
+
+**Tests:** `src/lib/bookings.test.ts` — 8 integration tests (valid booking, GDPR/name/phone/email validation, inactive service, race condition).
+
+---
+
+## What's NOT built yet (as of Phase 9)
 
 - `/blog/` and `/blog/[slug]/` — Phase 13
 - `/privatumo-politika/` — Phase 14
-- Booking submission (`POST /api/bookings`) — **Phase 8 (in progress)**
-- BookingWizard wired to Payload (still uses `constants.ts`) — Phase 8
-- Admin booking actions (confirm/reject/cancel) — Phase 9
+- Admin booking actions (confirm/reject/cancel) — **Phase 9 (in progress)**
 - Sitemap + robots.txt — Phase 14
 - Footer navigation updated for multi-page structure — deferred (no phase assigned)
