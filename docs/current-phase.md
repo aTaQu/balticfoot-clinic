@@ -10,61 +10,54 @@ The following phases are complete:
 - **Phase 6 — Notification Layer**: `sendEmail()` and `sendSms()` live in `src/lib/notifications/`. 6 React Email templates (Lithuanian text, clinic branding), 4 SMS strings, shared style tokens in `styles.ts`. Both functions catch and log errors without rethrowing. Smoke test: `npx tsx src/lib/notifications/smoke-test.ts`.
 - **Phase 7 — Availability API**: `GET /api/availability?date=YYYY-MM-DD&service=<slug>` implemented with `force-dynamic`. Core algorithm in `src/lib/availability.ts` — duration-aware slot blocking, PENDING+CONFIRMED+BlockedSlots all block `[slot, slot+duration)`. 11 integration tests pass against real DB.
 - **Phase 8 — Booking Submission**: `POST /api/bookings` implemented with GDPR validation, race condition guard (availability re-checked before create), fire-and-forget notifications. BookingWizard rewritten to fetch live services from Payload and time slots from `/api/availability`. `constants.ts` SERVICES array removed. 8 integration tests pass.
+- **Phase 9 — Booking Admin Actions**: `POST /api/admin/bookings/[id]/{confirm,reject,cancel}` implemented with Payload session auth. `bookingActions.ts` shared helpers with state guards, AuditLog writes, fire-and-forget notifications. `BookingActions.tsx` AfterFields Client Component shows correct buttons by status. `parseAdminRequest.ts` extracts auth + ID-parse. `formatDateLT` extracted to `format.ts`. 10 integration tests pass.
 
 ## Your task
 
-### Phase 9 — Booking Admin Actions
+### Phase 10 — Slot Blocking
 
-**User stories**: US 6 (rejection with reason), US 21–25 (admin booking management), US 27 (audit log)
+**User stories**: US 26 (block time slots)
 
-Add confirm, reject, and cancel actions to the Payload booking admin. Each action is a custom button rendered in the booking edit view via a Payload v3 `AfterFields` component override.
+The `BlockedSlots` collection exists (Phase 3) and the availability algorithm already respects it (Phase 7). This phase makes slot blocking usable from the admin and adds a week schedule dashboard widget so Veneta can see her upcoming week at a glance.
 
-**Three internal API routes:**
-- `POST /api/admin/bookings/[id]/confirm` — `pending` → `confirmed`; sends `BookingConfirmedEmail` + SMS (if `smsOptIn`); AuditLog entry
-- `POST /api/admin/bookings/[id]/reject` — `pending` → `rejected`; body: `{ rejectionReason }` (required, non-empty); sends `BookingRejectedEmail` + SMS; AuditLog entry with `note = rejectionReason`
-- `POST /api/admin/bookings/[id]/cancel` — `confirmed` → `cancelled`; sends `BookingCancelledAlertEmail` to Veneta; AuditLog entry
+**BlockedSlots admin** — collection is already defined. Verify and improve:
+- `useAsTitle: 'date'` and `defaultColumns: ['date', 'startTime', 'endTime', 'reason', 'createdBy']` on the collection config
+- Admin can create, edit, and delete entries without errors
 
-All routes verify the Payload session via `payload.auth({ headers })` — return 401 if no authenticated user.
+**Schedule API route** — `GET /api/admin/schedule`:
+- Requires Payload session (`payload.auth({ headers })`) — return 401 if unauthenticated
+- Query params: `from` (YYYY-MM-DD, required), `days` (number 1–14, default 7)
+- Returns `{ days: [{ date: string, bookings: ScheduledBooking[], blocks: ScheduledBlock[] }] }`
+- `ScheduledBooking`: `{ id, patientName, serviceName, timeSlot, endTime }`
+- `ScheduledBlock`: `{ id, startTime, endTime, reason }`
+- Only CONFIRMED bookings appear — pending/rejected/cancelled excluded
+- Core logic extracted to `src/lib/schedule.ts` — pure function taking a `Payload` instance
 
-**Shared helper** — `src/lib/bookingActions.ts`:
-- `confirmBooking(payload, bookingId, userId)`
-- `rejectBooking(payload, bookingId, userId, rejectionReason)`
-- `cancelBooking(payload, bookingId, userId)`
-All return `BookingActionResult = { booking } | { error, status }`.
+**Week schedule widget** — `src/components/admin/WeekSchedule.tsx` (Client Component):
+- Registered via `admin.components.afterDashboard` in `payload.config.ts`
+- Fetches `GET /api/admin/schedule?from=<today>&days=7` on mount
+- Renders 7 columns (one per day), each listing confirmed bookings and blocked slots
+- Read-only — no actions, just display
+- Uses Payload CSS variables for consistent admin styling (same approach as `BookingActions.tsx`)
+- Registered in `src/app/(payload)/admin/importMap.ts`
 
-**Admin UI** — `src/components/admin/BookingActions.tsx` (Client Component):
-- Rendered via `admin.components.edit.AfterFields` in `Bookings` collection config
-- Shows "Patvirtinti" button for `pending` bookings
-- Shows rejection reason input + "Atmesti" button for `pending` bookings (button disabled until reason entered)
-- Shows "Atšaukti vizitą" button for `confirmed` bookings
-- Hidden for `rejected`/`cancelled` bookings
-- On success: calls `router.refresh()` to reload the admin edit view
-
-**Integration tests** — `src/lib/bookingActions.test.ts`:
-- confirm: pending → confirmed, AuditLog entry created
-- confirm: already-confirmed → 409
-- confirm: non-existent booking → 404
-- reject: pending → rejected with reason, AuditLog note set
-- reject: empty reason → 400
-- reject: already-rejected → 409
-- reject: non-existent → 404
-- cancel: confirmed → cancelled, AuditLog entry
-- cancel: pending (not confirmed) → 409
-- cancel: non-existent → 404
+**Integration tests** — `src/lib/schedule.test.ts`:
+- Confirmed booking appears in correct day's `bookings` array
+- Pending booking does NOT appear
+- BlockedSlot appears in correct day's `blocks` array
+- Empty days return `{ date, bookings: [], blocks: [] }`
+- Date range spanning multiple days returns correct structure
 
 ## Acceptance criteria
 
-- [ ] `POST /api/admin/bookings/[id]/confirm` exists and enforces `pending` → `confirmed` transition
-- [ ] `POST /api/admin/bookings/[id]/reject` requires non-empty `rejectionReason`, enforces `pending` → `rejected`
-- [ ] `POST /api/admin/bookings/[id]/cancel` enforces `confirmed` → `cancelled`
-- [ ] Each route returns 401 without a valid Payload session
-- [ ] Each action writes an `AuditLog` entry with correct `user`, `action`, `booking` fields
-- [ ] Confirm sends `BookingConfirmedEmail` + SMS (if smsOptIn) to patient
-- [ ] Reject sends `BookingRejectedEmail` + SMS (if smsOptIn) to patient, includes rejection reason
-- [ ] Cancel sends `BookingCancelledAlertEmail` to clinic email (Veneta)
-- [ ] Admin UI shows correct buttons based on booking status
-- [ ] Reject button disabled until rejection reason entered
-- [ ] All 10 integration tests pass
+- [ ] Admin can create a `BlockedSlot` with date, start time, end time, and optional reason
+- [ ] Admin can delete a `BlockedSlot`
+- [ ] Blocked time range is excluded from `GET /api/availability` (already true — verify with a test covering a block added in this phase)
+- [ ] `GET /api/admin/schedule` returns correct shape, 401 without session
+- [ ] Only CONFIRMED bookings appear in schedule output
+- [ ] Week schedule widget visible on Payload dashboard after login
+- [ ] Widget shows confirmed bookings and blocked slots for the next 7 days
+- [ ] All integration tests pass
 
 ## Rules
 
