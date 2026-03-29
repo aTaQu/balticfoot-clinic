@@ -14,6 +14,10 @@
 | `/rezervacija` | `src/app/(app)/rezervacija/page.tsx` | Dynamic, reads `?service=` param |
 | `/admin/[[...segments]]` | `src/app/(payload)/admin/[[...segments]]/page.tsx` | Payload admin UI |
 | `/api/availability` | `src/app/(app)/api/availability/route.ts` | `force-dynamic`, GET only |
+| `/api/bookings` | `src/app/(app)/api/bookings/route.ts` | `force-dynamic`, POST only |
+| `/api/admin/bookings/[id]/confirm` | `src/app/(app)/api/admin/bookings/[id]/confirm/route.ts` | POST, requires Payload session |
+| `/api/admin/bookings/[id]/reject` | `src/app/(app)/api/admin/bookings/[id]/reject/route.ts` | POST, requires Payload session |
+| `/api/admin/bookings/[id]/cancel` | `src/app/(app)/api/admin/bookings/[id]/cancel/route.ts` | POST, requires Payload session |
 | `/api/[...slug]` | `src/app/(payload)/api/[...slug]/route.ts` | Payload REST + GraphQL |
 
 **Route groups:**
@@ -59,7 +63,8 @@ All components live in `src/components/`. Each has a co-located `.module.css`.
 | `Trust` | Trust signals strip | none |
 | `Quote` | Pull-quote block | none |
 | `Gallery` | Photo gallery | none |
-| `BookingWizard` | Multi-step booking form | none (still reads from `constants.ts` — Phase 8) |
+| `BookingWizard` | Multi-step booking form — fetches live services + availability | none |
+| `BookingActions` | Payload admin AfterFields — confirm/reject/cancel buttons | rendered via `admin.components.edit.AfterFields` in `Bookings` collection |
 | `ScrollRevealInit` | Mounts scroll-reveal animations | none |
 
 **Footer nav links** are currently homepage fragment links (`#paslaugos`, `#registracija`, etc.) — not yet updated for multi-page structure.
@@ -118,6 +123,23 @@ Both `sendEmail` and `sendSms` catch and log errors without rethrowing — notif
 
 ---
 
+## Booking Actions (`src/lib/bookingActions.ts`)
+
+| Export | Signature | Purpose |
+|--------|-----------|---------|
+| `confirmBooking` | `(payload, bookingId, userId) → Promise<BookingActionResult>` | `pending → confirmed`, AuditLog, email + SMS |
+| `rejectBooking` | `(payload, bookingId, userId, reason) → Promise<BookingActionResult>` | `pending → rejected`, AuditLog, email + SMS |
+| `cancelBooking` | `(payload, bookingId, userId) → Promise<BookingActionResult>` | `confirmed → cancelled`, AuditLog, clinic alert email |
+| `BookingActionResult` | `{ booking } \| { error, status }` | Return type |
+
+All functions: validate state transition (409 if wrong status), write AuditLog, fire-and-forget notifications.
+
+**Admin route helper** — `src/app/(app)/api/admin/parseAdminRequest.ts`: authenticates via `payload.auth()`, parses `[id]` param, returns `{ payload, userId, bookingId }` or a `NextResponse` (401/400).
+
+**Tests:** `src/lib/bookingActions.test.ts` — 10 integration tests. Audit-log queries use `depth: 0` to return IDs not populated objects.
+
+---
+
 ## Availability API (`src/lib/availability.ts`)
 
 | Export | Signature | Purpose |
@@ -133,12 +155,12 @@ Both `sendEmail` and `sendSms` catch and log errors without rethrowing — notif
 
 ---
 
-## What's NOT built yet (as of Phase 8)
+## What's NOT built yet (as of Phase 9)
 
 - `/blog/` and `/blog/[slug]/` — Phase 13
 - `/privatumo-politika/` — Phase 14
-- Booking submission (`POST /api/bookings`) — **Phase 8 (in progress)**
-- BookingWizard wired to Payload (still uses `constants.ts`) — Phase 8
-- Admin booking actions (confirm/reject/cancel) — Phase 9
+- Slot blocking admin UI (calendar/list view) — **Phase 10 (in progress)**
+- Reminder cron (day-before SMS + email) — Phase 11
+- Contact form wired to `POST /api/contact` — Phase 12
 - Sitemap + robots.txt — Phase 14
 - Footer navigation updated for multi-page structure — deferred (no phase assigned)

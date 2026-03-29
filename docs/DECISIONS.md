@@ -29,6 +29,7 @@
 - Phase 7 (Availability API): Complete 2026-03-29
 - Phase 8 (Booking Submission): Complete 2026-03-29
 - Phase 9 (Booking Admin Actions): Complete 2026-03-29
+- Phase 10 (Slot Blocking): Started 2026-03-29
 
 ## Phase 4 decisions
 - `page.tsx` made async Server Component — fetches Services + ClinicSettings at request time (no static generation, ensures Payload changes reflect immediately on reload)
