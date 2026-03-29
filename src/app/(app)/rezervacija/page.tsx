@@ -4,7 +4,7 @@ import type { Metadata } from 'next'
 import type { Service, ClinicSetting } from '../../../../payload-types'
 import Navigation from '@/components/Navigation'
 import Footer from '@/components/Footer'
-import styles from './Rezervacija.module.css'
+import BookingWizard from '@/components/BookingWizard/BookingWizard'
 
 export const dynamic = 'force-dynamic'
 
@@ -21,50 +21,28 @@ export default async function RezervacijaPage({ searchParams }: Props) {
 
   const payload = await getPayload({ config: configPromise })
 
-  const [selectedResult, settings] = await Promise.all([
-    serviceSlug
-      ? payload.find({
-          collection: 'services',
-          where: { slug: { equals: serviceSlug }, active: { equals: true } },
-          limit: 1,
-        })
-      : Promise.resolve({ docs: [] as Service[] }),
+  const [servicesResult, settings] = await Promise.all([
+    payload.find({
+      collection: 'services',
+      where: { active: { equals: true } },
+      sort: 'name',
+      limit: 20,
+    }),
     payload.findGlobal({ slug: 'clinic-settings' }) as Promise<ClinicSetting>,
   ])
 
-  const selectedService = selectedResult.docs[0] as Service | undefined
+  const services = servicesResult.docs as Service[]
   const openDays = (settings.openDays ?? []) as string[]
 
   return (
     <>
       <Navigation />
       <main>
-        <section className={styles.hero}>
-          <div className="container">
-            <div className="section-label">{settings.clinicName} · Šiauliai</div>
-            <h1 className={styles.h1}>Registracija vizitui</h1>
-
-            {selectedService && (
-              <div className={styles.selectedService}>
-                <span className={styles.selectedLabel}>Pasirinkta paslauga</span>
-                <span className={styles.selectedName}>{selectedService.name}</span>
-              </div>
-            )}
-          </div>
-        </section>
-
-        <section className={styles.placeholder}>
-          <div className="container">
-            <div className={styles.placeholderBox}>
-              <p className={styles.placeholderText}>
-                Registracijos forma bus prieinama netrukus.
-              </p>
-              <a href={`tel:${settings.phone}`} className="btn btn-primary">
-                Skambinkite: {settings.phone}
-              </a>
-            </div>
-          </div>
-        </section>
+        <BookingWizard
+          services={services}
+          preselectedSlug={serviceSlug ?? null}
+          openDays={openDays}
+        />
       </main>
       <Footer
         phone={settings.phone}

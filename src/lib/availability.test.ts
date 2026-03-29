@@ -19,12 +19,12 @@ const SVC_30 = 'iaugusio-nago-gydymas'
 const SVC_120 = 'medicininis-pedikiuras'
 
 let payload: Payload
-let adminUserId: number | string
+let adminUserId: number
 
 beforeAll(async () => {
   payload = await getPayload({ config: configPromise })
   const users = await payload.find({ collection: 'users', limit: 1 })
-  adminUserId = users.docs[0].id
+  adminUserId = users.docs[0].id as number
 })
 
 afterEach(async () => {

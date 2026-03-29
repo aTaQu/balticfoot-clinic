@@ -10,7 +10,7 @@
     "lint": "next lint",
     "generate:importmap": "payload generate:importmap",
     "generate:types": "payload generate:types",
-    "test": "DATABASE_URI=${DATABASE_URI} PAYLOAD_SECRET=${PAYLOAD_SECRET} vitest run"
+    "test": "DATABASE_URI=${DATABASE_URI} PAYLOAD_SECRET=${PAYLOAD_SECRET} RESEND_API_KEY=${RESEND_API_KEY:-test} SMSAPI_TOKEN=${SMSAPI_TOKEN:-test} vitest run"
   },
   "dependencies": {
     "@payloadcms/db-postgres": "^3.80.0",
