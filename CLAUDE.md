@@ -1,11 +1,22 @@
 # Baltic Foot — Podology Booking & Management App
 
-## Read these first, every session
-- Full PRD (14 phases): @docs/PRD.md
-- Current phase scope: @docs/current-phase.md
-- Codebase map (what lives where): @docs/codebase-map.md
-- Detailed phase plan: @plans/backend-cms-seo.md
-- Architecture decisions: @docs/DECISIONS.md
+## Session start — Scan phase (not Read phase)
+
+**Always read first (core context):**
+- `docs/current-phase.md` — phase scope, acceptance criteria, rules
+- `docs/codebase-map.md` — route→file map, collection inventory, conventions
+
+**Load on demand — only when the task triggers it:**
+
+| File | Load when the task involves… |
+|------|------------------------------|
+| `docs/PRD.md` | "user story", "out of scope", "should we build", "why does X exist", product decisions |
+| `plans/backend-cms-seo.md` | a past/future phase, "what's planned for phase N", checking non-current acceptance criteria |
+| `docs/DECISIONS.md` | "why was X chosen", making a new architectural decision, any tech-stack question |
+| A specific source file | The task names a collection, component, route, or lib file — read it then, not upfront |
+
+**Never pre-read:** PRD.md and plans/backend-cms-seo.md together are 600+ lines.
+Load them only when they're the answer, not as a precaution.
 
 ## Stack
 Next.js 15/16, TypeScript strict, PayloadCMS v3, PostgreSQL (Railway), Tailwind, Resend, SMSAPI
