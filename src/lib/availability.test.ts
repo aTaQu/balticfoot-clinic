@@ -185,4 +185,22 @@ describe('getAvailability', () => {
     expect('error' in result).toBe(true)
     if ('error' in result) expect(result.status).toBe(400)
   })
+
+  it('slotIntervalMinutes change is reflected in slot count', async () => {
+    // Temporarily switch to 60-min intervals — 09:00–18:00 = 9 slots instead of 18
+    const original = await payload.findGlobal({ slug: 'clinic-settings' })
+    await payload.updateGlobal({ slug: 'clinic-settings', data: { slotIntervalMinutes: '60' } })
+    try {
+      const result = await getAvailability(payload, MON, SVC_30)
+      if ('error' in result) throw new Error(result.error)
+      expect(result.slots).toHaveLength(9)
+      expect(result.slots[0].time).toBe('09:00')
+      expect(result.slots[8].time).toBe('17:00')
+    } finally {
+      await payload.updateGlobal({
+        slug: 'clinic-settings',
+        data: { slotIntervalMinutes: original.slotIntervalMinutes ?? '30' },
+      })
+    }
+  })
 })

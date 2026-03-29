@@ -79,10 +79,10 @@ export async function getAvailability(
       if (!b.timeSlot || !b.endTime) return []
       return [[timeToMinutes(b.timeSlot), timeToMinutes(b.endTime)] as [number, number]]
     }),
-    ...blockedResult.docs.map((b) => [
-      timeToMinutes(b.startTime as string),
-      timeToMinutes(b.endTime as string),
-    ] as [number, number]),
+    ...blockedResult.docs.flatMap((b) => {
+      if (!b.startTime || !b.endTime) return []
+      return [[timeToMinutes(b.startTime), timeToMinutes(b.endTime)] as [number, number]]
+    }),
   ]
 
   const slots: Slot[] = []
