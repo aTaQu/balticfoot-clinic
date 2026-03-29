@@ -7,6 +7,7 @@ import Navigation from '@/components/Navigation'
 import Footer from '@/components/Footer'
 import Link from 'next/link'
 import styles from './ServicePage.module.css'
+import { formatDuration } from '@/lib/format'
 
 export const dynamic = 'force-dynamic'
 
@@ -42,13 +43,6 @@ const SEO: Record<string, { title: string; description: string; h1: string }> = 
       'Nagų protezavimas Šiauliuose — pažeistos ar prarastos nago plokštelės atkūrimas. Natūraliai atrodantis rezultatas. Registruokitės.',
     h1: 'Nagų protezavimas Šiauliuose',
   },
-}
-
-function formatDuration(minutes: number): string {
-  if (minutes < 60) return `${minutes} min.`
-  const h = minutes / 60
-  const hStr = Number.isInteger(h) ? String(h) : h.toFixed(1).replace('.', ',')
-  return `${hStr} val.`
 }
 
 type Props = { params: Promise<{ slug: string }> }
@@ -92,7 +86,7 @@ export default async function ServicePage({ params }: Props) {
               <span aria-hidden="true">›</span>
               <span>{service.name}</span>
             </nav>
-            <div className="section-label">Baltic Foot · Šiauliai</div>
+            <div className="section-label">{settings.clinicName} · Šiauliai</div>
             <h1 className={styles.h1}>{h1}</h1>
             {service.shortDescription && (
               <p className={styles.lead}>{service.shortDescription}</p>

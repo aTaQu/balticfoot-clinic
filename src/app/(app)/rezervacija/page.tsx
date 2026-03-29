@@ -41,7 +41,7 @@ export default async function RezervacijaPage({ searchParams }: Props) {
       <main>
         <section className={styles.hero}>
           <div className="container">
-            <div className="section-label">Baltic Foot · Šiauliai</div>
+            <div className="section-label">{settings.clinicName} · Šiauliai</div>
             <h1 className={styles.h1}>Registracija vizitui</h1>
 
             {selectedService && (

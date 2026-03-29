@@ -84,6 +84,8 @@ const configPromise = buildConfig({
     // ── Seed Services ─────────────────────────────────────────────────────────
     const existingServices = await payload.find({ collection: 'services', limit: 1 })
     if (existingServices.totalDocs === 0) {
+      // active: true is required by Payload's generated types (required field),
+      // even though the schema has defaultValue: true — defaults are runtime-only.
       const servicesData = [
         {
           name: 'Įaugusio nago gydymas',
