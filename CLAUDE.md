@@ -3,6 +3,7 @@
 ## Read these first, every session
 - Full PRD (14 phases): @docs/PRD.md
 - Current phase scope: @docs/current-phase.md
+- Codebase map (what lives where): @docs/codebase-map.md
 - Detailed phase plan: @plans/backend-cms-seo.md
 - Architecture decisions: @docs/DECISIONS.md
 

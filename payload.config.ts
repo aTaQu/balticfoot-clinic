@@ -86,53 +86,58 @@ const configPromise = buildConfig({
     if (existingServices.totalDocs === 0) {
       const servicesData = [
         {
-          name: 'Saugus aparatinis pedikiūras',
-          slug: 'aparatinis-pedikyuras',
-          price: 40,
-          duration: 120,
-          description:
-            'Profesionalus nagų ir odos priežiūra specializuotais aparatais. Saugi ir higieninė procedūra kiekvienam.',
-          icon: 'smiley',
-          active: true,
-        },
-        {
-          name: 'Higieninis pedikiūras',
-          slug: 'higieninis-pedikyuras',
-          price: 40,
-          duration: 120,
-          description:
-            'Pėdų valymas, minkštinimas ir priežiūra — procedūra sveikoms ir gražioms pėdoms.',
-          icon: 'heart',
-          active: true,
-        },
-        {
-          name: 'Probleminių pėdų procedūra',
-          slug: 'probleminiu-pedu-procedura',
-          price: 50,
-          duration: 150,
-          description:
-            'Nuospaudų, kietėjimų, įtrūkimų ir kitų pėdų problemų sprendimas.',
-          icon: 'coffee',
-          active: true,
-        },
-        {
-          name: 'Įaugusio nago korekcija Titano Siūlu',
-          slug: 'nagu-korekcija',
+          name: 'Įaugusio nago gydymas',
+          slug: 'iaugusio-nago-gydymas',
           price: 35,
           duration: 30,
           description:
-            'Minimaliai invazyvus metodas įaugusio nago problemai spręsti — be operacijos (1 nagui).',
+            'Įaugusio nago gydymas Titano siūlo korekcijos metodu — minimaliai invazyvus, neskausmingas sprendimas be operacijos. Procedūra trunka apie 30 minučių, taikoma vienam nagui.',
+          shortDescription: 'Įaugusio nago korekcija Titano siūlu be operacijos.',
           icon: 'shield',
           active: true,
         },
         {
-          name: 'Konsultacija',
-          slug: 'konsultacija',
-          price: 10,
-          duration: 30,
+          name: 'Nagų grybelio gydymas',
+          slug: 'nagu-grybelio-gydymas',
+          price: 50,
+          duration: 60,
           description:
-            'Individualus pėdų būklės įvertinimas su rekomendacijomis ir gydymo planu.',
+            'Profesionali nagų grybelio diagnostika ir klinikinės procedūros Šiauliuose. Kai vaistinės priemonės nebepadeda — specialisto pagalba yra efektyviausia. Gydome nagų grybelį saugiai ir efektyviai specializuotomis priemonėmis.',
+          shortDescription: 'Profesionalus nagų grybelio gydymas klinikoje.',
           icon: 'activity',
+          active: true,
+        },
+        {
+          name: 'Medicininis pedikiūras',
+          slug: 'medicininis-pedikiuras',
+          price: 40,
+          duration: 120,
+          description:
+            'Medicininis pedikiūras (dar vadinamas gydomuoju pedikiūru) — profesionali pėdų priežiūra specializuotais aparatais. Procedūra saugi ir tinkama diabetikams, vyresnio amžiaus pacientams bei visiems, kuriems rūpi pėdų sveikata Šiauliuose.',
+          shortDescription: 'Gydomasis pedikiūras specializuotais aparatais.',
+          icon: 'heart',
+          active: true,
+        },
+        {
+          name: 'Nuospaudų šalinimas',
+          slug: 'nuospaudu-salinimas',
+          price: 50,
+          duration: 90,
+          description:
+            'Profesionalus nuospaudų, mozolinių ir kietėjimų šalinimas Šiauliuose. Nustatome ir šaliname pėdų problemų priežastis, o ne vien simptomus — taip pasiekiamas ilgalaikis rezultatas.',
+          shortDescription: 'Nuospaudų ir kietėjimų šalinimas.',
+          icon: 'coffee',
+          active: true,
+        },
+        {
+          name: 'Nagų protezavimas',
+          slug: 'nagu-protezavimas',
+          price: 60,
+          duration: 60,
+          description:
+            'Prarastos ar pažeistos nago plokštelės atkūrimas estetinio nagų protezavimo metodu. Rezultatas — natūraliai atrodantis nagas, kuris apsaugo pirštą ir leidžia normaliai gyventi.',
+          shortDescription: 'Pažeisto nago plokštelės atkūrimas.',
+          icon: 'smiley',
           active: true,
         },
       ]

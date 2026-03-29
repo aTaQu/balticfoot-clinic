@@ -1,45 +1,46 @@
-// TODO(Phase 8): Remove SERVICES — no longer used by Services component (Phase 4 done).
-// Still used by BookingWizard; will be replaced when BookingWizard is wired to Payload in Phase 8.
+// TODO(Phase 8): Remove SERVICES — still used by BookingWizard only.
+// Slugs updated in Phase 5 to match SEO-optimised services in DB.
+// Will be replaced when BookingWizard is wired to Payload in Phase 8.
 export const SERVICES = [
   {
-    id: 'aparatinis-pedikyuras',
-    name: 'Saugus aparatinis pedikiūras',
-    description: 'Profesionalus nagų ir odos priežiūra specializuotais aparatais. Saugi ir higieninė procedūra kiekvienam.',
-    icon: 'smiley',
-    price: '40 €',
-    duration: '2 val.',
+    id: 'iaugusio-nago-gydymas',
+    name: 'Įaugusio nago gydymas',
+    description: 'Įaugusio nago gydymas Titano siūlo korekcijos metodu — minimaliai invazyvus, neskausmingas sprendimas be operacijos.',
+    icon: 'shield',
+    price: '35 €',
+    duration: '30 min.',
   },
   {
-    id: 'higieninis-pedikyuras',
-    name: 'Higieninis pedikiūras',
-    description: 'Pėdų valymas, minkštinimas ir priežiūra — procedūra sveikoms ir gražioms pėdoms.',
+    id: 'nagu-grybelio-gydymas',
+    name: 'Nagų grybelio gydymas',
+    description: 'Profesionali nagų grybelio diagnostika ir klinikinės procedūros.',
+    icon: 'activity',
+    price: '50 €',
+    duration: '1 val.',
+  },
+  {
+    id: 'medicininis-pedikiuras',
+    name: 'Medicininis pedikiūras',
+    description: 'Medicininis pedikiūras specializuotais aparatais. Saugi procedūra, tinkanti ir diabetikams.',
     icon: 'heart',
     price: '40 €',
     duration: '2 val.',
   },
   {
-    id: 'probleminiu-pedu-procedura',
-    name: 'Probleminių pėdų procedūra',
-    description: 'Nuospaudų, kietėjimų, įtrūkimų ir kitų pėdų problemų sprendimas.',
+    id: 'nuospaudu-salinimas',
+    name: 'Nuospaudų šalinimas',
+    description: 'Profesionalus nuospaudų, mozolinių ir kietėjimų šalinimas.',
     icon: 'coffee',
-    price: '50–80 €',
-    duration: '2,5 val.',
+    price: '50 €',
+    duration: '1,5 val.',
   },
   {
-    id: 'nagų-korekcija',
-    name: 'Įaugusio nago korekcija Titano Siūlu',
-    description: 'Minimaliai invazyvus metodas įaugusio nago problemai spręsti — be operacijos (1 nagui).',
-    icon: 'shield',
-    price: '35 €',
-    duration: '0,5 val.',
-  },
-  {
-    id: 'konsultacija',
-    name: 'Konsultacija',
-    description: 'Individualus pėdų būklės įvertinimas su rekomendacijomis ir gydymo planu.',
-    icon: 'activity',
-    price: '10 €',
-    duration: '0,5 val.',
+    id: 'nagu-protezavimas',
+    name: 'Nagų protezavimas',
+    description: 'Prarastos ar pažeistos nago plokštelės atkūrimas estetinio nagų protezavimo metodu.',
+    icon: 'smiley',
+    price: '60 €',
+    duration: '1 val.',
   },
 ] as const;
 

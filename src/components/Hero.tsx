@@ -18,8 +18,8 @@ export default function Hero({ phone }: HeroProps) {
             </div>
 
             <h1 id="hero-heading" className="reveal reveal-delay-1" style={{ marginBottom: '1.25rem' }}>
-              Sveikos pėdos —<br />
-              <em className={styles.heroEm}>sveika gyvensena</em>
+              Podologijos klinika Šiauliuose —<br />
+              <em className={styles.heroEm}>profesionali pėdų priežiūra</em>
             </h1>
 
             <div className={`${styles.heroBody} reveal reveal-delay-2`}>
