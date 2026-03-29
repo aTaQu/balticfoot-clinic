@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getPayload } from 'payload'
-import configPromise from '@payload-config'
+import { parseAdminRequest } from '../../../parseAdminRequest'
 import { cancelBooking } from '@/lib/bookingActions'
 
 export const dynamic = 'force-dynamic'
@@ -10,19 +9,10 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const payload = await getPayload({ config: configPromise })
-    const { user } = await payload.auth({ headers: request.headers })
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+    const parsed = await parseAdminRequest(request, params)
+    if ('response' in parsed) return parsed.response
 
-    const { id } = await params
-    const bookingId = parseInt(id, 10)
-    if (isNaN(bookingId)) {
-      return NextResponse.json({ error: 'Invalid booking ID' }, { status: 400 })
-    }
-
-    const result = await cancelBooking(payload, bookingId, user.id as number)
+    const result = await cancelBooking(parsed.payload, parsed.bookingId, parsed.userId)
 
     if ('error' in result) {
       return NextResponse.json({ error: result.error }, { status: result.status })

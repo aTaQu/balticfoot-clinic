@@ -1,5 +1,6 @@
 import type { Payload } from 'payload'
 import type { Booking, Service } from '../../payload-types'
+import { formatDateLT } from './format'
 import { sendEmail } from './notifications/email'
 import { sendSms, SMS } from './notifications/sms'
 
@@ -7,15 +8,14 @@ export type BookingActionResult =
   | { booking: { id: number; status: string } }
   | { error: string; status: 400 | 403 | 404 | 409 }
 
-// Format date: "2099-06-02" → "2099 m. birželio 2 d."
-function formatDateLT(isoDate: string): string {
-  const MONTHS_GEN = [
-    'sausio', 'vasario', 'kovo', 'balandžio', 'gegužės',
-    'birželio', 'liepos', 'rugpjūčio', 'rugsėjo', 'spalio', 'lapkričio', 'gruodžio',
-  ]
-  const [y, m, d] = isoDate.split('-').map(Number)
-  const month = MONTHS_GEN[m - 1] ?? isoDate
-  return `${y} m. ${month} ${d} d.`
+// Typed collection slugs — avoids repeating `as any` at every call site
+const BOOKINGS = 'bookings' as const
+const AUDIT_LOG = 'audit-log' as const
+
+function resolveServiceName(booking: Booking): string {
+  return typeof booking.service === 'object'
+    ? (booking.service as Service).name
+    : ''
 }
 
 export async function confirmBooking(
@@ -23,37 +23,31 @@ export async function confirmBooking(
   bookingId: number,
   userId: number,
 ): Promise<BookingActionResult> {
-  // 1. Fetch booking
   let booking: Booking
   try {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    booking = await payload.findByID({ collection: 'bookings' as any, id: bookingId })
+    booking = await payload.findByID({ collection: BOOKINGS as any, id: bookingId })
   } catch {
     return { error: 'Booking not found', status: 404 }
   }
   if (!booking) return { error: 'Booking not found', status: 404 }
 
-  // 2. Validate state
   if (booking.status !== 'pending') {
     return { error: `Cannot confirm a booking with status "${booking.status}"`, status: 409 }
   }
 
-  // 3. Update status
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const updated = await payload.update({ collection: 'bookings' as any, id: bookingId, data: { status: 'confirmed' } })
+  const updated = await payload.update({ collection: BOOKINGS as any, id: bookingId, data: { status: 'confirmed' } })
 
-  // 4. Write AuditLog
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   await payload.create({
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    collection: 'audit-log' as any,
+    collection: AUDIT_LOG as any,
     data: { user: userId, action: 'confirmed', booking: bookingId },
   })
 
-  // 5. Notifications (fire-and-forget)
   const settings = await payload.findGlobal({ slug: 'clinic-settings' })
-  const service = typeof booking.service === 'object' ? booking.service : null
-  const serviceName = service ? (service as Service).name : ''
-  const formattedDate = formatDateLT(booking.date.split('T')[0])
+  const serviceName = resolveServiceName(booking)
+  const formattedDate = formatDateLT(booking.date)
 
   void sendEmail('booking-confirmed', booking.patientEmail, {
     patientName: booking.patientName,
@@ -67,7 +61,7 @@ export async function confirmBooking(
     void sendSms(booking.patientPhone, SMS.confirmed(formattedDate, booking.timeSlot, serviceName))
   }
 
-  return { booking: { id: updated.id as number, status: updated.status as string } }
+  return { booking: { id: updated.id, status: updated.status } }
 }
 
 export async function rejectBooking(
@@ -83,7 +77,7 @@ export async function rejectBooking(
   let booking: Booking
   try {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    booking = await payload.findByID({ collection: 'bookings' as any, id: bookingId })
+    booking = await payload.findByID({ collection: BOOKINGS as any, id: bookingId })
   } catch {
     return { error: 'Booking not found', status: 404 }
   }
@@ -93,23 +87,22 @@ export async function rejectBooking(
     return { error: `Cannot reject a booking with status "${booking.status}"`, status: 409 }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const updated = await payload.update({
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    collection: 'bookings' as any,
+    collection: BOOKINGS as any,
     id: bookingId,
     data: { status: 'rejected', rejectionReason: rejectionReason.trim() },
   })
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   await payload.create({
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    collection: 'audit-log' as any,
+    collection: AUDIT_LOG as any,
     data: { user: userId, action: 'rejected', booking: bookingId, note: rejectionReason.trim() },
   })
 
   const settings = await payload.findGlobal({ slug: 'clinic-settings' })
-  const service = typeof booking.service === 'object' ? booking.service : null
-  const serviceName = service ? (service as Service).name : ''
-  const formattedDate = formatDateLT(booking.date.split('T')[0])
+  const serviceName = resolveServiceName(booking)
+  const formattedDate = formatDateLT(booking.date)
 
   void sendEmail('booking-rejected', booking.patientEmail, {
     patientName: booking.patientName,
@@ -124,7 +117,7 @@ export async function rejectBooking(
     void sendSms(booking.patientPhone, SMS.rejected)
   }
 
-  return { booking: { id: updated.id as number, status: updated.status as string } }
+  return { booking: { id: updated.id, status: updated.status } }
 }
 
 export async function cancelBooking(
@@ -135,7 +128,7 @@ export async function cancelBooking(
   let booking: Booking
   try {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    booking = await payload.findByID({ collection: 'bookings' as any, id: bookingId })
+    booking = await payload.findByID({ collection: BOOKINGS as any, id: bookingId })
   } catch {
     return { error: 'Booking not found', status: 404 }
   }
@@ -145,23 +138,22 @@ export async function cancelBooking(
     return { error: `Cannot cancel a booking with status "${booking.status}"`, status: 409 }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const updated = await payload.update({
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    collection: 'bookings' as any,
+    collection: BOOKINGS as any,
     id: bookingId,
     data: { status: 'cancelled' },
   })
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   await payload.create({
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    collection: 'audit-log' as any,
+    collection: AUDIT_LOG as any,
     data: { user: userId, action: 'cancelled', booking: bookingId },
   })
 
   const settings = await payload.findGlobal({ slug: 'clinic-settings' })
-  const service = typeof booking.service === 'object' ? booking.service : null
-  const serviceName = service ? (service as Service).name : ''
-  const formattedDate = formatDateLT(booking.date.split('T')[0])
+  const serviceName = resolveServiceName(booking)
+  const formattedDate = formatDateLT(booking.date)
 
   void sendEmail('booking-cancelled-alert', settings.email, {
     patientName: booking.patientName,
@@ -170,5 +162,5 @@ export async function cancelBooking(
     time: booking.timeSlot,
   })
 
-  return { booking: { id: updated.id as number, status: updated.status as string } }
+  return { booking: { id: updated.id, status: updated.status } }
 }

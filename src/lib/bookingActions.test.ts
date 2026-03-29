@@ -169,8 +169,7 @@ describe('cancelBooking', () => {
       depth: 0,
       limit: 10,
     })
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const cancelLog = logs.docs.find((l: any) => l.action === 'cancelled')
+    const cancelLog = logs.docs.find((l) => l.action === 'cancelled')
     expect(cancelLog).toBeDefined()
     expect(cancelLog?.user).toBe(adminUserId)
   })

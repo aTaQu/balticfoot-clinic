@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { useDocumentInfo } from '@payloadcms/ui'
 import { useRouter } from 'next/navigation'
 
@@ -11,7 +11,7 @@ export function BookingActionsAfterFields() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const status = data?.status as string | undefined
+  const status = typeof data?.status === 'string' ? data.status : undefined
 
   if (!id || !status) return null
   // Only show on pending or confirmed bookings
