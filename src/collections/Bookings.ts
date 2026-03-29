@@ -5,6 +5,11 @@ export const Bookings: CollectionConfig = {
   admin: {
     useAsTitle: 'patientName',
     defaultColumns: ['patientName', 'service', 'date', 'timeSlot', 'status'],
+    components: {
+      edit: {
+        AfterFields: '@/components/admin/BookingActions#BookingActionsAfterFields',
+      },
+    },
   },
   fields: [
     {

@@ -1,5 +1,6 @@
 import type { Payload } from 'payload'
 import { getAvailability } from './availability'
+import { formatDateLT } from './format'
 import { sendEmail } from './notifications/email'
 import { sendSms, SMS } from './notifications/sms'
 
@@ -109,13 +110,3 @@ export async function createBooking(
   }
 }
 
-// "2026-04-15" → "2026 m. balandžio 15 d."
-function formatDateLT(isoDate: string): string {
-  const MONTHS_GEN = [
-    'sausio', 'vasario', 'kovo', 'balandžio', 'gegužės',
-    'birželio', 'liepos', 'rugpjūčio', 'rugsėjo', 'spalio', 'lapkričio', 'gruodžio',
-  ]
-  const [y, m, d] = isoDate.split('-').map(Number)
-  const month = MONTHS_GEN[m - 1] ?? isoDate  // fallback to raw string if month out of range
-  return `${y} m. ${month} ${d} d.`
-}
