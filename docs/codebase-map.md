@@ -102,14 +102,14 @@ Pages use `export const dynamic = 'force-dynamic'` where data must reflect Paylo
 
 ---
 
-## What's NOT built yet (as of Phase 5)
+## What's NOT built yet (as of Phase 6)
 
 - `/blog/` and `/blog/[slug]/` — Phase 13
 - `/privatumo-politika/` — Phase 14
 - Availability API (`GET /api/availability`) — Phase 7
 - Booking submission (`POST /api/bookings`) — Phase 8
 - BookingWizard wired to Payload (still uses `constants.ts`) — Phase 8
-- Notification layer (Resend + SMSAPI) — Phase 6
+- Notification layer (Resend + SMSAPI) — **Phase 6 (in progress)**
 - Admin booking actions (confirm/reject/cancel) — Phase 9
 - Sitemap + robots.txt — Phase 14
 - Footer navigation updated for multi-page structure — deferred (no phase assigned)

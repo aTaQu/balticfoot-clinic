@@ -24,9 +24,18 @@
 - Phase 2 (Content Collections Schema): Complete
 - Phase 3 (Booking Collections Schema): Complete
 - Phase 4 (CMS → Frontend Pipeline): Complete 2026-03-28
-- Phase 5 (Service Pages + SEO Structure): Started 2026-03-28
+- Phase 5 (Service Pages + SEO Structure): Complete 2026-03-29
+- Phase 6 (Notification Layer): Started 2026-03-29
 
 ## Phase 4 decisions
 - `page.tsx` made async Server Component — fetches Services + ClinicSettings at request time (no static generation, ensures Payload changes reflect immediately on reload)
 - Duration formatted as "X val." string in `Services.tsx` — matches existing UI convention from `constants.ts`
 - `constants.ts` SERVICES array kept (not deleted) — BookingWizard still imports it; removal deferred to Phase 8
+
+## Phase 5 decisions
+- Services reseeded with SEO-optimised slugs (`iaugusio-nago-gydymas` etc.) — old slugs (`aparatinis-pedikyuras` etc.) had no SEO signal; blocker discovered and resolved before building pages
+- SEO titles/descriptions stored as a static `SEO` map in `paslaugos/[slug]/page.tsx`, not in Payload — keyword brief is the source of truth, not editable by admins
+- `formatDuration()` extracted to `src/lib/format.ts` — was duplicated between `Services.tsx` and service page
+- `active: true` kept explicit in seed data despite `defaultValue: true` in schema — Payload's generated types require it at call sites (`required` field)
+- `force-dynamic` on service pages and `/rezervacija` — ensures Payload price changes reflect immediately on reload without cache invalidation
+- Codebase map (`docs/codebase-map.md`) introduced for progressive agent context; updated as part of every `/phase-complete`
