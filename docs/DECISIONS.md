@@ -26,7 +26,8 @@
 - Phase 4 (CMS → Frontend Pipeline): Complete 2026-03-28
 - Phase 5 (Service Pages + SEO Structure): Complete 2026-03-29
 - Phase 6 (Notification Layer): Complete 2026-03-29
-- Phase 7 (Availability API): Started 2026-03-29
+- Phase 7 (Availability API): Complete 2026-03-29
+- Phase 8 (Booking Submission): Started 2026-03-29
 
 ## Phase 4 decisions
 - `page.tsx` made async Server Component — fetches Services + ClinicSettings at request time (no static generation, ensures Payload changes reflect immediately on reload)
@@ -39,6 +40,15 @@
 - Shared email styles extracted to `styles.ts` — single source of truth for brand tokens across all 6 templates
 - SMS params sent in POST body with `Content-Type: application/x-www-form-urlencoded` — SMSAPI requires body, not query string
 - `SMS` strings and `sendSms` kept in same file for Phase 6 scope — can separate if Phase 9 expands SMS logic
+
+## Phase 7 decisions
+- `getAvailability()` extracted to `src/lib/availability.ts` — pure function taking a `Payload` instance, testable without HTTP layer
+- `timeToMinutes`/`minutesToTime` kept private (unexported) — internal helpers only, not part of the public API
+- `export const dynamic = 'force-dynamic'` on the route handler — prevents Next.js from caching GET responses and serving stale slot availability
+- `Booking.endTime` null-guarded via `flatMap` — field is typed `string | null` in payload-types; bookings without a computed endTime are silently skipped rather than crashing the algorithm
+- Integration tests use far-future dates (year 2099) — avoids interference with real clinic data in the dev DB
+- Test env vars injected via `docker exec -e` flags — `remoteEnv` in devcontainer.json is only available inside the VS Code terminal, not in plain `docker exec` shells
+- `slotIntervalMinutes` change reflected without restart — route uses `force-dynamic` + reads ClinicSettings fresh per request
 
 ## Phase 5 decisions
 - Services reseeded with SEO-optimised slugs (`iaugusio-nago-gydymas` etc.) — old slugs (`aparatinis-pedikyuras` etc.) had no SEO signal; blocker discovered and resolved before building pages

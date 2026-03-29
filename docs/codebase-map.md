@@ -13,6 +13,7 @@
 | `/paslaugos/[slug]` | `src/app/(app)/paslaugos/[slug]/page.tsx` | Dynamic (`force-dynamic`) |
 | `/rezervacija` | `src/app/(app)/rezervacija/page.tsx` | Dynamic, reads `?service=` param |
 | `/admin/[[...segments]]` | `src/app/(payload)/admin/[[...segments]]/page.tsx` | Payload admin UI |
+| `/api/availability` | `src/app/(app)/api/availability/route.ts` | `force-dynamic`, GET only |
 | `/api/[...slug]` | `src/app/(payload)/api/[...slug]/route.ts` | Payload REST + GraphQL |
 
 **Route groups:**
@@ -117,12 +118,26 @@ Both `sendEmail` and `sendSms` catch and log errors without rethrowing — notif
 
 ---
 
-## What's NOT built yet (as of Phase 7)
+## Availability API (`src/lib/availability.ts`)
+
+| Export | Signature | Purpose |
+|--------|-----------|---------|
+| `getAvailability` | `(payload, date, serviceSlug) → Promise<AvailabilityResult>` | Core algorithm — pure fn, no HTTP |
+| `AvailabilityResult` | `{ slots: SlotResult[] } \| { error: string, status: 400\|404 }` | Return type |
+
+**Algorithm:** fetches ClinicSettings + service duration + bookings (pending/confirmed) + BlockedSlots for the date, generates slots at `slotIntervalMinutes` intervals, marks each unavailable if `[slot, slot+duration)` overlaps any existing booking/block or exceeds workingHoursEnd.
+
+**Tests:** `src/lib/availability.test.ts` — 11 integration tests against real DB, dates in year 2099, `fileParallelism: false` in vitest.config.ts.
+
+**Run tests:** `docker exec -e DATABASE_URI="..." -e PAYLOAD_SECRET="..." stoic_wing bash -c "cd /workspaces/podologija && npm test"`
+
+---
+
+## What's NOT built yet (as of Phase 8)
 
 - `/blog/` and `/blog/[slug]/` — Phase 13
 - `/privatumo-politika/` — Phase 14
-- Availability API (`GET /api/availability`) — **Phase 7 (in progress)**
-- Booking submission (`POST /api/bookings`) — Phase 8
+- Booking submission (`POST /api/bookings`) — **Phase 8 (in progress)**
 - BookingWizard wired to Payload (still uses `constants.ts`) — Phase 8
 - Admin booking actions (confirm/reject/cancel) — Phase 9
 - Sitemap + robots.txt — Phase 14
