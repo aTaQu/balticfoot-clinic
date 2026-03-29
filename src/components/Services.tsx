@@ -1,6 +1,7 @@
 'use client';
 
 import type { Service } from '../../payload-types'
+import { formatDuration } from '@/lib/format'
 import styles from './Services.module.css';
 
 const SERVICE_ICONS: Record<string, React.ReactNode> = {
@@ -39,12 +40,6 @@ const SERVICE_ICONS: Record<string, React.ReactNode> = {
   ),
 };
 
-function formatDuration(minutes: number): string {
-  if (minutes < 60) return `${minutes} min.`
-  const h = minutes / 60
-  const hStr = Number.isInteger(h) ? String(h) : h.toFixed(1).replace('.', ',')
-  return `${hStr} val.`
-}
 
 interface ServicesProps {
   services: Service[]
