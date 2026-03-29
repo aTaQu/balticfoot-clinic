@@ -6,40 +6,49 @@ The following phases are complete:
 - **Phase 2 — Content Collections Schema**: `ClinicSettings` global, `Services` collection, `BlogPosts` collection, and `Media` upload collection defined and registered. All 5 services seeded from `constants.ts`. `ClinicSettings` seeded with clinic defaults. `BlogPosts` slug auto-generated from title with Lithuanian transliteration.
 - **Phase 3 — Booking Collections Schema**: `Bookings`, `BlockedSlots`, and `AuditLog` collections defined. `endTime` auto-computed via `beforeChange` hook. `rejectionReason` conditionally visible. `AuditLog` is read-only in admin (access hooks block create/update/delete). Admin CSS fixed: `@payloadcms/next/css` imported in `(payload)/layout.tsx`.
 - **Phase 4 — CMS → Frontend Pipeline**: Homepage services section renders from Payload `Services` (active only). Footer, Hero, About, Contact components accept ClinicSettings props — no hardcoded phone/email/address remains. `LocalBusiness` JSON-LD injected in homepage `<head>` from ClinicSettings. `constants.ts` SERVICES deferred to Phase 8 (BookingWizard dependency).
+- **Phase 5 — Service Pages + SEO Structure**: All 5 `/paslaugos/[slug]/` pages live with `generateMetadata()` SEO titles from keyword brief, price/duration from Payload, CTA to `/rezervacija/?service=[slug]`. `/rezervacija/` shell page reads `?service=` param. Homepage H1 updated. Services reseeded with SEO-optimised slugs.
 
 ## Your task
 
-### Phase 5 — Service Pages + SEO Structure
+### Phase 6 — Notification Layer
 
-**User stories**: US 12–16 (patients find service pages via Google), US 1 (see services with prices)
+**User stories**: US 4–7 (patient notifications), implicit (Veneta new-booking alert)
 
-Create individual `/paslaugos/[slug]/` pages driven by the `Services` collection. Each page has its own `generateMetadata()` with the SEO title and description from the keyword brief. Build in SEO priority order. Each page shows service description, price, duration, and a CTA button linking to `/rezervacija/?service=[slug]`. Create a `/rezervacija/` shell page that reads the `?service=` query param and displays the selected service name — full wizard wiring comes in Phase 8.
+Set up Resend and SMSAPI as isolated notification services. Write all email templates and SMS strings. Expose two internal functions: `sendEmail()` and `sendSms()`. No booking logic this phase — the deliverable is the notification infrastructure only.
 
-**Build order (SEO priority):**
-1. `/paslaugos/iaugusio-nago-gydymas/` — H1: "Įaugusio nago gydymas Šiauliuose"
-2. `/paslaugos/nagu-grybelio-gydymas/` — H1: "Nagų grybelio gydymas Šiauliuose"
-3. `/paslaugos/medicininis-pedikiuras/` — H1: "Medicininis pedikiūras Šiauliuose"
-4. `/paslaugos/nuospaudu-salinimas/` — H1: "Nuospaudų šalinimas Šiauliuose"
-5. `/paslaugos/nagu-protezavimas/` — H1: "Nagų protezavimas Šiauliuose"
+**Email templates** (React Email components, Lithuanian text):
+- `BookingReceivedEmail` — to patient on submit
+- `BookingConfirmedEmail` — to patient on confirm
+- `BookingRejectedEmail` — to patient on reject (includes `rejectionReason`)
+- `BookingReminderEmail` — to patient 1 day before
+- `NewBookingAlertEmail` — to Veneta on new submission
+- `BookingCancelledAlertEmail` — to Veneta on cancellation
 
-Homepage H1 updated to: "Podologijos klinika Šiauliuose — profesionali pėdų priežiūra"
+**SMS strings** (Lithuanian, ≤160 chars each):
+- Submit: "Jūsų vizito užklausa gauta. Patvirtinsime netrukus. — Baltic Foot"
+- Confirm: "Vizitas patvirtintas: [date] [time], [service]. — Baltic Foot"
+- Reject: "Deja, negalime patvirtinti jūsų užklausos. Skambinkite: +370 699 80980"
+- Reminder: "Primename: rytoj [time] vizitas Baltic Foot klinikoje. — +370 699 80980"
 
-**SEO notes from keyword brief:**
-- "Šiauliai" or "Šiauliuose" must appear on every service page — omitting it loses all local search signal
-- Nail fungus page: frame around professional clinical treatment, NOT pharmacy-intent variants ("vaistai nuo nagų grybelio")
-- Medical pedicure page: both "medicininis pedikiūras" AND "gydomasis pedikiūras" must appear — patients use both terms
-- Ingrown nail page is highest urgency (+900% search trend) — build first
+**Internal API:**
+```ts
+// src/lib/notifications/email.ts
+sendEmail(template: EmailTemplate, to: string, data: EmailData): Promise<void>
+
+// src/lib/notifications/sms.ts
+sendSms(to: string, message: string): Promise<void>
+```
+
+Both functions must handle API errors gracefully (log, don't throw) — a notification failure must never break a booking transaction.
 
 ## Acceptance criteria
 
-- [ ] All 5 service pages exist and render without errors
-- [ ] Each page `<title>` matches the SEO brief exactly
-- [ ] Each page H1 includes "Šiauliuose"
-- [ ] Price and duration on each page come from Payload `Services`, not hardcoded
-- [ ] CTA on each service page links to `/rezervacija/?service=[slug]`
-- [ ] `/rezervacija/` page exists, reads `?service=` param, and displays the pre-selected service name
-- [ ] Homepage H1 updated per SEO brief
-- [ ] Changing a service price in Payload is reflected on the service page after reload
+- [ ] `RESEND_API_KEY` and `SMSAPI_TOKEN` documented in `.env.example`
+- [ ] All 6 email templates render without errors
+- [ ] All 4 SMS strings are ≤160 characters
+- [ ] `sendEmail()` and `sendSms()` exist with typed parameters
+- [ ] Notification functions catch and log errors without rethrowing
+- [ ] Test script (or `console.log` smoke test) confirms templates render correctly
 
 ## Rules
 
