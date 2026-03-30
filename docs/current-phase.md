@@ -13,49 +13,43 @@ The following phases are complete:
 - **Phase 9 — Booking Admin Actions**: `POST /api/admin/bookings/[id]/{confirm,reject,cancel}` implemented with Payload session auth. `bookingActions.ts` shared helpers with state guards, AuditLog writes, fire-and-forget notifications. `BookingActions.tsx` AfterFields Client Component shows correct buttons by status. `parseAdminRequest.ts` extracts auth + ID-parse. `formatDateLT` extracted to `format.ts`. 10 integration tests pass.
 - **Phase 10 — Slot Blocking**: BlockedSlots admin verified (config already correct from Phase 3). `GET /api/admin/schedule` returns confirmed bookings + blocked slots for a date range (Payload session auth required). `WeekScheduleAfterDashboard` Client Component mounted on Payload dashboard via `admin.components.afterDashboard`. Parallel `Promise.all` queries, `AbortController` fetch cleanup. 6 integration tests pass including cross-phase availability regression.
 - **Phase 11 — Reminder Cron**: `GET /api/cron/reminders` protected by `Authorization: Bearer <CRON_SECRET>`. `sendReminders()` in `src/lib/reminders.ts` queries confirmed tomorrow bookings with `reminderSent=false`, sends `BookingReminderEmail` + optional SMS (if `smsOptIn=true`), sets `reminderSent=true` on success. `getTomorrowVilnius()` resolves date in `Europe/Vilnius` timezone. `CRON_SECRET` documented in `.env.example`. 5 integration tests pass.
+- **Phase 12 — Contact Form**: `POST /api/contact` implemented (name + message required, at least one of phone/email required, no DB writes). `ContactEnquiryAlertEmail` template added. `Contact.tsx` wired to real API with inline error display and at-least-one phone/email validation.
 
 ## Your task
 
-### Phase 12 — Contact Form
+### Phase 13 — Blog
 
-**User stories**: implicit (contact enquiries reach Veneta)
+**User stories**: US 17 (read blog articles), US 18 (CTA at end of posts), US 31 (publish posts), US 32 (instant publish)
 
-**API route** — `POST /api/contact`:
-- Input body (JSON): `name` (string), `phone` (string), `email` (string), `message` (string)
-- Validation:
-  - `name` and `message` are required and non-empty
-  - At least one of `phone` / `email` must be non-empty
-  - Return `400 { error: string }` on validation failure
-- Send `ContactEnquiryAlertEmail` to `info@balticfoot.lt` via `sendEmail()`
-- No Payload, no database writes
-- Return `200 { ok: true }` on success
+**Pages to build:**
 
-**Email template** — `src/lib/notifications/templates/ContactEnquiryAlertEmail.tsx`:
-- Minimal styling consistent with `NewBookingAlertEmail` / `BookingCancelledAlertEmail`
-- Displays: sender name, phone (if provided), email (if provided), message body
-- Subject: `"Nauja žinutė — Baltic Foot kontaktų forma"`
-- Register in `types.ts` (`'contact-enquiry-alert'`), `email.ts` (SUBJECTS + TEMPLATES), and `EmailData` union (`ContactEnquiryAlertEmailData`)
+`/blog/` — post list page:
+- Fetches all `BlogPosts` where `status = 'published'`, sorted by `publishedAt` descending
+- Renders post cards: title, excerpt, featured image (if set), formatted publish date
+- `generateMetadata()`: title `"Blogas — Baltic Foot"`, standard meta description
+- `force-dynamic`
 
-**Frontend** — update `src/components/Contact.tsx`:
-- Replace the fake `setTimeout` submit handler with a real `fetch('POST /api/contact', ...)`
-- Updated validation: `name` + `message` required; at least one of `phone` / `email` required
-- Update field labels to reflect "at least one required" — e.g. add `"(bent vienas privalomas)"` below the phone/email pair
-- Show the API `error` string inline (below the submit button) on `400` or `500`
-- Existing `submitted` success state and `submitting` disabled-button state are already wired — keep them
+`/blog/[slug]/` — individual post page:
+- Fetches `BlogPosts` by slug where `status = 'published'`; returns 404 if not found or draft
+- Renders: title (H1), featured image (if set), formatted publish date, rich text body via Payload's Lexical renderer (`@payloadcms/richtext-lexical/react`)
+- Fixed CTA block at end: `"Registruokitės konsultacijai"` → `/rezervacija/`
+- `generateMetadata()`: uses `metaTitle` and `metaDescription` from Payload fields
+- `force-dynamic`
 
-**No integration tests** — no DB side-effects; validation logic is thin.
+**No new collections** — `BlogPosts` is already defined and seeded from Phase 2.
+
+**No integration tests** — no booking/availability logic; page rendering is sufficient for manual QA.
 
 ## Acceptance criteria
 
-- [ ] `POST /api/contact` with `name`, at least one of `phone`/`email`, and `message` → sends email to `info@balticfoot.lt`, returns `200 { ok: true }`
-- [ ] Missing `name` or `message` → `400`
-- [ ] Neither `phone` nor `email` provided → `400`
-- [ ] `ContactEnquiryAlertEmail` renders with name, phone (if present), email (if present), message
-- [ ] Submitting the form calls the real API (not `setTimeout`)
-- [ ] Success state shown after `200`
-- [ ] API error message shown inline after `400`/`500`
-- [ ] Submit button disabled while request is in flight
-- [ ] No contact data written to the database
+- [ ] `/blog/` lists all published posts sorted by `publishedAt` descending
+- [ ] Draft posts do not appear on `/blog/` or at their slug URL
+- [ ] `/blog/[slug]/` renders title, body (rich text), featured image (if present), and publication date
+- [ ] Each post has correct `<title>` and meta description from Payload fields
+- [ ] Every post page ends with a CTA linking to `/rezervacija/`
+- [ ] Creating a post in Payload admin with default status makes it immediately publicly visible
+- [ ] Non-existent slug returns 404
+- [ ] `/blog/` page has correct `generateMetadata()`
 
 ## Rules
 
