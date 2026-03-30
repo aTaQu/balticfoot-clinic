@@ -19,6 +19,9 @@ const dirname = path.dirname(filename)
 const configPromise = buildConfig({
   admin: {
     user: Users.slug,
+    components: {
+      afterDashboard: ['@/components/admin/WeekSchedule#WeekScheduleAfterDashboard'],
+    },
   },
   collections: [Users, Media, Services, BlogPosts, Bookings, BlockedSlots, AuditLog],
   globals: [ClinicSettings],
