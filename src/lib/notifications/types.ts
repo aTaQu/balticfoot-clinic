@@ -5,6 +5,7 @@ export type EmailTemplate =
   | 'booking-reminder'
   | 'new-booking-alert'
   | 'booking-cancelled-alert'
+  | 'contact-enquiry-alert'
 
 export interface BookingEmailData {
   patientName: string
@@ -35,8 +36,16 @@ export interface BookingCancelledAlertEmailData {
   time: string
 }
 
+export interface ContactEnquiryAlertEmailData {
+  senderName: string
+  phone?: string
+  email?: string
+  message: string
+}
+
 export type EmailData =
   | BookingEmailData
   | BookingRejectedEmailData
   | NewBookingAlertEmailData
   | BookingCancelledAlertEmailData
+  | ContactEnquiryAlertEmailData

@@ -24,27 +24,44 @@ export default function Contact({ phone, email, address, hoursDisplay }: Contact
   const [errors, setErrors] = useState<Set<string>>(new Set());
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [apiError, setApiError] = useState<string | null>(null);
 
   const set = (field: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setForm((f) => ({ ...f, [field]: e.target.value }));
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const newErrors = new Set<string>();
     if (!form.name.trim()) newErrors.add('name');
-    if (!form.phone.trim()) newErrors.add('phone');
-    if (!form.email.trim()) newErrors.add('email');
     if (!form.message.trim()) newErrors.add('message');
+    if (!form.phone.trim() && !form.email.trim()) {
+      newErrors.add('phone');
+      newErrors.add('email');
+    }
     if (newErrors.size > 0) {
       setErrors(newErrors);
       setTimeout(() => setErrors(new Set()), 2500);
       return;
     }
     setSubmitting(true);
-    setTimeout(() => {
+    setApiError(null);
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
+      if (res.ok) {
+        setSubmitted(true);
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setApiError(data.error ?? 'Klaida siunčiant žinutę. Bandykite dar kartą.');
+      }
+    } catch {
+      setApiError('Klaida siunčiant žinutę. Bandykite dar kartą.');
+    } finally {
       setSubmitting(false);
-      setSubmitted(true);
-    }, 1200);
+    }
   };
 
   return (
@@ -142,7 +159,7 @@ export default function Contact({ phone, email, address, hoursDisplay }: Contact
                     />
                   </div>
                   <div className={styles.contactFormGroup}>
-                    <label htmlFor="c-phone">Telefonas *</label>
+                    <label htmlFor="c-phone">Telefonas</label>
                     <input
                       id="c-phone"
                       type="tel"
@@ -154,9 +171,10 @@ export default function Contact({ phone, email, address, hoursDisplay }: Contact
                     />
                   </div>
                 </div>
+                <p className={styles.contactFieldHint}>(bent vienas privalomas: telefonas arba el. paštas)</p>
 
                 <div className={styles.contactFormGroup}>
-                  <label htmlFor="c-email">El. paštas *</label>
+                  <label htmlFor="c-email">El. paštas</label>
                   <input
                     id="c-email"
                     type="email"
@@ -191,6 +209,7 @@ export default function Contact({ phone, email, address, hoursDisplay }: Contact
                     </>
                   )}
                 </button>
+                {apiError && <p className={styles.contactApiError}>{apiError}</p>}
               </form>
             )}
           </div>
