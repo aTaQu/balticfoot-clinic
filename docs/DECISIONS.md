@@ -29,7 +29,8 @@
 - Phase 7 (Availability API): Complete 2026-03-29
 - Phase 8 (Booking Submission): Complete 2026-03-29
 - Phase 9 (Booking Admin Actions): Complete 2026-03-29
-- Phase 10 (Slot Blocking): Started 2026-03-29
+- Phase 10 (Slot Blocking): Complete 2026-03-30
+- Phase 11 (Reminder Cron): Started 2026-03-30
 
 ## Phase 4 decisions
 - `page.tsx` made async Server Component — fetches Services + ClinicSettings at request time (no static generation, ensures Payload changes reflect immediately on reload)
@@ -57,6 +58,13 @@
 - Admin action routes live under `src/app/(app)/api/admin/bookings/[id]/` — co-located with other app API routes, not under `(payload)/`; authenticated via `payload.auth({ headers })`
 - `BookingActionsAfterFields` rendered via Payload v3 `admin.components.edit.AfterFields` — Client Component using `useDocumentInfo()` to read current status; avoids custom admin page
 - AuditLog relationship queries in tests require `depth: 0` — Payload defaults to depth 2 which populates the `user` relation into a full object; tests assert on the raw ID
+
+## Phase 10 decisions
+- `getSchedule()` extracted to `src/lib/schedule.ts` — same pure-function-taking-Payload pattern as `getAvailability()` and `bookingActions.ts`; keeps route handler thin
+- Two `payload.find()` queries (bookings + blocked slots) run in parallel via `Promise.all` — no data dependency between them
+- `WeekScheduleAfterDashboard` registered via `admin.components.afterDashboard` — Payload v3 dashboard extension point; Client Component with `useEffect` fetch + `AbortController` cleanup
+- `ScheduleResult` exported from `schedule.ts` and imported into `WeekSchedule.tsx` — avoids re-declaring the same interface locally
+- `afterDashboard` component pattern established in `importMap.ts` — same registration approach as `AfterFields` in Phase 9
 
 ## Phase 5 decisions
 - Services reseeded with SEO-optimised slugs (`iaugusio-nago-gydymas` etc.) — old slugs (`aparatinis-pedikyuras` etc.) had no SEO signal; blocker discovered and resolved before building pages

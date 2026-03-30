@@ -15,7 +15,7 @@ Read **one** of these before writing the corresponding code type — don't read 
 | New admin API route | `src/app/(app)/api/admin/bookings/[id]/confirm/route.ts` | `parseAdminRequest` usage, thin handler pattern |
 | New public API route | `src/app/(app)/api/bookings/route.ts` | Input validation, `force-dynamic`, error shape |
 | New AfterFields widget | `src/components/admin/BookingActions.tsx` | `useDocumentInfo`, inline styles (not Tailwind), `router.refresh()` |
-| New AfterDashboard widget | *(Phase 10 will establish this pattern)* | — |
+| New AfterDashboard widget | `src/components/admin/WeekSchedule.tsx` | `useEffect` fetch with `AbortController`, inline styles, registered via `admin.components.afterDashboard` + `importMap.ts` |
 | Integration test | `src/lib/bookingActions.test.ts` | `beforeAll` payload init, `afterEach` cleanup, far-future dates |
 | Sending notifications | `src/lib/bookingActions.ts` lines 44–65 | `findGlobal` for clinic settings, `void sendEmail(...)` pattern |
 | New Server Component page | `src/app/(app)/paslaugos/[slug]/page.tsx` | `force-dynamic`, `generateMetadata`, Payload fetch |
@@ -48,6 +48,7 @@ Read **one** of these before writing the corresponding code type — don't read 
 | `/api/admin/bookings/[id]/confirm` | `src/app/(app)/api/admin/bookings/[id]/confirm/route.ts` | POST, requires Payload session |
 | `/api/admin/bookings/[id]/reject` | `src/app/(app)/api/admin/bookings/[id]/reject/route.ts` | POST, requires Payload session |
 | `/api/admin/bookings/[id]/cancel` | `src/app/(app)/api/admin/bookings/[id]/cancel/route.ts` | POST, requires Payload session |
+| `/api/admin/schedule` | `src/app/(app)/api/admin/schedule/route.ts` | GET, requires Payload session, `?from=YYYY-MM-DD&days=1-14` |
 | `/api/[...slug]` | `src/app/(payload)/api/[...slug]/route.ts` | Payload REST + GraphQL |
 
 **Route groups:**
@@ -95,6 +96,7 @@ All components live in `src/components/`. Each has a co-located `.module.css`.
 | `Gallery` | Photo gallery | none |
 | `BookingWizard` | Multi-step booking form — fetches live services + availability | none |
 | `BookingActions` | Payload admin `AfterFields` — confirm/reject/cancel buttons | rendered via `admin.components.edit.AfterFields` in `Bookings` collection |
+| `WeekSchedule` | Payload admin `AfterDashboard` — 7-day read-only schedule widget | registered via `admin.components.afterDashboard` in `payload.config.ts` |
 | `ScrollRevealInit` | Mounts scroll-reveal animations | none |
 
 **Footer nav links** are currently homepage fragment links (`#paslaugos`, `#registracija`, etc.) — not yet updated for multi-page structure.
@@ -156,6 +158,16 @@ createBooking(payload, input: CreateBookingInput): Promise<CreateBookingResult>
 ```
 Validates → re-checks availability (race guard) → creates `pending` booking → fire-and-forget notifications.
 
+### `src/lib/schedule.ts`
+```ts
+getSchedule(payload, from: string, days: number): Promise<ScheduleResult>
+// ScheduleResult = { days: ScheduleDay[] }
+// ScheduleDay = { date: string, bookings: ScheduledBooking[], blocks: ScheduledBlock[] }
+// ScheduledBooking = { id, patientName, serviceName, timeSlot, endTime }
+// ScheduledBlock = { id, startTime, endTime, reason }
+```
+Only CONFIRMED bookings appear. Queries bookings + blocked-slots in parallel via `Promise.all`. Days sorted chronologically, entries within each day sorted by time.
+
 ### `src/lib/bookingActions.ts`
 ```ts
 confirmBooking(payload, bookingId: number, userId: number): Promise<BookingActionResult>
@@ -208,8 +220,7 @@ Authenticates via `payload.auth()`, parses `[id]` param. Check `'response' in re
 
 - `/blog/` and `/blog/[slug]/` — Phase 13
 - `/privatumo-politika/` — Phase 14
-- Slot blocking admin UI + week schedule widget — **Phase 10 (in progress)**
-- Reminder cron (day-before SMS + email) — Phase 11
+- Reminder cron (day-before SMS + email) — **Phase 11 (in progress)**
 - Contact form wired to `POST /api/contact` — Phase 12
 - Sitemap + robots.txt — Phase 14
 - Footer navigation updated for multi-page structure — deferred (no phase assigned)
