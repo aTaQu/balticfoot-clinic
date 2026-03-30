@@ -49,6 +49,7 @@ Read **one** of these before writing the corresponding code type — don't read 
 | `/api/admin/bookings/[id]/reject` | `src/app/(app)/api/admin/bookings/[id]/reject/route.ts` | POST, requires Payload session |
 | `/api/admin/bookings/[id]/cancel` | `src/app/(app)/api/admin/bookings/[id]/cancel/route.ts` | POST, requires Payload session |
 | `/api/admin/schedule` | `src/app/(app)/api/admin/schedule/route.ts` | GET, requires Payload session, `?from=YYYY-MM-DD&days=1-14` |
+| `/api/cron/reminders` | `src/app/(app)/api/cron/reminders/route.ts` | GET, `Authorization: Bearer <CRON_SECRET>`, returns `{ sent, failed }` |
 | `/api/[...slug]` | `src/app/(payload)/api/[...slug]/route.ts` | Payload REST + GraphQL |
 
 **Route groups:**
@@ -168,6 +169,14 @@ getSchedule(payload, from: string, days: number): Promise<ScheduleResult>
 ```
 Only CONFIRMED bookings appear. Queries bookings + blocked-slots in parallel via `Promise.all`. Days sorted chronologically, entries within each day sorted by time.
 
+### `src/lib/reminders.ts`
+```ts
+getTomorrowVilnius(): string                          // "YYYY-MM-DD" for tomorrow in Europe/Vilnius
+sendReminders(payload, tomorrow?: string): Promise<RemindersResult>
+// RemindersResult = { sent: number, failed: number }
+```
+Queries confirmed bookings for `tomorrow` with `reminderSent=false`. Sends `BookingReminderEmail` (always) + reminder SMS (if `smsOptIn=true`). Sets `reminderSent=true` on success. `tomorrow` param is a test seam; defaults to `getTomorrowVilnius()`.
+
 ### `src/lib/bookingActions.ts`
 ```ts
 confirmBooking(payload, bookingId: number, userId: number): Promise<BookingActionResult>
@@ -216,11 +225,11 @@ Authenticates via `payload.auth()`, parses `[id]` param. Check `'response' in re
 
 ---
 
-## What's NOT built yet (as of Phase 9)
+## What's NOT built yet (as of Phase 11)
 
 - `/blog/` and `/blog/[slug]/` — Phase 13
 - `/privatumo-politika/` — Phase 14
-- Reminder cron (day-before SMS + email) — **Phase 11 (in progress)**
+- Reminder cron (day-before SMS + email) — **Phase 11 complete**
 - Contact form wired to `POST /api/contact` — Phase 12
 - Sitemap + robots.txt — Phase 14
 - Footer navigation updated for multi-page structure — deferred (no phase assigned)

@@ -30,7 +30,8 @@
 - Phase 8 (Booking Submission): Complete 2026-03-29
 - Phase 9 (Booking Admin Actions): Complete 2026-03-29
 - Phase 10 (Slot Blocking): Complete 2026-03-30
-- Phase 11 (Reminder Cron): Started 2026-03-30
+- Phase 11 (Reminder Cron): Complete 2026-03-30
+- Phase 12 (Contact Form): Started 2026-03-30
 
 ## Phase 4 decisions
 - `page.tsx` made async Server Component — fetches Services + ClinicSettings at request time (no static generation, ensures Payload changes reflect immediately on reload)
@@ -65,6 +66,12 @@
 - `WeekScheduleAfterDashboard` registered via `admin.components.afterDashboard` — Payload v3 dashboard extension point; Client Component with `useEffect` fetch + `AbortController` cleanup
 - `ScheduleResult` exported from `schedule.ts` and imported into `WeekSchedule.tsx` — avoids re-declaring the same interface locally
 - `afterDashboard` component pattern established in `importMap.ts` — same registration approach as `AfterFields` in Phase 9
+
+## Phase 11 decisions
+- `sendReminders()` accepts `tomorrow?: string` as a test seam — avoids same-module spy issues; production path calls `getTomorrowVilnius()` automatically
+- Bearer token auth for cron route (not Payload session auth) — external cron callers cannot do cookie-based auth; fail-closed when `CRON_SECRET` is unset
+- `getTomorrowVilnius()` uses `Intl.DateTimeFormat` with `timeZone: 'Europe/Vilnius'` to extract date parts, then constructs tomorrow via local `Date` arithmetic (handles month/year rollover)
+- Notification failures are silently swallowed by existing `sendEmail`/`sendSms` — `reminderSent` may be set `true` on a silent failure; fixing requires modifying Phase 6 notification layer (deferred)
 
 ## Phase 5 decisions
 - Services reseeded with SEO-optimised slugs (`iaugusio-nago-gydymas` etc.) — old slugs (`aparatinis-pedikyuras` etc.) had no SEO signal; blocker discovered and resolved before building pages
