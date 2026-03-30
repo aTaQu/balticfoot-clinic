@@ -33,7 +33,8 @@
 - Phase 11 (Reminder Cron): Complete 2026-03-30
 - Phase 12 (Contact Form): Complete 2026-03-30
 - Phase 13 (Blog): Complete 2026-03-30
-- Phase 14 (GDPR + SEO Polish): Started 2026-03-30
+- Phase 14 (GDPR + SEO Polish): Complete 2026-03-30
+- Phase 15 (Go-Live Polish): Started 2026-03-30
 
 ## Phase 4 decisions
 - `page.tsx` made async Server Component — fetches Services + ClinicSettings at request time (no static generation, ensures Payload changes reflect immediately on reload)
@@ -87,6 +88,12 @@
 - `metaDescription: post.metaDescription ?? undefined` — coerces `null` to `undefined` so Next.js `Metadata` type is satisfied without a cast
 - Featured image rendered with `fill` + `aspect-ratio: 16/9` wrapper — maintains layout even before image loads; consistent with service page pattern
 - No integration tests — per spec; rich text rendering has no business logic
+
+## Phase 14 decisions
+- `force-dynamic` on `/privatumo-politika/` — page fetches ClinicSettings (address, email) for both body content and Footer; static generation would bake in stale data requiring redeploy on any CMS change
+- `settings.email` used in privacy policy body — not hardcoded; ensures contact email stays current if ClinicSettings changes
+- Production domain via `NEXT_PUBLIC_SITE_URL ?? 'https://www.balticfoot.lt'` in `sitemap.ts` and `robots.ts` — two consumers, no shared constant yet; set env var on Railway before go-live
+- Bookings deletion verified, no code change — `Bookings` collection has no `access` key; Payload defaults allow authenticated admin users to delete records, satisfying GDPR US 29
 
 ## Phase 5 decisions
 - Services reseeded with SEO-optimised slugs (`iaugusio-nago-gydymas` etc.) — old slugs (`aparatinis-pedikyuras` etc.) had no SEO signal; blocker discovered and resolved before building pages

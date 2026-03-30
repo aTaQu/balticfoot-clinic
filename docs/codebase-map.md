@@ -44,6 +44,9 @@ Read **one** of these before writing the corresponding code type — don't read 
 | `/paslaugos/[slug]` | `src/app/(app)/paslaugos/[slug]/page.tsx` | Dynamic (`force-dynamic`) |
 | `/blog` | `src/app/(app)/blog/page.tsx` | Dynamic (fetches published posts) |
 | `/blog/[slug]` | `src/app/(app)/blog/[slug]/page.tsx` | Dynamic (`force-dynamic`), 404 on draft/missing |
+| `/privatumo-politika` | `src/app/(app)/privatumo-politika/page.tsx` | Dynamic (`force-dynamic`), Lithuanian GDPR policy |
+| `/sitemap.xml` | `src/app/sitemap.ts` | Auto-generated; active services + published posts |
+| `/robots.txt` | `src/app/robots.ts` | Allow all, disallow `/admin` |
 | `/rezervacija` | `src/app/(app)/rezervacija/page.tsx` | Dynamic, reads `?service=` param |
 | `/admin/[[...segments]]` | `src/app/(payload)/admin/[[...segments]]/page.tsx` | Payload admin UI |
 | `/api/availability` | `src/app/(app)/api/availability/route.ts` | `force-dynamic`, GET only |
@@ -229,11 +232,10 @@ Authenticates via `payload.auth()`, parses `[id]` param. Check `'response' in re
 
 ---
 
-## What's NOT built yet (as of Phase 13)
+## What's NOT built yet (as of Phase 14)
 
-- `/privatumo-politika/` — Phase 14
-- Sitemap + robots.txt — Phase 14
-- Footer navigation updated for multi-page structure — deferred (no phase assigned)
-- `/privatumo-politika/` — Phase 14
-- Sitemap + robots.txt — Phase 14
+- Canonical `<link rel="canonical">` on all public pages — Phase 15
+- Alt text audit across all public images — Phase 15
+- 2-year data retention cron (auto-flag/delete old bookings) — Phase 15
+- `NEXT_PUBLIC_SITE_URL` env var set on Railway — deployment step before go-live
 - Footer navigation updated for multi-page structure — deferred (no phase assigned)
