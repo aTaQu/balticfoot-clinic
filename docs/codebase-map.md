@@ -19,6 +19,7 @@ Read **one** of these before writing the corresponding code type — don't read 
 | Integration test | `src/lib/bookingActions.test.ts` | `beforeAll` payload init, `afterEach` cleanup, far-future dates |
 | Sending notifications | `src/lib/bookingActions.ts` lines 44–65 | `findGlobal` for clinic settings, `void sendEmail(...)` pattern |
 | New Server Component page | `src/app/(app)/paslaugos/[slug]/page.tsx` | `force-dynamic`, `generateMetadata`, Payload fetch |
+| Lexical rich text rendering | `src/app/(app)/blog/[slug]/page.tsx` | `import { RichText } from '@payloadcms/richtext-lexical/react'`, pass `data={post.body}` |
 
 ---
 
@@ -41,6 +42,8 @@ Read **one** of these before writing the corresponding code type — don't read 
 |-----|------|-----------|
 | `/` | `src/app/(app)/page.tsx` | Dynamic (fetches Services + ClinicSettings) |
 | `/paslaugos/[slug]` | `src/app/(app)/paslaugos/[slug]/page.tsx` | Dynamic (`force-dynamic`) |
+| `/blog` | `src/app/(app)/blog/page.tsx` | Dynamic (fetches published posts) |
+| `/blog/[slug]` | `src/app/(app)/blog/[slug]/page.tsx` | Dynamic (`force-dynamic`), 404 on draft/missing |
 | `/rezervacija` | `src/app/(app)/rezervacija/page.tsx` | Dynamic, reads `?service=` param |
 | `/admin/[[...segments]]` | `src/app/(payload)/admin/[[...segments]]/page.tsx` | Payload admin UI |
 | `/api/availability` | `src/app/(app)/api/availability/route.ts` | `force-dynamic`, GET only |
@@ -226,9 +229,11 @@ Authenticates via `payload.auth()`, parses `[id]` param. Check `'response' in re
 
 ---
 
-## What's NOT built yet (as of Phase 12)
+## What's NOT built yet (as of Phase 13)
 
-- `/blog/` and `/blog/[slug]/` — Phase 13
+- `/privatumo-politika/` — Phase 14
+- Sitemap + robots.txt — Phase 14
+- Footer navigation updated for multi-page structure — deferred (no phase assigned)
 - `/privatumo-politika/` — Phase 14
 - Sitemap + robots.txt — Phase 14
 - Footer navigation updated for multi-page structure — deferred (no phase assigned)

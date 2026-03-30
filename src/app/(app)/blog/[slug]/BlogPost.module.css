@@ -1,0 +1,141 @@
+.header {
+  padding: 6rem 0 2.5rem;
+  background: var(--cream);
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--stone);
+  opacity: 0.7;
+  margin-bottom: 1.5rem;
+}
+
+.breadcrumb a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.breadcrumb a:hover {
+  color: var(--terra);
+  opacity: 1;
+}
+
+.date {
+  display: block;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--stone);
+  opacity: 0.6;
+  margin-bottom: 0.75rem;
+}
+
+.h1 {
+  margin: 0;
+  max-width: 22ch;
+}
+
+/* ── Featured image ──────────────────────────────────── */
+.featuredImageWrap {
+  padding: 2rem 0 0;
+  background: var(--cream);
+}
+
+.featuredImage {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  aspect-ratio: 16 / 9;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.image {
+  object-fit: cover;
+}
+
+/* ── Body ────────────────────────────────────────────── */
+.body {
+  padding: 3rem 0 4rem;
+}
+
+/* Rich text prose styles */
+.prose {
+  max-width: 68ch;
+  font-size: 1.05rem;
+  line-height: 1.85;
+  color: var(--stone);
+}
+
+.prose h2 {
+  font-family: var(--font-cormorant), 'Cormorant Garamond', serif;
+  font-size: 1.9rem;
+  margin-top: 2.5rem;
+  margin-bottom: 0.75rem;
+  color: var(--soil);
+}
+
+.prose h3 {
+  font-family: var(--font-cormorant), 'Cormorant Garamond', serif;
+  font-size: 1.5rem;
+  margin-top: 2rem;
+  margin-bottom: 0.5rem;
+  color: var(--soil);
+}
+
+.prose p {
+  margin-bottom: 1.25rem;
+}
+
+.prose ul,
+.prose ol {
+  padding-left: 1.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.prose li {
+  margin-bottom: 0.4rem;
+}
+
+.prose a {
+  color: var(--terra);
+  text-decoration: underline;
+}
+
+.prose strong {
+  color: var(--soil);
+}
+
+/* ── CTA block ───────────────────────────────────────── */
+.cta {
+  margin-top: 4rem;
+  padding: 2.5rem;
+  background: var(--cream);
+  border: 1px solid rgba(107, 94, 82, 0.14);
+  border-radius: 12px;
+  max-width: 68ch;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.25rem;
+}
+
+.ctaText {
+  font-family: var(--font-cormorant), 'Cormorant Garamond', serif;
+  font-size: 1.6rem;
+  color: var(--soil);
+  margin: 0;
+}
+
+@media (max-width: 600px) {
+  .cta {
+    padding: 1.75rem;
+  }
+
+  .ctaText {
+    font-size: 1.35rem;
+  }
+}

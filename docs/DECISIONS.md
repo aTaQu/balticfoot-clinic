@@ -32,7 +32,8 @@
 - Phase 10 (Slot Blocking): Complete 2026-03-30
 - Phase 11 (Reminder Cron): Complete 2026-03-30
 - Phase 12 (Contact Form): Complete 2026-03-30
-- Phase 13 (Blog): Started 2026-03-30
+- Phase 13 (Blog): Complete 2026-03-30
+- Phase 14 (GDPR + SEO Polish): Started 2026-03-30
 
 ## Phase 4 decisions
 - `page.tsx` made async Server Component — fetches Services + ClinicSettings at request time (no static generation, ensures Payload changes reflect immediately on reload)
@@ -79,6 +80,13 @@
 - `void sendEmail()` (fire-and-forget) — matches established pattern in `bookings.ts` and `bookingActions.ts`; `sendEmail` catches internally so awaiting adds only latency
 - Phone/email validated as "at least one required" — matches spec; both fields remain optional individually
 - No integration tests — no DB side-effects; validation logic is thin (per spec)
+
+## Phase 13 decisions
+- `RichText` from `@payloadcms/richtext-lexical/react` used directly — no custom JSX converters needed for a basic prose blog; component accepts `data={post.body}` prop
+- `generateMetadata()` on the post page does a second Payload query — acceptable for a `force-dynamic` page; avoids prop-drilling from a layout or sharing a singleton
+- `metaDescription: post.metaDescription ?? undefined` — coerces `null` to `undefined` so Next.js `Metadata` type is satisfied without a cast
+- Featured image rendered with `fill` + `aspect-ratio: 16/9` wrapper — maintains layout even before image loads; consistent with service page pattern
+- No integration tests — per spec; rich text rendering has no business logic
 
 ## Phase 5 decisions
 - Services reseeded with SEO-optimised slugs (`iaugusio-nago-gydymas` etc.) — old slugs (`aparatinis-pedikyuras` etc.) had no SEO signal; blocker discovered and resolved before building pages

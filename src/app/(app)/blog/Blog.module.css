@@ -1,0 +1,120 @@
+.hero {
+  padding: 6rem 0 3rem;
+  background: var(--cream);
+}
+
+.h1 {
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.lead {
+  font-size: 1.15rem;
+  max-width: 52ch;
+  color: var(--stone);
+  opacity: 0.85;
+}
+
+/* ── Post grid ───────────────────────────────────────── */
+.listing {
+  padding: 3rem 0 6rem;
+}
+
+.grid {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 2rem;
+}
+
+.empty {
+  color: var(--stone);
+  opacity: 0.7;
+}
+
+/* ── Card ────────────────────────────────────────────── */
+.card {
+  background: var(--cream);
+  border: 1px solid rgba(107, 94, 82, 0.14);
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.2s;
+}
+
+.card:hover {
+  box-shadow: 0 4px 20px rgba(107, 94, 82, 0.12);
+}
+
+.imageWrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+}
+
+.image {
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.card:hover .image {
+  transform: scale(1.03);
+}
+
+.cardBody {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.date {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--stone);
+  opacity: 0.6;
+}
+
+.cardTitle {
+  font-family: var(--font-cormorant), 'Cormorant Garamond', serif;
+  font-size: 1.5rem;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.cardTitle a {
+  color: var(--soil);
+  text-decoration: none;
+}
+
+.cardTitle a:hover {
+  color: var(--terra);
+}
+
+.excerpt {
+  font-size: 0.95rem;
+  color: var(--stone);
+  opacity: 0.85;
+  line-height: 1.6;
+  margin: 0;
+  flex: 1;
+}
+
+.readMore {
+  font-size: 0.85rem;
+  color: var(--terra);
+  text-decoration: none;
+  font-weight: 500;
+  margin-top: 0.25rem;
+  align-self: flex-start;
+}
+
+.readMore:hover {
+  text-decoration: underline;
+}
