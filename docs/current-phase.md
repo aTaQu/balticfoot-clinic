@@ -1,55 +1,46 @@
 ## Context
 
-Phases 1–14 complete. See DECISIONS.md for full log.
+Phases 1–15 complete. See DECISIONS.md for full log.
 
 ## Your task
 
-### Phase 15 — Go-Live Polish
+### Phase 16 — Pre-Launch
 
-**User stories**: US 19 (schema.org / SEO completeness), US 20 (privacy policy), US 29 (GDPR retention)
+**User stories**: no new user stories — completing deferred polish items before go-live.
 
-**Canonical URLs:**
+**Footer navigation fix:**
 
-Add `<link rel="canonical">` to all public pages:
-- `/` — `https://www.balticfoot.lt/`
-- `/paslaugos/[slug]/` — `https://www.balticfoot.lt/paslaugos/[slug]/`
-- `/blog/` — `https://www.balticfoot.lt/blog/`
-- `/blog/[slug]/` — `https://www.balticfoot.lt/blog/[slug]/`
-- `/rezervacija/` — `https://www.balticfoot.lt/rezervacija/`
-- `/privatumo-politika/` — `https://www.balticfoot.lt/privatumo-politika/`
+The Footer `Navigacija` column uses bare fragment links (`#paslaugos`, `#registracija`, etc.)
+that only work on the homepage. From any other page they silently scroll nowhere.
+Fix the links to work site-wide:
 
-Use Next.js `Metadata.alternates.canonical` — not a raw `<link>` tag.
-Base URL from `process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.balticfoot.lt'`.
+| Current | Replace with |
+|---------|-------------|
+| `#virsus` | `/` |
+| `#paslaugos` | `/#paslaugos` |
+| `#apie` | `/#apie` |
+| `#susisiekite` | `/#susisiekite` |
+| `#registracija` | `/rezervacija/` |
 
-**Alt text audit:**
+Also add a **Blogas** link pointing to `/blog/`.
 
-Verify every `<Image>` on all public pages has a meaningful Lithuanian `alt` attribute.
-Check: homepage, all service pages, blog list, blog post pages. Fix any missing or
-generic (`""`, `"image"`) alt values.
+Use Next.js `<Link>` for all entries (footer already imports it for the privacy link).
 
-**2-year data retention:**
+**SITE_URL / BASE_URL consolidation:**
 
-Add a cron route `GET /api/cron/retention` (same Bearer auth pattern as reminders)
-that deletes bookings older than 2 years.
+`sitemap.ts` and `robots.ts` each declare `const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.balticfoot.lt'`
+independently. Replace both with an import of `SITE_URL` from `@/lib/constants`.
 
-Retention cron spec:
-- Auth: `Authorization: Bearer <CRON_SECRET>` (same as reminders cron)
-- Query: bookings where `date < today − 730 days`
-- Action: hard delete via `payload.delete()`
-- Returns: `{ deleted: number }`
-- No new collection needed
-
-**No new collections.**
-**No integration tests** — canonical meta is Next.js framework behaviour; retention
-cron follows the same pattern as reminders (already tested).
+**No new collections. No new routes. No integration tests.**
 
 ## Acceptance criteria
 
-- [ ] `<link rel="canonical">` present in `<head>` on all 6 public page types
-- [ ] No public page image is missing a meaningful alt attribute
-- [ ] `GET /api/cron/retention` exists, requires Bearer token, deletes bookings
-  older than 2 years, returns `{ deleted: number }`
-- [ ] `NEXT_PUBLIC_SITE_URL` documented in `.env.example`
+- [ ] Footer nav links work correctly when rendered on `/blog/`, `/paslaugos/[slug]/`,
+  `/rezervacija/`, and `/privatumo-politika/`
+- [ ] Footer nav includes a Blogas link to `/blog/`
+- [ ] `/rezervacija/` link in footer goes directly to the booking page (not `#registracija`)
+- [ ] `sitemap.ts` and `robots.ts` import `SITE_URL` from `@/lib/constants`
+  (no more local `BASE_URL` declaration in those files)
 
 ## Rules
 
