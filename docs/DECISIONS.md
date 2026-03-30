@@ -31,7 +31,8 @@
 - Phase 9 (Booking Admin Actions): Complete 2026-03-29
 - Phase 10 (Slot Blocking): Complete 2026-03-30
 - Phase 11 (Reminder Cron): Complete 2026-03-30
-- Phase 12 (Contact Form): Started 2026-03-30
+- Phase 12 (Contact Form): Complete 2026-03-30
+- Phase 13 (Blog): Started 2026-03-30
 
 ## Phase 4 decisions
 - `page.tsx` made async Server Component — fetches Services + ClinicSettings at request time (no static generation, ensures Payload changes reflect immediately on reload)
@@ -72,6 +73,12 @@
 - Bearer token auth for cron route (not Payload session auth) — external cron callers cannot do cookie-based auth; fail-closed when `CRON_SECRET` is unset
 - `getTomorrowVilnius()` uses `Intl.DateTimeFormat` with `timeZone: 'Europe/Vilnius'` to extract date parts, then constructs tomorrow via local `Date` arithmetic (handles month/year rollover)
 - Notification failures are silently swallowed by existing `sendEmail`/`sendSms` — `reminderSent` may be set `true` on a silent failure; fixing requires modifying Phase 6 notification layer (deferred)
+
+## Phase 12 decisions
+- `POST /api/contact` uses no Payload reads — phase spec forbids DB writes; hardcoding `info@balticfoot.lt` is intentional given no-Payload constraint
+- `void sendEmail()` (fire-and-forget) — matches established pattern in `bookings.ts` and `bookingActions.ts`; `sendEmail` catches internally so awaiting adds only latency
+- Phone/email validated as "at least one required" — matches spec; both fields remain optional individually
+- No integration tests — no DB side-effects; validation logic is thin (per spec)
 
 ## Phase 5 decisions
 - Services reseeded with SEO-optimised slugs (`iaugusio-nago-gydymas` etc.) — old slugs (`aparatinis-pedikyuras` etc.) had no SEO signal; blocker discovered and resolved before building pages

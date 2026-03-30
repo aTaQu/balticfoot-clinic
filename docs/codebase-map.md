@@ -49,6 +49,7 @@ Read **one** of these before writing the corresponding code type — don't read 
 | `/api/admin/bookings/[id]/reject` | `src/app/(app)/api/admin/bookings/[id]/reject/route.ts` | POST, requires Payload session |
 | `/api/admin/bookings/[id]/cancel` | `src/app/(app)/api/admin/bookings/[id]/cancel/route.ts` | POST, requires Payload session |
 | `/api/admin/schedule` | `src/app/(app)/api/admin/schedule/route.ts` | GET, requires Payload session, `?from=YYYY-MM-DD&days=1-14` |
+| `/api/contact` | `src/app/(app)/api/contact/route.ts` | POST only, no auth, no DB writes |
 | `/api/cron/reminders` | `src/app/(app)/api/cron/reminders/route.ts` | GET, `Authorization: Bearer <CRON_SECRET>`, returns `{ sent, failed }` |
 | `/api/[...slug]` | `src/app/(payload)/api/[...slug]/route.ts` | Payload REST + GraphQL |
 
@@ -192,7 +193,7 @@ sendEmail(template: EmailTemplate, to: string, data: EmailData): Promise<void>
 sendSms(to: string, message: string): Promise<void>
 SMS.received / SMS.confirmed(date, time, service) / SMS.rejected / SMS.reminder(time)
 ```
-Both functions catch and log — never rethrow. `EmailTemplate` = `'booking-received' | 'booking-confirmed' | 'booking-rejected' | 'booking-reminder' | 'new-booking-alert' | 'booking-cancelled-alert'`.
+Both functions catch and log — never rethrow. `EmailTemplate` = `'booking-received' | 'booking-confirmed' | 'booking-rejected' | 'booking-reminder' | 'new-booking-alert' | 'booking-cancelled-alert' | 'contact-enquiry-alert'`.
 
 ### `src/app/(app)/api/admin/parseAdminRequest.ts`
 ```ts
@@ -220,16 +221,14 @@ Authenticates via `payload.auth()`, parses `[id]` param. Check `'response' in re
 | `sms.ts` | `sendSms(to, message)` + `SMS` string constants |
 | `types.ts` | `EmailTemplate` union, `EmailData` variants |
 | `styles.ts` | Shared inline style tokens for all email templates |
-| `templates/` | 6 React Email components (received, confirmed, rejected, reminder, new-booking alert, cancelled alert) |
+| `templates/` | 7 React Email components (received, confirmed, rejected, reminder, new-booking alert, cancelled alert, contact enquiry alert) |
 | `smoke-test.ts` | Run with `npx tsx src/lib/notifications/smoke-test.ts` — no API keys needed |
 
 ---
 
-## What's NOT built yet (as of Phase 11)
+## What's NOT built yet (as of Phase 12)
 
 - `/blog/` and `/blog/[slug]/` — Phase 13
 - `/privatumo-politika/` — Phase 14
-- Reminder cron (day-before SMS + email) — **Phase 11 complete**
-- Contact form wired to `POST /api/contact` — Phase 12
 - Sitemap + robots.txt — Phase 14
 - Footer navigation updated for multi-page structure — deferred (no phase assigned)
