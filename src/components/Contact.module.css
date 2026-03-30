@@ -164,6 +164,18 @@ a.contactDetailItem:hover { opacity: 0.75; }
   .contactIntro { max-width: 100%; }
 }
 
+.contactFieldHint {
+  font-size: 0.78rem;
+  color: var(--stone);
+  margin: -0.5rem 0 1rem;
+}
+
+.contactApiError {
+  font-size: 0.875rem;
+  color: #c0392b;
+  margin-top: 0.75rem;
+}
+
 @media (max-width: 600px) {
   .contactFormWrap { padding: 2rem 1.5rem; }
   .contactFormRow { grid-template-columns: 1fr; }
