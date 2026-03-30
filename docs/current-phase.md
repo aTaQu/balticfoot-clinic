@@ -12,52 +12,53 @@ The following phases are complete:
 - **Phase 8 — Booking Submission**: `POST /api/bookings` implemented with GDPR validation, race condition guard (availability re-checked before create), fire-and-forget notifications. BookingWizard rewritten to fetch live services from Payload and time slots from `/api/availability`. `constants.ts` SERVICES array removed. 8 integration tests pass.
 - **Phase 9 — Booking Admin Actions**: `POST /api/admin/bookings/[id]/{confirm,reject,cancel}` implemented with Payload session auth. `bookingActions.ts` shared helpers with state guards, AuditLog writes, fire-and-forget notifications. `BookingActions.tsx` AfterFields Client Component shows correct buttons by status. `parseAdminRequest.ts` extracts auth + ID-parse. `formatDateLT` extracted to `format.ts`. 10 integration tests pass.
 - **Phase 10 — Slot Blocking**: BlockedSlots admin verified (config already correct from Phase 3). `GET /api/admin/schedule` returns confirmed bookings + blocked slots for a date range (Payload session auth required). `WeekScheduleAfterDashboard` Client Component mounted on Payload dashboard via `admin.components.afterDashboard`. Parallel `Promise.all` queries, `AbortController` fetch cleanup. 6 integration tests pass including cross-phase availability regression.
+- **Phase 11 — Reminder Cron**: `GET /api/cron/reminders` protected by `Authorization: Bearer <CRON_SECRET>`. `sendReminders()` in `src/lib/reminders.ts` queries confirmed tomorrow bookings with `reminderSent=false`, sends `BookingReminderEmail` + optional SMS (if `smsOptIn=true`), sets `reminderSent=true` on success. `getTomorrowVilnius()` resolves date in `Europe/Vilnius` timezone. `CRON_SECRET` documented in `.env.example`. 5 integration tests pass.
 
 ## Your task
 
-### Phase 11 — Reminder Cron
+### Phase 12 — Contact Form
 
-**User stories**: US 7 (day-before reminder), US 8 (SMS opt-in respected)
+**User stories**: implicit (contact enquiries reach Veneta)
 
-**Cron route** — `GET /api/cron/reminders`:
-- Protected by a static Bearer token — `Authorization: Bearer <CRON_SECRET>` header verified against `process.env.CRON_SECRET`
-- Return 401 if token is missing or wrong (external cron callers cannot do cookie-based Payload session auth)
-- Core logic extracted to `src/lib/reminders.ts` — pure function taking a `Payload` instance
+**API route** — `POST /api/contact`:
+- Input body (JSON): `name` (string), `phone` (string), `email` (string), `message` (string)
+- Validation:
+  - `name` and `message` are required and non-empty
+  - At least one of `phone` / `email` must be non-empty
+  - Return `400 { error: string }` on validation failure
+- Send `ContactEnquiryAlertEmail` to `info@balticfoot.lt` via `sendEmail()`
+- No Payload, no database writes
+- Return `200 { ok: true }` on success
 
-**Reminder logic** — `src/lib/reminders.ts`:
-- Query all `Bookings` where `date = tomorrow` AND `status = confirmed` AND `reminderSent = false`
-- For each booking:
-  - Always send `BookingReminderEmail` to `patientEmail`
-  - Send reminder SMS only if `smsOptIn = true`
-  - On successful send: update `reminderSent = true`
-  - On send failure: log error, do NOT set `reminderSent = true` (retries on next run)
-- Returns `{ sent: number, failed: number }`
-- "Tomorrow" computed in Lithuanian timezone (`Europe/Vilnius`, UTC+2/UTC+3)
+**Email template** — `src/lib/notifications/templates/ContactEnquiryAlertEmail.tsx`:
+- Minimal styling consistent with `NewBookingAlertEmail` / `BookingCancelledAlertEmail`
+- Displays: sender name, phone (if provided), email (if provided), message body
+- Subject: `"Nauja žinutė — Baltic Foot kontaktų forma"`
+- Register in `types.ts` (`'contact-enquiry-alert'`), `email.ts` (SUBJECTS + TEMPLATES), and `EmailData` union (`ContactEnquiryAlertEmailData`)
 
-**Scheduling** — document in `.env.example`:
-- Intended to be triggered daily at 10:00 Europe/Vilnius by Railway cron or an external cron service (e.g. cron-job.org) calling `GET /api/cron/reminders` with the Bearer token
+**Frontend** — update `src/components/Contact.tsx`:
+- Replace the fake `setTimeout` submit handler with a real `fetch('POST /api/contact', ...)`
+- Updated validation: `name` + `message` required; at least one of `phone` / `email` required
+- Update field labels to reflect "at least one required" — e.g. add `"(bent vienas privalomas)"` below the phone/email pair
+- Show the API `error` string inline (below the submit button) on `400` or `500`
+- Existing `submitted` success state and `submitting` disabled-button state are already wired — keep them
 
-**Integration tests** — `src/lib/reminders.test.ts`:
-- Confirmed booking for tomorrow with `reminderSent = false` → sends reminder, sets flag to `true`
-- Confirmed booking with `reminderSent = true` → skipped, flag unchanged
-- Pending booking for tomorrow → skipped
-- Booking with `smsOptIn = false` → email sent, SMS not sent
-- Booking with `smsOptIn = true` → both email and SMS sent
+**No integration tests** — no DB side-effects; validation logic is thin.
 
 ## Acceptance criteria
 
-- [ ] `GET /api/cron/reminders` returns 401 without correct `CRON_SECRET` Bearer token
-- [ ] Only tomorrow's CONFIRMED bookings with `reminderSent = false` are processed
-- [ ] `reminderSent` set to `true` after successful send
-- [ ] `reminderSent` left `false` on send failure (retries next run)
-- [ ] SMS only sent if `smsOptIn = true`
-- [ ] "Tomorrow" resolved in Europe/Vilnius timezone
-- [ ] `CRON_SECRET` documented in `.env.example`
-- [ ] All integration tests pass
+- [ ] `POST /api/contact` with `name`, at least one of `phone`/`email`, and `message` → sends email to `info@balticfoot.lt`, returns `200 { ok: true }`
+- [ ] Missing `name` or `message` → `400`
+- [ ] Neither `phone` nor `email` provided → `400`
+- [ ] `ContactEnquiryAlertEmail` renders with name, phone (if present), email (if present), message
+- [ ] Submitting the form calls the real API (not `setTimeout`)
+- [ ] Success state shown after `200`
+- [ ] API error message shown inline after `400`/`500`
+- [ ] Submit button disabled while request is in flight
+- [ ] No contact data written to the database
 
 ## Rules
 
 - Implement only this phase. Stop when all acceptance criteria are met.
 - Do not modify files outside the scope of this phase.
-- Integration tests run against the dev container DB — no mocks.
 - If you discover a blocker, stop and report it — do not improvise a workaround.
