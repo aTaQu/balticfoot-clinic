@@ -57,6 +57,7 @@ Read **one** of these before writing the corresponding code type — don't read 
 | `/api/admin/schedule` | `src/app/(app)/api/admin/schedule/route.ts` | GET, requires Payload session, `?from=YYYY-MM-DD&days=1-14` |
 | `/api/contact` | `src/app/(app)/api/contact/route.ts` | POST only, no auth, no DB writes |
 | `/api/cron/reminders` | `src/app/(app)/api/cron/reminders/route.ts` | GET, `Authorization: Bearer <CRON_SECRET>`, returns `{ sent, failed }` |
+| `/api/cron/retention` | `src/app/(app)/api/cron/retention/route.ts` | GET, `Authorization: Bearer <CRON_SECRET>`, deletes bookings older than 730 days, returns `{ deleted }` |
 | `/api/[...slug]` | `src/app/(payload)/api/[...slug]/route.ts` | Payload REST + GraphQL |
 
 **Route groups:**
@@ -146,6 +147,14 @@ Pages use `export const dynamic = 'force-dynamic'` where data must reflect Paylo
 
 ## Lib API reference
 
+### `src/lib/constants.ts`
+```ts
+SITE_URL: string   // process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.balticfoot.lt'
+LT_MONTHS: string[]
+LT_DAYS: string[]
+formatDate(d: Date): string   // "15 Balandis 2026 (pirmadienis)"
+```
+
 ### `src/lib/format.ts`
 ```ts
 formatDateLT(isoDate: string): string        // "2026-04-15" → "2026 m. balandžio 15 d."
@@ -232,10 +241,8 @@ Authenticates via `payload.auth()`, parses `[id]` param. Check `'response' in re
 
 ---
 
-## What's NOT built yet (as of Phase 14)
+## What's NOT built yet (as of Phase 15)
 
-- Canonical `<link rel="canonical">` on all public pages — Phase 15
-- Alt text audit across all public images — Phase 15
-- 2-year data retention cron (auto-flag/delete old bookings) — Phase 15
+- Footer navigation updated for multi-page structure — deferred (Phase 16)
 - `NEXT_PUBLIC_SITE_URL` env var set on Railway — deployment step before go-live
-- Footer navigation updated for multi-page structure — deferred (no phase assigned)
+- `BASE_URL` in `sitemap.ts`/`robots.ts` not unified with `SITE_URL` from `constants.ts` — same env var, two names; consolidation deferred
