@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import styles from './Footer.module.css';
 
 const DAY_SHORT_LT: Record<string, string> = {
@@ -110,6 +111,7 @@ export default function Footer({ phone, email, address, workingHoursStart, worki
 
         <div className={styles.footerBottom}>
           <span>© {new Date().getFullYear()} Baltic Foot. Visos teisės saugomos.</span>
+          <Link href="/privatumo-politika" className={styles.footerPrivacy}>Privatumo politika</Link>
           <span>Sukurta su rūpestingumu</span>
         </div>
       </div>

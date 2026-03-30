@@ -108,6 +108,12 @@
   gap: 0.5rem;
 }
 
+.footerPrivacy {
+  text-decoration: underline;
+  transition: color 0.2s;
+}
+.footerPrivacy:hover { color: var(--sand); }
+
 @media (max-width: 900px) {
   .footerGrid { grid-template-columns: 1fr 1fr; }
   .footerGrid > .footerCol:first-child { grid-column: 1 / -1; }

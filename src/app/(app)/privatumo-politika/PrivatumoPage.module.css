@@ -1,0 +1,49 @@
+.content {
+  max-width: 720px;
+  padding: 5rem 0 6rem;
+}
+
+.content h1 {
+  font-family: var(--font-cormorant);
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  font-weight: 600;
+  color: var(--soil);
+  margin-bottom: 0.5rem;
+}
+
+.updated {
+  color: var(--stone);
+  font-size: 0.875rem;
+  margin-bottom: 3rem;
+}
+
+.content h2 {
+  font-family: var(--font-cormorant);
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--soil);
+  margin-top: 2.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.content p {
+  color: var(--stone);
+  line-height: 1.75;
+  margin-bottom: 1rem;
+}
+
+.content ul {
+  color: var(--stone);
+  line-height: 1.75;
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.content li {
+  margin-bottom: 0.4rem;
+}
+
+.content a {
+  color: var(--terra);
+  text-decoration: underline;
+}
