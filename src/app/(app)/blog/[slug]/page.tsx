@@ -10,6 +10,7 @@ import Image from 'next/image'
 import { RichText } from '@payloadcms/richtext-lexical/react'
 import styles from './BlogPost.module.css'
 import { formatDateLT } from '@/lib/format'
+import { SITE_URL } from '@/lib/constants'
 
 export const dynamic = 'force-dynamic'
 
@@ -31,6 +32,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: post.metaTitle ?? post.title,
     description: post.metaDescription ?? undefined,
+    alternates: { canonical: `${SITE_URL}/blog/${slug}/` },
   }
 }
 

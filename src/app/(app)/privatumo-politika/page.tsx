@@ -4,11 +4,13 @@ import configPromise from '@payload-config'
 import Navigation from '@/components/Navigation'
 import Footer from '@/components/Footer'
 import styles from './PrivatumoPage.module.css'
+import { SITE_URL } from '@/lib/constants'
 
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
   title: 'Privatumo politika — Baltic Foot',
+  alternates: { canonical: `${SITE_URL}/privatumo-politika/` },
 }
 
 export default async function PrivatumoPage() {

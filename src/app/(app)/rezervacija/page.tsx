@@ -5,6 +5,7 @@ import type { Service, ClinicSetting } from '../../../../payload-types'
 import Navigation from '@/components/Navigation'
 import Footer from '@/components/Footer'
 import BookingWizard from '@/components/BookingWizard/BookingWizard'
+import { SITE_URL } from '@/lib/constants'
 
 export const dynamic = 'force-dynamic'
 
@@ -12,6 +13,7 @@ export const metadata: Metadata = {
   title: 'Registracija vizitui | Baltic Foot',
   description:
     'Užsiregistruokite vizitui Baltic Foot podologijos klinikoje Šiauliuose. Pasirinkite paslaugą ir patogų laiką.',
+  alternates: { canonical: `${SITE_URL}/rezervacija/` },
 }
 
 type Props = { searchParams: Promise<{ service?: string }> }

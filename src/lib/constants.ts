@@ -1,3 +1,6 @@
+// Site URL — used for canonical URLs and Open Graph
+export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.balticfoot.lt'
+
 // Date and calendar helpers — used by BookingWizard
 
 export const LT_MONTHS = [

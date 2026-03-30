@@ -1,5 +1,6 @@
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
+import type { Metadata } from 'next'
 import type { Service, ClinicSetting } from '../../../payload-types'
 import Navigation from '@/components/Navigation'
 import Hero from '@/components/Hero'
@@ -12,6 +13,11 @@ import Contact from '@/components/Contact'
 import BookingWizard from '@/components/BookingWizard/BookingWizard'
 import Footer from '@/components/Footer'
 import ScrollRevealInit from '@/components/ScrollRevealInit'
+import { SITE_URL } from '@/lib/constants'
+
+export const metadata: Metadata = {
+  alternates: { canonical: `${SITE_URL}/` },
+}
 
 const DAY_SCHEMA: Record<string, string> = {
   monday: 'Mo', tuesday: 'Tu', wednesday: 'We',

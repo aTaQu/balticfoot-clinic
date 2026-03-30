@@ -8,6 +8,7 @@ import Footer from '@/components/Footer'
 import Link from 'next/link'
 import styles from './ServicePage.module.css'
 import { formatDuration } from '@/lib/format'
+import { SITE_URL } from '@/lib/constants'
 
 export const dynamic = 'force-dynamic'
 
@@ -51,7 +52,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const meta = SEO[slug]
   if (!meta) return {}
-  return { title: meta.title, description: meta.description }
+  return {
+    title: meta.title,
+    description: meta.description,
+    alternates: { canonical: `${SITE_URL}/paslaugos/${slug}/` },
+  }
 }
 
 export default async function ServicePage({ params }: Props) {

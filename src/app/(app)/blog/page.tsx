@@ -8,6 +8,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import styles from './Blog.module.css'
 import { formatDateLT } from '@/lib/format'
+import { SITE_URL } from '@/lib/constants'
 
 export const dynamic = 'force-dynamic'
 
@@ -15,6 +16,7 @@ export const metadata: Metadata = {
   title: 'Blogas — Baltic Foot',
   description:
     'Patarimai pėdų sveikatai, procedūrų aprašymai ir naujienos iš Baltic Foot podologijos klinikos Šiauliuose.',
+  alternates: { canonical: `${SITE_URL}/blog/` },
 }
 
 export default async function BlogPage() {
