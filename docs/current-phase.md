@@ -11,52 +11,48 @@ The following phases are complete:
 - **Phase 7 — Availability API**: `GET /api/availability?date=YYYY-MM-DD&service=<slug>` implemented with `force-dynamic`. Core algorithm in `src/lib/availability.ts` — duration-aware slot blocking, PENDING+CONFIRMED+BlockedSlots all block `[slot, slot+duration)`. 11 integration tests pass against real DB.
 - **Phase 8 — Booking Submission**: `POST /api/bookings` implemented with GDPR validation, race condition guard (availability re-checked before create), fire-and-forget notifications. BookingWizard rewritten to fetch live services from Payload and time slots from `/api/availability`. `constants.ts` SERVICES array removed. 8 integration tests pass.
 - **Phase 9 — Booking Admin Actions**: `POST /api/admin/bookings/[id]/{confirm,reject,cancel}` implemented with Payload session auth. `bookingActions.ts` shared helpers with state guards, AuditLog writes, fire-and-forget notifications. `BookingActions.tsx` AfterFields Client Component shows correct buttons by status. `parseAdminRequest.ts` extracts auth + ID-parse. `formatDateLT` extracted to `format.ts`. 10 integration tests pass.
+- **Phase 10 — Slot Blocking**: BlockedSlots admin verified (config already correct from Phase 3). `GET /api/admin/schedule` returns confirmed bookings + blocked slots for a date range (Payload session auth required). `WeekScheduleAfterDashboard` Client Component mounted on Payload dashboard via `admin.components.afterDashboard`. Parallel `Promise.all` queries, `AbortController` fetch cleanup. 6 integration tests pass including cross-phase availability regression.
 
 ## Your task
 
-### Phase 10 — Slot Blocking
+### Phase 11 — Reminder Cron
 
-**User stories**: US 26 (block time slots)
+**User stories**: US 7 (day-before reminder), US 8 (SMS opt-in respected)
 
-The `BlockedSlots` collection exists (Phase 3) and the availability algorithm already respects it (Phase 7). This phase makes slot blocking usable from the admin and adds a week schedule dashboard widget so Veneta can see her upcoming week at a glance.
+**Cron route** — `GET /api/cron/reminders`:
+- Protected by a static Bearer token — `Authorization: Bearer <CRON_SECRET>` header verified against `process.env.CRON_SECRET`
+- Return 401 if token is missing or wrong (external cron callers cannot do cookie-based Payload session auth)
+- Core logic extracted to `src/lib/reminders.ts` — pure function taking a `Payload` instance
 
-**BlockedSlots admin** — collection is already defined. Verify and improve:
-- `useAsTitle: 'date'` and `defaultColumns: ['date', 'startTime', 'endTime', 'reason', 'createdBy']` on the collection config
-- Admin can create, edit, and delete entries without errors
+**Reminder logic** — `src/lib/reminders.ts`:
+- Query all `Bookings` where `date = tomorrow` AND `status = confirmed` AND `reminderSent = false`
+- For each booking:
+  - Always send `BookingReminderEmail` to `patientEmail`
+  - Send reminder SMS only if `smsOptIn = true`
+  - On successful send: update `reminderSent = true`
+  - On send failure: log error, do NOT set `reminderSent = true` (retries on next run)
+- Returns `{ sent: number, failed: number }`
+- "Tomorrow" computed in Lithuanian timezone (`Europe/Vilnius`, UTC+2/UTC+3)
 
-**Schedule API route** — `GET /api/admin/schedule`:
-- Requires Payload session (`payload.auth({ headers })`) — return 401 if unauthenticated
-- Query params: `from` (YYYY-MM-DD, required), `days` (number 1–14, default 7)
-- Returns `{ days: [{ date: string, bookings: ScheduledBooking[], blocks: ScheduledBlock[] }] }`
-- `ScheduledBooking`: `{ id, patientName, serviceName, timeSlot, endTime }`
-- `ScheduledBlock`: `{ id, startTime, endTime, reason }`
-- Only CONFIRMED bookings appear — pending/rejected/cancelled excluded
-- Core logic extracted to `src/lib/schedule.ts` — pure function taking a `Payload` instance
+**Scheduling** — document in `.env.example`:
+- Intended to be triggered daily at 10:00 Europe/Vilnius by Railway cron or an external cron service (e.g. cron-job.org) calling `GET /api/cron/reminders` with the Bearer token
 
-**Week schedule widget** — `src/components/admin/WeekSchedule.tsx` (Client Component):
-- Registered via `admin.components.afterDashboard` in `payload.config.ts`
-- Fetches `GET /api/admin/schedule?from=<today>&days=7` on mount
-- Renders 7 columns (one per day), each listing confirmed bookings and blocked slots
-- Read-only — no actions, just display
-- Uses Payload CSS variables for consistent admin styling (same approach as `BookingActions.tsx`)
-- Registered in `src/app/(payload)/admin/importMap.ts`
-
-**Integration tests** — `src/lib/schedule.test.ts`:
-- Confirmed booking appears in correct day's `bookings` array
-- Pending booking does NOT appear
-- BlockedSlot appears in correct day's `blocks` array
-- Empty days return `{ date, bookings: [], blocks: [] }`
-- Date range spanning multiple days returns correct structure
+**Integration tests** — `src/lib/reminders.test.ts`:
+- Confirmed booking for tomorrow with `reminderSent = false` → sends reminder, sets flag to `true`
+- Confirmed booking with `reminderSent = true` → skipped, flag unchanged
+- Pending booking for tomorrow → skipped
+- Booking with `smsOptIn = false` → email sent, SMS not sent
+- Booking with `smsOptIn = true` → both email and SMS sent
 
 ## Acceptance criteria
 
-- [ ] Admin can create a `BlockedSlot` with date, start time, end time, and optional reason
-- [ ] Admin can delete a `BlockedSlot`
-- [ ] Blocked time range is excluded from `GET /api/availability` (already true — verify with a test covering a block added in this phase)
-- [ ] `GET /api/admin/schedule` returns correct shape, 401 without session
-- [ ] Only CONFIRMED bookings appear in schedule output
-- [ ] Week schedule widget visible on Payload dashboard after login
-- [ ] Widget shows confirmed bookings and blocked slots for the next 7 days
+- [ ] `GET /api/cron/reminders` returns 401 without correct `CRON_SECRET` Bearer token
+- [ ] Only tomorrow's CONFIRMED bookings with `reminderSent = false` are processed
+- [ ] `reminderSent` set to `true` after successful send
+- [ ] `reminderSent` left `false` on send failure (retries next run)
+- [ ] SMS only sent if `smsOptIn = true`
+- [ ] "Tomorrow" resolved in Europe/Vilnius timezone
+- [ ] `CRON_SECRET` documented in `.env.example`
 - [ ] All integration tests pass
 
 ## Rules
