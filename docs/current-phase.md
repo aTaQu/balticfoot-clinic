@@ -1,54 +1,55 @@
 ## Context
 
-Phases 1–13 complete. See DECISIONS.md for full log.
+Phases 1–14 complete. See DECISIONS.md for full log.
 
 ## Your task
 
-### Phase 14 — GDPR + SEO Polish
+### Phase 15 — Go-Live Polish
 
-**User stories**: US 20 (privacy policy), US 29 (delete patient data)
+**User stories**: US 19 (schema.org / SEO completeness), US 20 (privacy policy), US 29 (GDPR retention)
 
-**Pages to build:**
+**Canonical URLs:**
 
-`/privatumo-politika/` — privacy policy page:
-- Static page in Lithuanian (no Payload fetch needed)
-- Must cover: data collected (name, phone, email, notes), purpose (appointment
-  management), retention (2 years from appointment date), patient rights
-  (access, correction, deletion), contact: info@balticfoot.lt
-- `generateMetadata()`: title `"Privatumo politika — Baltic Foot"`
-- Link it from the Footer
+Add `<link rel="canonical">` to all public pages:
+- `/` — `https://www.balticfoot.lt/`
+- `/paslaugos/[slug]/` — `https://www.balticfoot.lt/paslaugos/[slug]/`
+- `/blog/` — `https://www.balticfoot.lt/blog/`
+- `/blog/[slug]/` — `https://www.balticfoot.lt/blog/[slug]/`
+- `/rezervacija/` — `https://www.balticfoot.lt/rezervacija/`
+- `/privatumo-politika/` — `https://www.balticfoot.lt/privatumo-politika/`
 
-**SEO infrastructure:**
+Use Next.js `Metadata.alternates.canonical` — not a raw `<link>` tag.
+Base URL from `process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.balticfoot.lt'`.
 
-`src/app/sitemap.ts` — auto-generated XML sitemap:
-- Homepage `/`
-- All active service pages `/paslaugos/[slug]`
-- All published blog posts `/blog/[slug]`
-- Exclude `/admin`, `/api/*`
+**Alt text audit:**
 
-`src/app/robots.ts` — robots.txt:
-- Allow all
-- Disallow `/admin`
-- Sitemap URL pointing to production domain
+Verify every `<Image>` on all public pages has a meaningful Lithuanian `alt` attribute.
+Check: homepage, all service pages, blog list, blog post pages. Fix any missing or
+generic (`""`, `"image"`) alt values.
 
-**Patient data deletion:**
-- Verify (don't change) that Payload admin already allows deleting a Booking
-  record — if it does, document it; if access rules block it, fix them
+**2-year data retention:**
 
-**Footer update:**
-- Add link to `/privatumo-politika/` in the Footer component
+Add a cron route `GET /api/cron/retention` (same Bearer auth pattern as reminders)
+that deletes bookings older than 2 years.
+
+Retention cron spec:
+- Auth: `Authorization: Bearer <CRON_SECRET>` (same as reminders cron)
+- Query: bookings where `date < today − 730 days`
+- Action: hard delete via `payload.delete()`
+- Returns: `{ deleted: number }`
+- No new collection needed
 
 **No new collections.**
-**No integration tests** — static content and sitemap generation.
+**No integration tests** — canonical meta is Next.js framework behaviour; retention
+cron follows the same pattern as reminders (already tested).
 
 ## Acceptance criteria
 
-- [ ] `/privatumo-politika/` exists and covers all required GDPR elements in Lithuanian
-- [ ] Footer links to `/privatumo-politika/`
-- [ ] `/sitemap.xml` includes homepage, all active service slugs, all published blog slugs
-- [ ] `/robots.txt` disallows `/admin`, includes sitemap URL
-- [ ] Admin can delete a Booking record (PII removal)
-- [ ] `/privatumo-politika/` has correct `<title>` meta
+- [ ] `<link rel="canonical">` present in `<head>` on all 6 public page types
+- [ ] No public page image is missing a meaningful alt attribute
+- [ ] `GET /api/cron/retention` exists, requires Bearer token, deletes bookings
+  older than 2 years, returns `{ deleted: number }`
+- [ ] `NEXT_PUBLIC_SITE_URL` documented in `.env.example`
 
 ## Rules
 
