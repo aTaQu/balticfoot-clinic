@@ -27,7 +27,7 @@ Read **one** of these before writing the corresponding code type — don't read 
 
 - **Collection slug type casts** — Payload's generated `CollectionSlug` type may not include new collections until `generate:types` runs. Use typed constants: `const BOOKINGS = 'bookings' as const` then `collection: BOOKINGS as any`.
 - **Payload relationship depth** — `payload.find()` defaults to `depth: 2`, returning full nested objects. Use `depth: 0` when you only need IDs (e.g. asserting `log.user === userId` in tests).
-- **Test env vars** — any test that imports `bookingActions.ts` or `bookings.ts` (which import `notifications/email.ts`) will fail at module load unless `RESEND_API_KEY` is set. Run as: `RESEND_API_KEY=re_test_dummy SMSAPI_TOKEN=test_dummy npx vitest run <file>`.
+- **Test env vars** — any test that imports `bookingActions.ts` or `bookings.ts` (which import `notifications/email.ts`) will fail at module load unless `RESEND_API_KEY` is set. Run as: `RESEND_API_KEY=re_test_dummy npx vitest run <file>`.
 - **`slotIntervalMinutes` is a string** — stored as `'30'`/`'60'` select in Postgres. Always `parseInt()` before arithmetic.
 - **`endTime` on Bookings** — computed server-side via `beforeChange` hook, typed `string | null`. Null-guard with `flatMap` or `??` before use.
 - **Admin UI styling** — Payload admin doesn't reliably pick up Tailwind classes. Use inline `style={{ }}` with `var(--theme-*)` CSS variables (see `BookingActions.tsx`).
@@ -73,7 +73,7 @@ Read **one** of these before writing the corresponding code type — don't read 
 | `users` | `src/collections/Users.ts` | `name`, `email`, `role` (admin\|staff) |
 | `services` | `src/collections/Services.ts` | `name`, `slug`, `price`, `duration` (min), `description`, `shortDescription`, `icon`, `active` |
 | `blog-posts` | `src/collections/BlogPosts.ts` | `title`, `slug` (auto), `body` (Lexical), `status` (published\|draft), `publishedAt` |
-| `bookings` | `src/collections/Bookings.ts` | `service` (rel), `date`, `timeSlot`, `endTime` (computed, nullable), `status` (pending\|confirmed\|rejected\|cancelled), `patientName/Phone/Email`, `gdprConsent`, `smsOptIn` |
+| `bookings` | `src/collections/Bookings.ts` | `service` (rel), `date`, `timeSlot`, `endTime` (computed, nullable), `status` (pending\|confirmed\|rejected\|cancelled), `patientName/Phone/Email`, `gdprConsent` |
 | `blocked-slots` | `src/collections/BlockedSlots.ts` | `date`, `startTime`, `endTime`, `reason`, `createdBy` (rel → users) |
 | `audit-log` | `src/collections/AuditLog.ts` | `user` (rel), `action` (confirmed\|rejected\|cancelled\|rescheduled\|slot_blocked\|slot_unblocked), `booking` (rel, optional), `note` — **read-only in admin** |
 | `media` | `src/collections/Media.ts` | Upload collection, 5 MB limit, stored in `/public/media` |
@@ -205,8 +205,6 @@ Each: validates state transition → updates booking → writes AuditLog → fir
 ### `src/lib/notifications/`
 ```ts
 sendEmail(template: EmailTemplate, to: string, data: EmailData): Promise<void>
-sendSms(to: string, message: string): Promise<void>
-SMS.received / SMS.confirmed(date, time, service) / SMS.rejected / SMS.reminder(time)
 ```
 Both functions catch and log — never rethrow. `EmailTemplate` = `'booking-received' | 'booking-confirmed' | 'booking-rejected' | 'booking-reminder' | 'new-booking-alert' | 'booking-cancelled-alert' | 'contact-enquiry-alert'`.
 
@@ -233,7 +231,6 @@ Authenticates via `payload.auth()`, parses `[id]` param. Check `'response' in re
 | File | Purpose |
 |------|---------|
 | `email.ts` | `sendEmail(template, to, data)` — renders + sends via Resend singleton |
-| `sms.ts` | `sendSms(to, message)` + `SMS` string constants |
 | `types.ts` | `EmailTemplate` union, `EmailData` variants |
 | `styles.ts` | Shared inline style tokens for all email templates |
 | `templates/` | 7 React Email components (received, confirmed, rejected, reminder, new-booking alert, cancelled alert, contact enquiry alert) |

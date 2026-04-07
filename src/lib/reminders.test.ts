@@ -3,7 +3,6 @@ import { getPayload, type Payload } from 'payload'
 import configPromise from '@payload-config'
 import { sendReminders } from './reminders'
 import * as emailMod from './notifications/email'
-import * as smsMod from './notifications/sms'
 
 // Far-future date used as "tomorrow" in tests
 const TEST_TOMORROW = '2099-11-15'
@@ -45,7 +44,6 @@ async function createBooking(overrides: Record<string, unknown> = {}) {
       patientPhone: '+37060000099',
       patientEmail: 'reminder-test@example.com',
       gdprConsent: true,
-      smsOptIn: false,
       reminderSent: false,
       ...overrides,
     },
@@ -56,7 +54,6 @@ describe('sendReminders', () => {
   it('sends email and sets reminderSent=true for confirmed booking with reminderSent=false', async () => {
     const booking = await createBooking()
     vi.spyOn(emailMod, 'sendEmail').mockResolvedValue(undefined)
-    vi.spyOn(smsMod, 'sendSms').mockResolvedValue(undefined)
 
     const result = await sendReminders(payload, TEST_TOMORROW)
 
@@ -67,7 +64,6 @@ describe('sendReminders', () => {
       'reminder-test@example.com',
       expect.objectContaining({ patientName: 'Test Reminder' }),
     )
-    expect(smsMod.sendSms).not.toHaveBeenCalled()
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const updated = await payload.findByID({ collection: 'bookings' as any, id: booking.id as number })
@@ -93,30 +89,5 @@ describe('sendReminders', () => {
 
     expect(result.sent).toBe(0)
     expect(emailMod.sendEmail).not.toHaveBeenCalled()
-  })
-
-  it('sends only email when smsOptIn=false', async () => {
-    await createBooking({ smsOptIn: false })
-    vi.spyOn(emailMod, 'sendEmail').mockResolvedValue(undefined)
-    vi.spyOn(smsMod, 'sendSms').mockResolvedValue(undefined)
-
-    const result = await sendReminders(payload, TEST_TOMORROW)
-
-    expect(result.sent).toBe(1)
-    expect(emailMod.sendEmail).toHaveBeenCalledOnce()
-    expect(smsMod.sendSms).not.toHaveBeenCalled()
-  })
-
-  it('sends email and SMS when smsOptIn=true', async () => {
-    await createBooking({ smsOptIn: true })
-    vi.spyOn(emailMod, 'sendEmail').mockResolvedValue(undefined)
-    vi.spyOn(smsMod, 'sendSms').mockResolvedValue(undefined)
-
-    const result = await sendReminders(payload, TEST_TOMORROW)
-
-    expect(result.sent).toBe(1)
-    expect(emailMod.sendEmail).toHaveBeenCalledOnce()
-    expect(smsMod.sendSms).toHaveBeenCalledOnce()
-    expect(smsMod.sendSms).toHaveBeenCalledWith('+37060000099', expect.stringContaining('10:00'))
   })
 })

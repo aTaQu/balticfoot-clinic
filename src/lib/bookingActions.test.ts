@@ -53,7 +53,6 @@ async function createPendingBooking(timeSlot = '10:00') {
       patientPhone: '+37060000099',
       patientEmail: 'test-actions@example.com',
       gdprConsent: true,
-      smsOptIn: false,
     },
   })
 }

@@ -71,7 +71,6 @@ async function createConfirmedBooking(date = DATE_0, timeSlot = '10:00') {
       patientPhone: '+37060000001',
       patientEmail: 'schedule-test@example.com',
       gdprConsent: true,
-      smsOptIn: false,
     },
   })
 }
@@ -89,7 +88,6 @@ async function createPendingBooking(date = DATE_0, timeSlot = '11:00') {
       patientPhone: '+37060000002',
       patientEmail: 'schedule-pending@example.com',
       gdprConsent: true,
-      smsOptIn: false,
     },
   })
 }

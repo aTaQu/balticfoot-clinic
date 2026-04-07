@@ -1,7 +1,6 @@
 import type { Payload } from 'payload'
 import { formatDateLT } from './format'
 import { sendEmail } from './notifications/email'
-import { sendSms, SMS } from './notifications/sms'
 import type { Service } from '../../payload-types'
 
 export type RemindersResult = { sent: number; failed: number }
@@ -71,10 +70,6 @@ export async function sendReminders(payload: Payload, tomorrow?: string): Promis
         time: booking.timeSlot as string,
         clinicPhone: settings.phone,
       })
-
-      if (booking.smsOptIn) {
-        await sendSms(booking.patientPhone as string, SMS.reminder(booking.timeSlot as string))
-      }
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await payload.update({

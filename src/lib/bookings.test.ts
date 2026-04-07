@@ -20,7 +20,6 @@ const VALID_INPUT = {
   patientName: 'Test Pacientas',
   patientPhone: '+37060000099',
   patientEmail: 'test@example.com',
-  smsOptIn: false,
   gdprConsent: true,
 }
 

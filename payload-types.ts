@@ -266,7 +266,6 @@ export interface Booking {
   patientPhone?: string | null;
   patientEmail?: string | null;
   patientNotes?: string | null;
-  smsOptIn?: boolean | null;
   reminderSent?: boolean | null;
   gdprConsent: boolean;
   updatedAt: string;
@@ -492,7 +491,6 @@ export interface BookingsSelect<T extends boolean = true> {
   patientPhone?: T;
   patientEmail?: T;
   patientNotes?: T;
-  smsOptIn?: T;
   reminderSent?: T;
   gdprConsent?: T;
   updatedAt?: T;

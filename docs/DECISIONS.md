@@ -5,7 +5,7 @@
 - PayloadCMS v3 — runs natively inside Next.js, no separate service, single Railway deployment, admin at `/admin`
 - PostgreSQL (Railway) — managed hosting, connected via `DATABASE_URI`; Payload ORM handles migrations
 - Resend — transactional email (React Email templates, Lithuanian text)
-- SMSAPI — SMS notifications, sender ID "BalticFoot", Lithuanian numbers, ~€0.04/SMS
+- ~~SMSAPI~~ — removed; SMS added cost (~€0.04/SMS) and opt-in UI complexity with low expected uptake; email-only reminders are sufficient
 - Tailwind + shadcn — UI
 
 ## Key schema decisions

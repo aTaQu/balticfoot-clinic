@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
     const {
       serviceSlug, date, timeSlot,
       patientName, patientPhone, patientEmail,
-      patientNotes, smsOptIn, gdprConsent,
+      patientNotes, gdprConsent,
     } = body
 
     if (!serviceSlug || !date || !timeSlot) {
@@ -39,7 +39,6 @@ export async function POST(request: NextRequest) {
       patientPhone: typeof patientPhone === 'string' ? patientPhone : '',
       patientEmail: typeof patientEmail === 'string' ? patientEmail : '',
       patientNotes: typeof patientNotes === 'string' ? patientNotes : undefined,
-      smsOptIn: Boolean(smsOptIn),
       gdprConsent: Boolean(gdprConsent),
     })
 

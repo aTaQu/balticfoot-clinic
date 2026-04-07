@@ -60,7 +60,6 @@ async function createBooking(timeSlot: string, serviceSlug = SVC_30, status = 'p
       patientPhone: '+37060000001',
       patientEmail: 'test@example.com',
       gdprConsent: true,
-      smsOptIn: false,
     },
   })
 }

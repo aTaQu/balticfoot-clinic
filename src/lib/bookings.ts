@@ -2,8 +2,6 @@ import type { Payload } from 'payload'
 import { getAvailability } from './availability'
 import { formatDateLT } from './format'
 import { sendEmail } from './notifications/email'
-import { sendSms, SMS } from './notifications/sms'
-
 export interface CreateBookingInput {
   serviceSlug: string
   date: string         // YYYY-MM-DD
@@ -12,7 +10,6 @@ export interface CreateBookingInput {
   patientPhone: string
   patientEmail: string
   patientNotes?: string
-  smsOptIn: boolean
   gdprConsent: boolean
 }
 
@@ -27,7 +24,7 @@ export async function createBooking(
   const {
     serviceSlug, date, timeSlot,
     patientName, patientPhone, patientEmail,
-    patientNotes, smsOptIn, gdprConsent,
+    patientNotes, gdprConsent,
   } = input
 
   // --- Validation ---
@@ -66,7 +63,6 @@ export async function createBooking(
       patientPhone: patientPhone.trim(),
       patientEmail: patientEmail.trim(),
       patientNotes: patientNotes?.trim() ?? undefined,
-      smsOptIn,
       gdprConsent: true,
       reminderSent: false,
     },
@@ -76,7 +72,7 @@ export async function createBooking(
   const settings = await payload.findGlobal({ slug: 'clinic-settings' })
   const formattedDate = formatDateLT(date)
 
-  // Fire-and-forget: errors caught inside sendEmail/sendSms, never throw
+  // Fire-and-forget: errors caught inside sendEmail, never throw
   if (patientEmail.trim()) void sendEmail('booking-received', patientEmail, {
     patientName,
     serviceName: service.name,
@@ -84,10 +80,6 @@ export async function createBooking(
     time: timeSlot,
     clinicPhone: settings.phone,
   })
-
-  if (smsOptIn) {
-    void sendSms(patientPhone, SMS.received)
-  }
 
   void sendEmail('new-booking-alert', settings.email, {
     patientName,

@@ -2,7 +2,6 @@ import type { Payload } from 'payload'
 import type { Booking, Service } from '../../payload-types'
 import { formatDateLT } from './format'
 import { sendEmail } from './notifications/email'
-import { sendSms, SMS } from './notifications/sms'
 
 export type BookingActionResult =
   | { booking: { id: number; status: string } }
@@ -57,10 +56,6 @@ export async function confirmBooking(
     clinicPhone: settings.phone,
   })
 
-  if (booking.smsOptIn) {
-    void sendSms(booking.patientPhone ?? '', SMS.confirmed(formattedDate, booking.timeSlot, serviceName))
-  }
-
   return { booking: { id: updated.id, status: updated.status } }
 }
 
@@ -112,10 +107,6 @@ export async function rejectBooking(
     clinicPhone: settings.phone,
     rejectionReason: rejectionReason.trim(),
   })
-
-  if (booking.smsOptIn) {
-    void sendSms(booking.patientPhone ?? '', SMS.rejected)
-  }
 
   return { booking: { id: updated.id, status: updated.status } }
 }

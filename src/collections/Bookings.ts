@@ -84,12 +84,6 @@ export const Bookings: CollectionConfig = {
       type: 'textarea',
     },
     {
-      name: 'smsOptIn',
-      type: 'checkbox',
-      defaultValue: false,
-      label: 'Sutinka gauti SMS priminimus',
-    },
-    {
       name: 'reminderSent',
       type: 'checkbox',
       defaultValue: false,

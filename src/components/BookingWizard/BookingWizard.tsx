@@ -49,7 +49,6 @@ interface BookingState {
   phone: string
   email: string
   notes: string
-  smsOptIn: boolean
   gdprConsent: boolean
 }
 
@@ -61,7 +60,6 @@ const INITIAL_STATE: BookingState = {
   phone: '',
   email: '',
   notes: '',
-  smsOptIn: false,
   gdprConsent: false,
 }
 
@@ -152,7 +150,6 @@ export default function BookingWizard({ services, preselectedSlug, openDays = []
       const newErrors = new Set<string>()
       if (!state.name.trim()) newErrors.add('name')
       if (!state.phone.trim() && !state.email.trim()) newErrors.add('contact')
-      if (state.smsOptIn && !state.phone.trim()) newErrors.add('phone')
       if (newErrors.size > 0) {
         setErrors(newErrors)
         setTimeout(() => setErrors(new Set()), 5000)
@@ -198,7 +195,6 @@ export default function BookingWizard({ services, preselectedSlug, openDays = []
           patientPhone: state.phone,
           patientEmail: state.email,
           patientNotes: state.notes,
-          smsOptIn: state.smsOptIn,
           gdprConsent: state.gdprConsent,
         }),
       })
@@ -302,7 +298,6 @@ export default function BookingWizard({ services, preselectedSlug, openDays = []
                   <strong>{state.service?.name}</strong><br />
                   {state.date && formatDate(state.date)}, {state.time}<br />
                   {state.name} · {state.phone}
-                  {state.smsOptIn && <><br /><small style={{ color: 'var(--sage)' }}>SMS priminimas įjungtas</small></>}
                 </div>
               </div>
             ) : (
@@ -464,37 +459,17 @@ export default function BookingWizard({ services, preselectedSlug, openDays = []
                     </div>
                     <div className={styles.wizFormRow}>
                       <div className={styles.wizFormGroup}>
-                        <label htmlFor="wiz-phone">Telefono numeris {state.smsOptIn ? '*' : <span className={styles.optional}>(arba el. paštas)</span>}</label>
+                        <label htmlFor="wiz-phone">Telefono numeris <span className={styles.optional}>(arba el. paštas)</span></label>
                         <input type="tel" id="wiz-phone" placeholder="+370 ..." autoComplete="tel" value={state.phone} onChange={(e) => setState((s) => ({ ...s, phone: e.target.value }))} className={errors.has('contact') || errors.has('phone') ? styles.inputError : ''} />
                       </div>
                       <div className={styles.wizFormGroup}>
-                        <label htmlFor="wiz-email">El. pašto adresas {!state.smsOptIn && <span className={styles.optional}>(arba telefonas)</span>}</label>
+                        <label htmlFor="wiz-email">El. pašto adresas <span className={styles.optional}>(arba telefonas)</span></label>
                         <input type="email" id="wiz-email" placeholder="jusu@pastas.lt" autoComplete="email" value={state.email} onChange={(e) => setState((s) => ({ ...s, email: e.target.value }))} className={errors.has('contact') ? styles.inputError : ''} />
                       </div>
                     </div>
                     <div className={styles.wizFormGroup}>
                       <label htmlFor="wiz-notes">Pastabos <span className={styles.optional}>(neprivaloma)</span></label>
                       <textarea id="wiz-notes" placeholder="Aprašykite savo situaciją arba užduokite klausimą specialistei..." value={state.notes} onChange={(e) => setState((s) => ({ ...s, notes: e.target.value }))} />
-                    </div>
-                    <div
-                      className={`${styles.smsToggle} ${state.smsOptIn ? styles.on : ''}`}
-                      role="switch"
-                      aria-checked={state.smsOptIn}
-                      tabIndex={0}
-                      aria-label="SMS priminimas"
-                      onClick={() => setState((s) => ({ ...s, smsOptIn: !s.smsOptIn }))}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault()
-                          setState((s) => ({ ...s, smsOptIn: !s.smsOptIn }))
-                        }
-                      }}
-                    >
-                      <div className={styles.smsToggleSwitch} aria-hidden="true" />
-                      <div className={styles.smsToggleText}>
-                        <strong>SMS priminimas</strong>
-                        <span>Gausite pranešimą dieną prieš vizitą</span>
-                      </div>
                     </div>
                   </div>
                 )}
@@ -525,7 +500,6 @@ export default function BookingWizard({ services, preselectedSlug, openDays = []
                           ['Telefonas', state.phone],
                           ['El. paštas', state.email],
                           ...(state.notes ? [['Pastabos', state.notes]] : []),
-                          ['SMS', state.smsOptIn ? '✓ Įjungtas' : 'Išjungtas'],
                         ] as [string, string | undefined][]).map(([label, value]) => (
                           <div key={label} className={styles.confirmRow}>
                             <span className={styles.confirmRowLabel}>{label}</span>
