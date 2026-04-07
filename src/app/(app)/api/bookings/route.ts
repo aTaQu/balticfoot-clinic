@@ -21,8 +21,12 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    if (typeof serviceSlug !== 'string' || typeof date !== 'string' || typeof timeSlot !== 'string') {
+      return NextResponse.json({ error: 'serviceSlug, date, and timeSlot must be strings' }, { status: 400 })
+    }
+
     // Reject slugs with unexpected characters before they reach the DB query
-    if (typeof serviceSlug !== 'string' || !/^[a-z0-9-]+$/.test(serviceSlug)) {
+    if (!/^[a-z0-9-]+$/.test(serviceSlug)) {
       return NextResponse.json({ error: 'Invalid serviceSlug format' }, { status: 400 })
     }
 
@@ -31,10 +35,10 @@ export async function POST(request: NextRequest) {
       serviceSlug,
       date,
       timeSlot,
-      patientName: patientName ?? '',
-      patientPhone: patientPhone ?? '',
-      patientEmail: patientEmail ?? '',
-      patientNotes,
+      patientName: typeof patientName === 'string' ? patientName : '',
+      patientPhone: typeof patientPhone === 'string' ? patientPhone : '',
+      patientEmail: typeof patientEmail === 'string' ? patientEmail : '',
+      patientNotes: typeof patientNotes === 'string' ? patientNotes : undefined,
       smsOptIn: Boolean(smsOptIn),
       gdprConsent: Boolean(gdprConsent),
     })

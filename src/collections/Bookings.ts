@@ -5,11 +5,12 @@ export const Bookings: CollectionConfig = {
   admin: {
     useAsTitle: 'patientName',
     defaultColumns: ['patientName', 'service', 'date', 'timeSlot', 'status'],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     components: {
       edit: {
         AfterFields: '@/components/admin/BookingActions#BookingActionsAfterFields',
       },
-    },
+    } as any,
   },
   fields: [
     {

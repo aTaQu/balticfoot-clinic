@@ -49,8 +49,8 @@ export async function confirmBooking(
   const serviceName = resolveServiceName(booking)
   const formattedDate = formatDateLT(booking.date)
 
-  void sendEmail('booking-confirmed', booking.patientEmail, {
-    patientName: booking.patientName,
+  void sendEmail('booking-confirmed', booking.patientEmail ?? '', {
+    patientName: booking.patientName ?? '',
     serviceName,
     date: formattedDate,
     time: booking.timeSlot,
@@ -58,7 +58,7 @@ export async function confirmBooking(
   })
 
   if (booking.smsOptIn) {
-    void sendSms(booking.patientPhone, SMS.confirmed(formattedDate, booking.timeSlot, serviceName))
+    void sendSms(booking.patientPhone ?? '', SMS.confirmed(formattedDate, booking.timeSlot, serviceName))
   }
 
   return { booking: { id: updated.id, status: updated.status } }
@@ -104,8 +104,8 @@ export async function rejectBooking(
   const serviceName = resolveServiceName(booking)
   const formattedDate = formatDateLT(booking.date)
 
-  void sendEmail('booking-rejected', booking.patientEmail, {
-    patientName: booking.patientName,
+  void sendEmail('booking-rejected', booking.patientEmail ?? '', {
+    patientName: booking.patientName ?? '',
     serviceName,
     date: formattedDate,
     time: booking.timeSlot,
@@ -114,7 +114,7 @@ export async function rejectBooking(
   })
 
   if (booking.smsOptIn) {
-    void sendSms(booking.patientPhone, SMS.rejected)
+    void sendSms(booking.patientPhone ?? '', SMS.rejected)
   }
 
   return { booking: { id: updated.id, status: updated.status } }
