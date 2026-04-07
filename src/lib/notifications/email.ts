@@ -41,7 +41,7 @@ export async function sendEmail(
   try {
     const html = await render(TEMPLATES[template](data))
     await resend.emails.send({
-      from: 'Baltic Foot <info@balticfoot.lt>',
+      from: 'Baltic Foot <info@podologija-siauliai.lt>',
       to,
       subject: SUBJECTS[template],
       html,

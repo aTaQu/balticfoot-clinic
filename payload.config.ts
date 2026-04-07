@@ -1,4 +1,5 @@
 import { buildConfig } from 'payload'
+import { s3Storage } from '@payloadcms/storage-s3'
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import path from 'path'
@@ -23,6 +24,22 @@ const configPromise = buildConfig({
       afterDashboard: ['@/components/admin/WeekSchedule#WeekScheduleAfterDashboard'],
     },
   },
+  plugins: [
+    s3Storage({
+      collections: {
+        media: true,
+      },
+      bucket: process.env.S3_BUCKET || '',
+      config: {
+        credentials: {
+          accessKeyId: process.env.S3_ACCESS_KEY_ID || '',
+          secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || '',
+        },
+        region: 'auto',
+        endpoint: process.env.S3_ENDPOINT || '',
+      },
+    }),
+  ],
   collections: [Users, Media, Services, BlogPosts, Bookings, BlockedSlots, AuditLog],
   globals: [ClinicSettings],
   db: postgresAdapter({
@@ -48,7 +65,7 @@ const configPromise = buildConfig({
         collection: 'users',
         data: {
           name: 'Veneta Liaudanskienė',
-          email: 'veneta@balticfoot.lt',
+          email: 'veneta@podologija-siauliai.lt',
           password: process.env.SEED_VENETA_PASSWORD || 'ChangeMe123!',
           role: 'admin',
         },
@@ -57,7 +74,7 @@ const configPromise = buildConfig({
         collection: 'users',
         data: {
           name: 'Lina',
-          email: 'lina@balticfoot.lt',
+          email: 'lina@podologija-siauliai.lt',
           password: process.env.SEED_LINA_PASSWORD || 'ChangeMe123!',
           role: 'admin',
         },
@@ -73,7 +90,7 @@ const configPromise = buildConfig({
         data: {
           clinicName: 'Baltic Foot',
           phone: '+370 699 80980',
-          email: 'info@balticfoot.lt',
+          email: 'info@podologija-siauliai.lt',
           address: 'Šiauliai, Lietuva',
           workingHoursStart: '09:00',
           workingHoursEnd: '18:00',

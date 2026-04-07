@@ -1,5 +1,5 @@
 // Site URL — used for canonical URLs and Open Graph
-export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.balticfoot.lt'
+export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.podologija-siauliai.lt'
 
 // Date and calendar helpers — used by BookingWizard
 
