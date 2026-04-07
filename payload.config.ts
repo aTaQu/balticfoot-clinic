@@ -37,6 +37,7 @@ const configPromise = buildConfig({
         },
         region: 'auto',
         endpoint: process.env.S3_ENDPOINT || '',
+        forcePathStyle: true,
       },
     }),
   ],
