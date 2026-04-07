@@ -15,7 +15,6 @@ COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 
 # Payload reads these at build time for config validation.
-# Pass real values via --build-arg in CI; stubs are fine for local compose.
 ARG DATABASE_URI=postgresql://placeholder/placeholder
 ARG PAYLOAD_SECRET=build-time-placeholder
 
@@ -34,10 +33,12 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN addgroup --system --gid 1001 nodejs \
  && adduser  --system --uid 1001 nextjs
 
-# Copy only the standalone output and static assets
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/next.config.ts ./next.config.ts
+COPY --from=builder /app/src/migrations ./src/migrations
 
 USER nextjs
 
@@ -46,4 +47,6 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-CMD ["node", "server.js"]
+# Run migrations on every start (idempotent — skips already-applied migrations)
+# then start the Next.js server
+CMD ["sh", "-c", "npx payload migrate && npx next start -p ${PORT}"]
