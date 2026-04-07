@@ -40,7 +40,7 @@ export default function Contact({ phone, email, address, hoursDisplay }: Contact
     }
     if (newErrors.size > 0) {
       setErrors(newErrors);
-      setTimeout(() => setErrors(new Set()), 2500);
+      setTimeout(() => setErrors(new Set()), 5000);
       return;
     }
     setSubmitting(true);
@@ -113,6 +113,18 @@ export default function Contact({ phone, email, address, hoursDisplay }: Contact
                 <div>
                   <div className={styles.contactDetailLabel}>Adresas</div>
                   <div className={styles.contactDetailValue}>{address}</div>
+                  <a
+                    href="https://share.google/1uisUCxxuErwNiKbh"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={styles.contactMapLink}
+                  >
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
+                      <circle cx="12" cy="10" r="3" />
+                    </svg>
+                    Atidaryti žemėlapyje →
+                  </a>
                 </div>
               </div>
 

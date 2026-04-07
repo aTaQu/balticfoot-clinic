@@ -23,7 +23,7 @@
   gap: 4rem;
   align-items: center;
   min-height: 100dvh;
-  padding: 6rem 0 4rem;
+  padding: 8rem 0 4rem;
 }
 
 .heroContent {
@@ -54,7 +54,40 @@
     grid-template-columns: 1fr;
     padding-bottom: 4rem;
   }
-  .heroImageWrap { display: none; }
+
+  /* Show a compact portrait on mobile — practitioners' faces are the #1 trust signal */
+  .heroImageWrap {
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    height: 300px;
+    min-height: unset;
+  }
+
+  .heroImageFrame {
+    width: 100%;
+    max-width: 520px;
+  }
+}
+
+@media (max-width: 480px) {
+  .heroImageWrap { height: 240px; }
+}
+
+/* ── Hero entrance — CSS keyframes, no JS needed ─────────── */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes heroUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: none; }
+  }
+
+  .heroEnter {
+    animation: heroUp 0.75s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .heroEnterDelay1 { animation-delay: 0.1s; }
+  .heroEnterDelay2 { animation-delay: 0.2s; }
+  .heroEnterDelay3 { animation-delay: 0.35s; }
+  .heroEnterDelay4 { animation-delay: 0.5s; }
 }
 
 .heroEyebrow {
@@ -103,12 +136,20 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: var(--stone);
-  transition: color 0.2s;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--soil);
+  min-height: 44px;
+  padding: 0.5rem 1.25rem;
+  border: 1.5px solid rgba(107, 94, 82, 0.3);
+  border-radius: 4px;
+  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
 }
-.heroPhone:hover { color: var(--terra); }
+.heroPhone:hover {
+  color: var(--terra);
+  border-color: var(--terra);
+  background: rgba(181, 103, 61, 0.06);
+}
 .heroPhone svg { flex-shrink: 0; }
 
 .heroStats {

@@ -7,12 +7,14 @@
 
 /* ── Design Tokens ─────────────────────────────────────── */
 :root {
-  --sand:  #E8DDD0;
-  --stone: #6B5E52;
-  --terra: #B5673D;
-  --sage:  #8A9E8C;
-  --cream: #FAF7F4;
-  --soil:  #2C2420;
+  --sand:       #E8DDD0;
+  --stone:      #6B5E52;
+  --terra:      #B5673D;
+  --sage:       #8A9E8C;
+  --cream:      #FAF7F4;
+  --soil:       #2C2420;
+  --stone-muted: rgba(107, 94, 82, 0.65); /* AA-passing muted text */
+  --error:      #b94a3c; /* distinct from --terra so error ≠ CTA */
 }
 
 /* ── Base ───────────────────────────────────────────────── */
@@ -43,6 +45,24 @@ h4 { font-size: clamp(1.1rem, 2vw, 1.35rem); }
 a { color: inherit; text-decoration: none; }
 
 img { display: block; max-width: 100%; }
+
+/* ── Scroll anchors — clear fixed nav ───────────────────── */
+[id] {
+  scroll-margin-top: 96px;
+}
+
+/* ── Focus visibility — WCAG AA ─────────────────────────── */
+:focus-visible {
+  outline: 2.5px solid var(--terra);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+/* Form inputs already show a box-shadow ring on focus */
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: none;
+}
 
 /* ── Layout ─────────────────────────────────────────────── */
 .container {
@@ -98,6 +118,12 @@ img { display: block; max-width: 100%; }
   transform: translateY(-1px);
   box-shadow: 0 6px 20px rgba(181, 103, 61, 0.32);
 }
+.btn-primary:active {
+  background: #8a4a28;
+  transform: translateY(1px);
+  box-shadow: 0 2px 8px rgba(181, 103, 61, 0.2);
+  transition-duration: 0.08s;
+}
 
 .btn-ghost {
   background: transparent;
@@ -108,23 +134,36 @@ img { display: block; max-width: 100%; }
   border-color: var(--stone);
   background: rgba(107, 94, 82, 0.06);
 }
+.btn-ghost:active {
+  background: rgba(107, 94, 82, 0.12);
+  transform: translateY(1px);
+  transition-duration: 0.08s;
+}
 
 /* ── Reveal Animations ──────────────────────────────────── */
-.reveal {
-  opacity: 0;
-  transform: translateY(28px);
-  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
-    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+/* JS-primary: ScrollRevealInit adds .visible via IntersectionObserver.
+   Time-based transition-delay gives reliable stagger for grid items.  */
+@media (prefers-reduced-motion: no-preference) {
+  .reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+                transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .reveal.reveal-left  { transform: translateX(-36px); }
+  .reveal.reveal-right { transform: translateX(36px); }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+  .reveal-delay-4 { transition-delay: 0.4s; }
+  .reveal-delay-5 { transition-delay: 0.5s; }
 }
-.reveal.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-.reveal-delay-1 { transition-delay: 0.1s; }
-.reveal-delay-2 { transition-delay: 0.2s; }
-.reveal-delay-3 { transition-delay: 0.3s; }
-.reveal-delay-4 { transition-delay: 0.4s; }
-.reveal-delay-5 { transition-delay: 0.5s; }
 
 /* ── Shake animation ────────────────────────────────────── */
 @keyframes shake {
@@ -133,4 +172,14 @@ img { display: block; max-width: 100%; }
   40%       { transform: translateX(7px); }
   60%       { transform: translateX(-4px); }
   80%       { transform: translateX(4px); }
+}
+
+/* ── Reduced Motion ─────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

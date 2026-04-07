@@ -35,7 +35,7 @@ export default function About({ phone }: AboutProps) {
 
         {/* Veneta */}
         <div className={styles.aboutGrid}>
-          <div className="reveal">
+          <div className="reveal reveal-left">
             <div className={styles.aboutPhotoFrame}>
               <div className={styles.aboutPhotoInner}>
                 <Image
@@ -53,7 +53,7 @@ export default function About({ phone }: AboutProps) {
             </div>
           </div>
 
-          <div className={`${styles.aboutContent} reveal reveal-delay-2`}>
+          <div className={`${styles.aboutContent} reveal reveal-right reveal-delay-2`}>
             <h3>Veneta Liaudanskienė</h3>
 
             <p className={styles.aboutBodyText}>
@@ -99,7 +99,7 @@ export default function About({ phone }: AboutProps) {
 
         {/* Lina */}
         <div className={`${styles.aboutGrid} ${styles.aboutGridReversed}`}>
-          <div className={`${styles.aboutContent} reveal`}>
+          <div className={`${styles.aboutContent} reveal reveal-left`}>
             <h3>Lina Bagarauskienė</h3>
 
             <p className={styles.aboutBodyText}>
@@ -140,7 +140,7 @@ export default function About({ phone }: AboutProps) {
             </div>
           </div>
 
-          <div className="reveal reveal-delay-2">
+          <div className="reveal reveal-right reveal-delay-2">
             <div className={styles.aboutPhotoFrame}>
               <div className={styles.aboutPhotoInner}>
                 <Image

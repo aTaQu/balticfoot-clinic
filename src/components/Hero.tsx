@@ -13,16 +13,16 @@ export default function Hero({ phone }: HeroProps) {
       <div className="container">
         <div className={styles.heroInner}>
           <div className={styles.heroContent}>
-            <div className={`${styles.heroEyebrow} reveal`}>
+            <div className={`${styles.heroEyebrow} ${styles.heroEnter}`}>
               Profesionali podologijos priežiūra
             </div>
 
-            <h1 id="hero-heading" className="reveal reveal-delay-1" style={{ marginBottom: '1.25rem' }}>
+            <h1 id="hero-heading" className={`${styles.heroEnter} ${styles.heroEnterDelay1}`} style={{ marginBottom: '1.25rem' }}>
               Podologijos klinika Šiauliuose —<br />
               <em className={styles.heroEm}>profesionali pėdų priežiūra</em>
             </h1>
 
-            <div className={`${styles.heroBody} reveal reveal-delay-2`}>
+            <div className={`${styles.heroBody} ${styles.heroEnter} ${styles.heroEnterDelay2}`}>
               <p>
                 Venetos Liaudanskienės podologijos kabinetuose rūpinamės jūsų pėdų
                 sveikata su šiluma, profesionalumu ir individualia priežiūra — nuo
@@ -30,7 +30,7 @@ export default function Hero({ phone }: HeroProps) {
               </p>
             </div>
 
-            <div className={`${styles.heroActions} reveal reveal-delay-3`}>
+            <div className={`${styles.heroActions} ${styles.heroEnter} ${styles.heroEnterDelay3}`}>
               <a href="#registracija" className="btn btn-primary">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
@@ -48,14 +48,14 @@ export default function Hero({ phone }: HeroProps) {
               </a>
             </div>
 
-            <div className={`${styles.heroStats} reveal reveal-delay-4`}>
+            <div className={`${styles.heroStats} ${styles.heroEnter} ${styles.heroEnterDelay4}`}>
               <div className={styles.heroStat}>
                 <div className={styles.heroStatValue}>10+</div>
                 <div className={styles.heroStatLabel}>Metų patirtis</div>
               </div>
               <div className={styles.heroStat}>
-                <div className={styles.heroStatValue}>5</div>
-                <div className={styles.heroStatLabel}>Procedūros</div>
+                <div className={styles.heroStatValue}>1900+</div>
+                <div className={styles.heroStatLabel}>Lankytojų per metus</div>
               </div>
               <div className={styles.heroStat}>
                 <div className={styles.heroStatValue}>100%</div>
@@ -64,7 +64,7 @@ export default function Hero({ phone }: HeroProps) {
             </div>
           </div>
 
-          <div className={`${styles.heroImageWrap} reveal reveal-delay-2`} aria-hidden="true">
+          <div className={`${styles.heroImageWrap} ${styles.heroEnter} ${styles.heroEnterDelay2}`} aria-hidden="true">
             <div className={styles.heroImageFrame}>
               <Image
                 src="/images/Veneta_Lina.jpg"
@@ -72,7 +72,7 @@ export default function Hero({ phone }: HeroProps) {
                 fill
                 priority
                 style={{ objectFit: 'cover', objectPosition: 'center top' }}
-                sizes="(max-width: 900px) 0px, 45vw"
+                sizes="(max-width: 480px) 100vw, (max-width: 900px) 520px, 45vw"
               />
             </div>
           </div>

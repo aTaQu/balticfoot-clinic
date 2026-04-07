@@ -73,12 +73,10 @@ export const Bookings: CollectionConfig = {
     {
       name: 'patientPhone',
       type: 'text',
-      required: true,
     },
     {
       name: 'patientEmail',
       type: 'email',
-      required: true,
     },
     {
       name: 'patientNotes',

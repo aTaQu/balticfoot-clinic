@@ -1,5 +1,4 @@
-'use client';
-
+import Link from 'next/link'
 import type { Service } from '../../payload-types'
 import { formatDuration } from '@/lib/format'
 import styles from './Services.module.css';
@@ -43,16 +42,9 @@ const SERVICE_ICONS: Record<string, React.ReactNode> = {
 
 interface ServicesProps {
   services: Service[]
-  onServiceSelect?: (name: string) => void;
 }
 
-export default function Services({ services, onServiceSelect }: ServicesProps) {
-  const handleCardClick = (name: string) => {
-    if (onServiceSelect) onServiceSelect(name);
-    const section = document.getElementById('registracija');
-    if (section) section.scrollIntoView({ behavior: 'smooth' });
-  };
-
+export default function Services({ services }: ServicesProps) {
   return (
     <section className={styles.services} id="paslaugos" aria-labelledby="services-heading">
       <div className="container">
@@ -67,12 +59,10 @@ export default function Services({ services, onServiceSelect }: ServicesProps) {
 
         <div className={styles.servicesGrid}>
           {services.map((service, i) => (
-            <article
+            <Link
               key={service.id}
+              href={`/paslaugos/${service.slug}`}
               className={`${styles.serviceCard} reveal reveal-delay-${i + 1}`}
-              onClick={() => handleCardClick(service.name)}
-              title="Spustelėkite norėdami rezervuoti"
-              style={{ cursor: 'pointer' }}
             >
               <div className={styles.serviceIcon} aria-hidden="true">
                 {service.icon ? SERVICE_ICONS[service.icon] : null}
@@ -89,7 +79,8 @@ export default function Services({ services, onServiceSelect }: ServicesProps) {
                 </span>
                 <span className={styles.serviceCardPrice}>{service.price} €</span>
               </div>
-            </article>
+              <span className={styles.serviceCardBtn}>Skaityti daugiau →</span>
+            </Link>
           ))}
         </div>
       </div>

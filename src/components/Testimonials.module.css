@@ -1,0 +1,71 @@
+.testimonials {
+  background: var(--sand);
+  padding: 8rem 0;
+}
+
+.testimonialsHeader {
+  margin-bottom: 4rem;
+}
+.testimonialsHeader h2 { margin-bottom: 0; }
+
+.testimonialsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.testimonialCard {
+  background: var(--cream);
+  border: 1px solid rgba(107, 94, 82, 0.12);
+  border-radius: 16px;
+  padding: 2rem;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  position: relative;
+  transition: box-shadow 0.3s ease;
+}
+.testimonialCard:hover {
+  box-shadow: 0 8px 32px rgba(44, 36, 32, 0.09);
+}
+
+.testimonialQuoteMark {
+  font-family: var(--font-cormorant), 'Cormorant Garamond', serif;
+  font-size: 4rem;
+  line-height: 0.75;
+  color: var(--terra);
+  opacity: 0.3;
+  user-select: none;
+}
+
+.testimonialText {
+  font-size: 1rem;
+  line-height: 1.75;
+  color: var(--stone);
+  font-style: italic;
+  margin: 0;
+}
+.testimonialText p { margin: 0; }
+
+.testimonialMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(107, 94, 82, 0.1);
+  margin-top: auto;
+}
+
+.testimonialAuthor {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--soil);
+}
+
+.testimonialService {
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--sage);
+}

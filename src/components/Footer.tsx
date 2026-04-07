@@ -35,6 +35,7 @@ export default function Footer({ phone, email, address, workingHoursStart, worki
               Profesionali pėdų priežiūra su šiluma ir rūpesčiu. Venetos
               Liaudanskienės kabinetas — jūsų pėdų sveikatai.
             </p>
+            {/* Social links — URLs to be provided by client before enabling
             <div className={styles.footerSocial}>
               <a
                 href="https://facebook.com/balticfoot"
@@ -61,17 +62,19 @@ export default function Footer({ phone, email, address, workingHoursStart, worki
                 </svg>
               </a>
             </div>
+            */}
           </div>
 
           {/* Col 2 — Navigation */}
           <div className={styles.footerCol}>
             <h4>Navigacija</h4>
             <ul>
-              <li><a href="#virsus">Pradžia</a></li>
-              <li><a href="#paslaugos">Paslaugos</a></li>
-              <li><a href="#apie">Apie mus</a></li>
-              <li><a href="#susisiekite">Susisiekite</a></li>
-              <li><a href="#registracija">Registracija</a></li>
+              <li><Link href="/">Pradžia</Link></li>
+              <li><Link href="/#paslaugos">Paslaugos</Link></li>
+              <li><Link href="/#apie">Apie mus</Link></li>
+              <li><Link href="/#kontaktai">Susisiekite</Link></li>
+              <li><Link href="/rezervacija/">Registracija</Link></li>
+              <li><Link href="/blog/">Blogas</Link></li>
             </ul>
           </div>
 

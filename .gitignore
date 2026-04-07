@@ -34,3 +34,4 @@ tsconfig.tsbuildinfo
 # media uploads
 public/media/
 .claude/settings.local.json
+.claude/skills/

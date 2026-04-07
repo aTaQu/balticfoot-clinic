@@ -21,6 +21,9 @@ export const metadata: Metadata = {
   title: 'Baltic Foot — Venetos Liaudanskienės podologijos kabinetai',
   description:
     'Profesionali podologijos priežiūra Lietuvoje. Saugus aparatinis pedikiūras, įaugusio nago korekcija Titano Siūlu, probleminių pėdų procedūros. Registruokitės: +370 699 80980',
+  icons: {
+    icon: '/images/favicon.png',
+  },
 };
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {

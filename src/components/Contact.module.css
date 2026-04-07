@@ -64,6 +64,19 @@ a.contactDetailItem:hover { opacity: 0.75; }
   line-height: 1.5;
 }
 
+.contactMapLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 0.4rem;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--terra);
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+.contactMapLink:hover { opacity: 0.75; }
+
 /* Form side */
 .contactFormWrap {
   background: var(--cream);
@@ -105,7 +118,7 @@ a.contactDetailItem:hover { opacity: 0.75; }
   border-radius: 8px;
   background: #fff;
   font-family: var(--font-dm-sans), 'DM Sans', sans-serif;
-  font-size: 0.9rem;
+  font-size: 1rem;
   color: var(--soil);
   transition: border-color 0.2s, box-shadow 0.2s;
   resize: vertical;
@@ -119,8 +132,8 @@ a.contactDetailItem:hover { opacity: 0.75; }
 }
 
 .inputError {
-  border-color: #d44 !important;
-  box-shadow: 0 0 0 3px rgba(221, 68, 68, 0.1) !important;
+  border-color: var(--error) !important;
+  box-shadow: 0 0 0 3px rgba(185, 74, 60, 0.12) !important;
 }
 
 .contactSubmit {

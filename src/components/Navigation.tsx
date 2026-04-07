@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import styles from './Navigation.module.css';
 
@@ -30,7 +31,7 @@ export default function Navigation() {
       >
         <div className="container">
           <div className={styles.navInner}>
-            <a href="#virsus" className={styles.navLogo} aria-label="Baltic Foot pradžia">
+            <Link href="/" className={styles.navLogo} aria-label="Baltic Foot pradžia">
               <Image
                 src="/images/balticfoot-logo-1608546074.jpg"
                 alt="Baltic Foot"
@@ -39,17 +40,17 @@ export default function Navigation() {
                 className={styles.navLogoImg}
                 priority
               />
-            </a>
+            </Link>
 
             <ul className={styles.navLinks} role="list">
-              <li><a href="#paslaugos">Paslaugos</a></li>
-              <li><a href="#apie">Apie mus</a></li>
-              <li><a href="#kontaktai">Kontaktai</a></li>
+              <li><Link href="/#paslaugos">Paslaugos</Link></li>
+              <li><Link href="/#apie">Apie mus</Link></li>
+              <li><Link href="/#kontaktai">Kontaktai</Link></li>
             </ul>
 
-            <a href="#registracija" className={`btn btn-primary ${styles.navCta}`}>
+            <Link href="/rezervacija/" className={`btn btn-primary ${styles.navCta}`}>
               Registruotis
-            </a>
+            </Link>
 
             <button
               className={`${styles.hamburger} ${mobileOpen ? styles.open : ''}`}
@@ -73,12 +74,12 @@ export default function Navigation() {
         aria-label="Mobilusis meniu"
         aria-modal="true"
       >
-        <a href="#paslaugos" onClick={closeMenu}>Paslaugos</a>
-        <a href="#apie" onClick={closeMenu}>Apie mus</a>
-        <a href="#kontaktai" onClick={closeMenu}>Kontaktai</a>
-        <a href="#registracija" className={`btn btn-primary ${styles.navMobileCta}`} onClick={closeMenu}>
+        <Link href="/#paslaugos" onClick={closeMenu}>Paslaugos</Link>
+        <Link href="/#apie" onClick={closeMenu}>Apie mus</Link>
+        <Link href="/#kontaktai" onClick={closeMenu}>Kontaktai</Link>
+        <Link href="/rezervacija/" className={`btn btn-primary ${styles.navMobileCta}`} onClick={closeMenu}>
           Registruotis vizitui
-        </a>
+        </Link>
       </div>
     </>
   );

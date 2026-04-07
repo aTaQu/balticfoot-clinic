@@ -151,11 +151,11 @@ export default function BookingWizard({ services, preselectedSlug, openDays = []
     if (step === 3) {
       const newErrors = new Set<string>()
       if (!state.name.trim()) newErrors.add('name')
-      if (!state.phone.trim()) newErrors.add('phone')
-      if (!state.email.trim()) newErrors.add('email')
+      if (!state.phone.trim() && !state.email.trim()) newErrors.add('contact')
+      if (state.smsOptIn && !state.phone.trim()) newErrors.add('phone')
       if (newErrors.size > 0) {
         setErrors(newErrors)
-        setTimeout(() => setErrors(new Set()), 2500)
+        setTimeout(() => setErrors(new Set()), 5000)
         return false
       }
     }
@@ -409,7 +409,16 @@ export default function BookingWizard({ services, preselectedSlug, openDays = []
                         {!state.date ? (
                           <p className={styles.timePlaceholder}>Pirmiausia pasirinkite datą.</p>
                         ) : slotsLoading ? (
-                          <p className={styles.timePlaceholder}>Kraunama...</p>
+                          <div
+                            className={styles.timeSkeleton}
+                            role="status"
+                            aria-label="Kraunami laikai..."
+                            aria-busy="true"
+                          >
+                            {Array.from({ length: 8 }).map((_, i) => (
+                              <div key={i} className={styles.timeSkeletonCell} />
+                            ))}
+                          </div>
                         ) : slots.length === 0 ? (
                           <p className={styles.timePlaceholder}>Šią dieną laisvų laikų nėra.</p>
                         ) : (
@@ -449,19 +458,19 @@ export default function BookingWizard({ services, preselectedSlug, openDays = []
                   <div className={styles.wizardPanel} role="group" aria-labelledby="step3-title">
                     <div className={styles.wizardPanelTitle} id="step3-title">Jūsų kontaktiniai duomenys</div>
                     <div className={styles.wizardPanelSub}>Reikalinga informacija vizitui patvirtinti. Duomenys naudojami tik rezervacijos tikslais.</div>
+                    <div className={styles.wizFormGroup}>
+                      <label htmlFor="wiz-name">Vardas ir pavardė *</label>
+                      <input type="text" id="wiz-name" placeholder="Jūsų vardas" autoComplete="name" value={state.name} onChange={(e) => setState((s) => ({ ...s, name: e.target.value }))} className={errors.has('name') ? styles.inputError : ''} />
+                    </div>
                     <div className={styles.wizFormRow}>
                       <div className={styles.wizFormGroup}>
-                        <label htmlFor="wiz-name">Vardas ir pavardė *</label>
-                        <input type="text" id="wiz-name" placeholder="Jūsų vardas" autoComplete="name" value={state.name} onChange={(e) => setState((s) => ({ ...s, name: e.target.value }))} className={errors.has('name') ? styles.inputError : ''} />
+                        <label htmlFor="wiz-phone">Telefono numeris {state.smsOptIn ? '*' : <span className={styles.optional}>(arba el. paštas)</span>}</label>
+                        <input type="tel" id="wiz-phone" placeholder="+370 ..." autoComplete="tel" value={state.phone} onChange={(e) => setState((s) => ({ ...s, phone: e.target.value }))} className={errors.has('contact') || errors.has('phone') ? styles.inputError : ''} />
                       </div>
                       <div className={styles.wizFormGroup}>
-                        <label htmlFor="wiz-phone">Telefono numeris *</label>
-                        <input type="tel" id="wiz-phone" placeholder="+370 ..." autoComplete="tel" value={state.phone} onChange={(e) => setState((s) => ({ ...s, phone: e.target.value }))} className={errors.has('phone') ? styles.inputError : ''} />
+                        <label htmlFor="wiz-email">El. pašto adresas {!state.smsOptIn && <span className={styles.optional}>(arba telefonas)</span>}</label>
+                        <input type="email" id="wiz-email" placeholder="jusu@pastas.lt" autoComplete="email" value={state.email} onChange={(e) => setState((s) => ({ ...s, email: e.target.value }))} className={errors.has('contact') ? styles.inputError : ''} />
                       </div>
-                    </div>
-                    <div className={styles.wizFormGroup}>
-                      <label htmlFor="wiz-email">El. pašto adresas *</label>
-                      <input type="email" id="wiz-email" placeholder="jusu@pastas.lt" autoComplete="email" value={state.email} onChange={(e) => setState((s) => ({ ...s, email: e.target.value }))} className={errors.has('email') ? styles.inputError : ''} />
                     </div>
                     <div className={styles.wizFormGroup}>
                       <label htmlFor="wiz-notes">Pastabos <span className={styles.optional}>(neprivaloma)</span></label>

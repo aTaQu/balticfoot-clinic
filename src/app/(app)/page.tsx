@@ -9,6 +9,7 @@ import Trust from '@/components/Trust'
 import Quote from '@/components/Quote'
 import About from '@/components/About'
 import Gallery from '@/components/Gallery'
+import Testimonials from '@/components/Testimonials'
 import Contact from '@/components/Contact'
 import BookingWizard from '@/components/BookingWizard/BookingWizard'
 import Footer from '@/components/Footer'
@@ -81,9 +82,10 @@ export default async function Home() {
         <Hero phone={settings.phone} />
         <Services services={services} />
         <Trust />
-        <Quote />
         <About phone={settings.phone} />
+        <Testimonials />
         <Gallery />
+        <Quote />
         <BookingWizard services={services} openDays={openDays as string[]} />
         <Contact
           phone={settings.phone}

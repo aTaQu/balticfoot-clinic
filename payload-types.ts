@@ -263,8 +263,8 @@ export interface Booking {
    */
   rejectionReason?: string | null;
   patientName: string;
-  patientPhone: string;
-  patientEmail: string;
+  patientPhone?: string | null;
+  patientEmail?: string | null;
   patientNotes?: string | null;
   smsOptIn?: boolean | null;
   reminderSent?: boolean | null;

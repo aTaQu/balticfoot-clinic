@@ -33,8 +33,7 @@ export async function createBooking(
   // --- Validation ---
   if (!gdprConsent) return { error: 'GDPR consent is required', status: 400 }
   if (!patientName.trim()) return { error: 'patientName is required', status: 400 }
-  if (!patientPhone.trim()) return { error: 'patientPhone is required', status: 400 }
-  if (!patientEmail.trim()) return { error: 'patientEmail is required', status: 400 }
+  if (!patientPhone.trim() && !patientEmail.trim()) return { error: 'patientPhone or patientEmail is required', status: 400 }
 
   // --- Fetch service ---
   const serviceResult = await payload.find({
@@ -78,7 +77,7 @@ export async function createBooking(
   const formattedDate = formatDateLT(date)
 
   // Fire-and-forget: errors caught inside sendEmail/sendSms, never throw
-  void sendEmail('booking-received', patientEmail, {
+  if (patientEmail.trim()) void sendEmail('booking-received', patientEmail, {
     patientName,
     serviceName: service.name,
     date: formattedDate,
