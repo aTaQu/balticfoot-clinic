@@ -9,7 +9,11 @@ import { NewBookingAlertEmail } from './templates/NewBookingAlertEmail'
 import { BookingCancelledAlertEmail } from './templates/BookingCancelledAlertEmail'
 import { ContactEnquiryAlertEmail } from './templates/ContactEnquiryAlertEmail'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+let _resend: Resend | null = null
+function getResend(): Resend {
+  if (!_resend) _resend = new Resend(process.env.RESEND_API_KEY)
+  return _resend
+}
 
 const SUBJECTS: Record<EmailTemplate, string> = {
   'booking-received':         'Vizito užklausa gauta — Baltic Foot',
@@ -40,7 +44,7 @@ export async function sendEmail(
 ): Promise<void> {
   try {
     const html = await render(TEMPLATES[template](data))
-    await resend.emails.send({
+    await getResend().emails.send({
       from: 'Baltic Foot <info@podologija-siauliai.lt>',
       to,
       subject: SUBJECTS[template],
