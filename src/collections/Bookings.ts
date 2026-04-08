@@ -5,12 +5,6 @@ export const Bookings: CollectionConfig = {
   admin: {
     useAsTitle: 'patientName',
     defaultColumns: ['patientName', 'service', 'date', 'timeSlot', 'status'],
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    components: {
-      edit: {
-        AfterFields: '@/components/admin/BookingActions#BookingActionsAfterFields',
-      },
-    } as any,
   },
   fields: [
     {
@@ -97,6 +91,15 @@ export const Bookings: CollectionConfig = {
       type: 'checkbox',
       required: true,
       label: 'Sutinka su duomenų tvarkymu (BDAR)',
+    },
+    {
+      name: 'bookingActions',
+      type: 'ui',
+      admin: {
+        components: {
+          Field: '@/components/admin/BookingActions#BookingActionsAfterFields',
+        },
+      },
     },
   ],
   hooks: {
