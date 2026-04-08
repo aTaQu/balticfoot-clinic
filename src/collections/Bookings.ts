@@ -51,6 +51,9 @@ export const Bookings: CollectionConfig = {
         { label: 'Atmesta', value: 'rejected' },
         { label: 'Atšaukta', value: 'cancelled' },
       ],
+      admin: {
+        readOnly: true,
+      },
     },
     {
       name: 'rejectionReason',
