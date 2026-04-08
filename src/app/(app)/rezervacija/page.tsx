@@ -5,6 +5,7 @@ import type { Service, ClinicSetting } from '../../../../payload-types'
 import Navigation from '@/components/Navigation'
 import Footer from '@/components/Footer'
 import BookingWizard from '@/components/BookingWizard/BookingWizard'
+import ScrollRevealInit from '@/components/ScrollRevealInit'
 import { SITE_URL } from '@/lib/constants'
 
 export const dynamic = 'force-dynamic'
@@ -39,6 +40,7 @@ export default async function RezervacijaPage({ searchParams }: Props) {
   return (
     <>
       <Navigation />
+      <ScrollRevealInit />
       <main>
         <BookingWizard
           services={services}
