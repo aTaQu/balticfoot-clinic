@@ -1,5 +1,4 @@
 import { render } from '@react-email/render'
-import { Resend } from 'resend'
 import type { EmailTemplate, EmailData, BookingEmailData, BookingRejectedEmailData, NewBookingAlertEmailData, BookingCancelledAlertEmailData, ContactEnquiryAlertEmailData } from './types'
 import { BookingReceivedEmail } from './templates/BookingReceivedEmail'
 import { BookingConfirmedEmail } from './templates/BookingConfirmedEmail'
@@ -8,12 +7,6 @@ import { BookingReminderEmail } from './templates/BookingReminderEmail'
 import { NewBookingAlertEmail } from './templates/NewBookingAlertEmail'
 import { BookingCancelledAlertEmail } from './templates/BookingCancelledAlertEmail'
 import { ContactEnquiryAlertEmail } from './templates/ContactEnquiryAlertEmail'
-
-let _resend: Resend | null = null
-function getResend(): Resend {
-  if (!_resend) _resend = new Resend(process.env.RESEND_API_KEY)
-  return _resend
-}
 
 const SUBJECTS: Record<EmailTemplate, string> = {
   'booking-received':         'Vizito užklausa gauta — Baltic Foot',
@@ -44,12 +37,23 @@ export async function sendEmail(
 ): Promise<void> {
   try {
     const html = await render(TEMPLATES[template](data))
-    await getResend().emails.send({
-      from: 'Baltic Foot <info@podologija-siauliai.lt>',
-      to,
-      subject: SUBJECTS[template],
-      html,
+    const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: {
+        'api-key': process.env.BREVO_API_KEY ?? '',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        sender: { name: 'Baltic Foot', email: 'info@podologija-siauliai.lt' },
+        to: [{ email: to }],
+        subject: SUBJECTS[template],
+        htmlContent: html,
+      }),
     })
+    if (!res.ok) {
+      const body = await res.text()
+      throw new Error(`Brevo ${res.status}: ${body}`)
+    }
   } catch (err) {
     // Intentionally not rethrowing — notification failure must never break a booking transaction
     console.error(`[notifications] sendEmail failed (template=${template}, to=${to}):`, err)
