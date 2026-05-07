@@ -7,8 +7,8 @@ import Navigation from '@/components/Navigation'
 import Footer from '@/components/Footer'
 import Link from 'next/link'
 import styles from './ServicePage.module.css'
-import { formatDuration } from '@/lib/format'
 import { SITE_URL } from '@/lib/constants'
+import { findServiceBySlug, formatPrice, VENETA_PHONE } from '@/lib/services-catalog'
 
 export const dynamic = 'force-dynamic'
 
@@ -108,20 +108,42 @@ export default async function ServicePage({ params }: Props) {
 
               <aside className={styles.sidebar}>
                 <div className={styles.card}>
-                  <div className={styles.cardRow}>
-                    <span className={styles.cardLabel}>Kaina</span>
-                    <span className={styles.cardValue}>{service.price} €</span>
-                  </div>
-                  <div className={styles.cardRow}>
-                    <span className={styles.cardLabel}>Trukmė</span>
-                    <span className={styles.cardValue}>{formatDuration(service.duration)}</span>
-                  </div>
-                  <Link
-                    href={`/rezervacija?service=${service.slug}`}
-                    className={`btn btn-primary ${styles.cta}`}
-                  >
-                    Registruotis vizitui
-                  </Link>
+                  {(() => {
+                    const catalogItem = findServiceBySlug(slug)
+                    const priceText = catalogItem
+                      ? formatPrice(catalogItem.price)
+                      : `${service.price} €`
+                    const venetaOnly = catalogItem?.venetaOnly ?? false
+                    return (
+                      <>
+                        <div className={styles.cardRow}>
+                          <span className={styles.cardLabel}>Kaina</span>
+                          <span className={styles.cardValue}>{priceText}</span>
+                        </div>
+                        {venetaOnly ? (
+                          <>
+                            <p className={styles.phoneOnlyNote}>
+                              Šią procedūrą atlieka tik Veneta. Registruotis galima tik
+                              telefonu.
+                            </p>
+                            <a
+                              href={`tel:${VENETA_PHONE.replace(/\s/g, '')}`}
+                              className={`btn btn-primary ${styles.cta}`}
+                            >
+                              Skambinti {VENETA_PHONE}
+                            </a>
+                          </>
+                        ) : (
+                          <Link
+                            href={`/rezervacija?service=${service.slug}`}
+                            className={`btn btn-primary ${styles.cta}`}
+                          >
+                            Registruotis vizitui
+                          </Link>
+                        )}
+                      </>
+                    )
+                  })()}
                 </div>
               </aside>
             </div>

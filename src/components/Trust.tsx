@@ -40,9 +40,9 @@ export default function Trust() {
     <section className={styles.trust} aria-labelledby="trust-heading">
       <div className="container">
         <div className={`${styles.trustIntro} reveal`}>
-          <div className={`section-label ${styles.centeredLabel}`}>Kodėl Baltic Foot</div>
-          <h2 id="trust-heading">Profesionalumas su šiluma</h2>
-          <p>Rūpinamės kiekvienu pacientu kaip unikaliu žmogumi — su dėmesiu, kompetencija ir tikru rūpesčiu.</p>
+          <div className={`section-label ${styles.centeredLabel}`}>Kodėl verta rinktis mus</div>
+          <h2 id="trust-heading">Priežiūra, paremta patirtimi ir dėmesiu</h2>
+          <p>Ilgametė patirtis, profesionalus tikslumas ir individualus požiūris kiekvienam.</p>
         </div>
 
         <div className={styles.trustGrid}>

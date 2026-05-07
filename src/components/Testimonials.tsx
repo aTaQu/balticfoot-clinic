@@ -15,9 +15,9 @@ const TESTIMONIALS = [
   },
   {
     quote:
-      'Diabetikui labai svarbu rūpintis pėdomis, o Baltic Foot tai daro atsakingai ir kompetentingai. Esu dėkingas už atsidavimą.',
+      'Nuospaudos kėlė skausmą kiekviename žingsnyje. Po vizito iškart pajutau palengvėjimą, o pėdos tapo daug komfortiškesnės. Tikrai rekomenduoju.',
     author: 'Vytautas J.',
-    service: 'Diabetinių pėdų priežiūra',
+    service: 'Nuospaudų šalinimas',
   },
 ];
 
@@ -26,8 +26,8 @@ export default function Testimonials() {
     <section className={styles.testimonials} aria-labelledby="testimonials-heading">
       <div className="container">
         <div className={`${styles.testimonialsHeader} reveal`}>
-          <div className="section-label">Pacientų atsiliepimai</div>
-          <h2 id="testimonials-heading">Ką sako mūsų pacientai</h2>
+          <div className="section-label">Klientų atsiliepimai</div>
+          <h2 id="testimonials-heading">Ką sako mūsų klientai?</h2>
         </div>
 
         <div className={styles.testimonialsGrid}>

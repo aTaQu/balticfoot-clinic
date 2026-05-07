@@ -14,19 +14,19 @@ export default function Hero({ phone }: HeroProps) {
         <div className={styles.heroInner}>
           <div className={styles.heroContent}>
             <div className={`${styles.heroEyebrow} ${styles.heroEnter}`}>
-              Profesionali podologijos priežiūra
+              Pažangi podologinė priežiūra
             </div>
 
             <h1 id="hero-heading" className={`${styles.heroEnter} ${styles.heroEnterDelay1}`} style={{ marginBottom: '1.25rem' }}>
-              Podologijos klinika Šiauliuose —<br />
-              <em className={styles.heroEm}>profesionali pėdų priežiūra</em>
+              Podologijos specialistai Šiauliuose —<br />
+              <em className={styles.heroEm}>profesionalūs sprendimai Jūsų pėdoms</em>
             </h1>
 
             <div className={`${styles.heroBody} ${styles.heroEnter} ${styles.heroEnterDelay2}`}>
               <p>
-                Venetos Liaudanskienės podologijos kabinetuose rūpinamės jūsų pėdų
-                sveikata su šiluma, profesionalumu ir individualia priežiūra — nuo
-                higienos iki sudėtingų korekcijų.
+                Venetos Liaudanskienės podologijos kabinetuose rūpinamės Jūsų pėdų
+                sveikata, derindami patirtį, šilumą ir individualų dėmesį. Nuo
+                higieninės priežiūros iki sudėtingų korekcijų.
               </p>
             </div>
 
@@ -50,7 +50,7 @@ export default function Hero({ phone }: HeroProps) {
 
             <div className={`${styles.heroStats} ${styles.heroEnter} ${styles.heroEnterDelay4}`}>
               <div className={styles.heroStat}>
-                <div className={styles.heroStatValue}>10+</div>
+                <div className={styles.heroStatValue}>15+</div>
                 <div className={styles.heroStatLabel}>Metų patirtis</div>
               </div>
               <div className={styles.heroStat}>

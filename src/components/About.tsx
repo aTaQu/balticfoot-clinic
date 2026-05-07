@@ -2,17 +2,17 @@ import Image from 'next/image';
 import styles from './About.module.css';
 
 const VENETA_CREDS = [
-  'Sertifikuota podologė',
-  'Titano Siūlo korekcijos specialistė',
-  'Higieninis ir aparatinis pedikiūras',
-  'Diabetinių pėdų priežiūra',
+  '15+ metų profesinė patirtis',
+  'Tarptautinė praktika',
+  'Probleminių pėdų specialistė',
+  'Individuali priežiūra',
 ];
 
 const LINA_CREDS = [
-  'Higieninis pedikiūras',
-  'Podologijos principai',
-  'Nagų ir odos būklės vertinimas',
-  'Individualus požiūris į klientą',
+  'Profesionali pėdų priežiūra',
+  'Kruopštus ir preciziškas darbas',
+  'Higieninis ir specializuotas manikiūras',
+  'Šiltas ir dėmesingas aptarnavimas',
 ];
 
 interface AboutProps {
@@ -25,11 +25,11 @@ export default function About({ phone }: AboutProps) {
       <div className="container">
 
         <div className={`${styles.aboutSectionHeader} reveal`}>
-          <div className="section-label">Apie specialistes</div>
-          <h2 id="about-heading">Komanda, kuria galite pasitikėti</h2>
+          <div className="section-label">Mūsų komanda</div>
+          <h2 id="about-heading">Patirtis, kuria galima pasitikėti</h2>
           <p className={styles.aboutSectionIntro}>
-            Baltic Foot podologijos kabinetai Meliva Klinikoje, Šiauliuose. Kiekviena
-            specialistė — profesionalė su individualia priežiūros filosofija.
+            Patirtis, kruopštumas ir individualus požiūris — vertybės, kuriomis Baltic
+            Foot specialistės vadovaujasi kiekvieną dieną.
           </p>
         </div>
 
@@ -57,16 +57,20 @@ export default function About({ phone }: AboutProps) {
             <h3>Veneta Liaudanskienė</h3>
 
             <p className={styles.aboutBodyText}>
-              Veneta yra sertifikuota podologė su daugiau nei dešimtmečio patirtimi.
-              Ji specializuojasi saugiame aparatiniame pedikiūre, probleminių pėdų
-              priežiūroje bei moderniose nago korekcijos technikose — įskaitant Titano
-              Siūlo metodą be operacijos.
+              Baltic Foot įkūrėja ir podologė, sukaupusi daugiau nei 15 metų patirtį
+              profesionalios pėdų priežiūros srityje.
             </p>
 
             <p className={styles.aboutBodyText}>
-              Per stažuotes Vokietijoje, Lenkijoje, Ispanijoje bei Ukrainoje sukaupta
-              tarptautinė patirtis leidžia jai teikti aukščiausio lygio paslaugas
-              klientams iš visos Lietuvos.
+              Per daugiau nei penkiolika metų sukaupta praktinė patirtis, nuolatinis
+              kvalifikacijos tobulinimas ir tarptautinės stažuotės Vokietijoje,
+              Lenkijoje, Ispanijoje bei Ukrainoje leidžia užtikrinti aukšto lygio
+              priežiūrą klientams iš visos Lietuvos.
+            </p>
+
+            <p className={styles.aboutBodyText}>
+              Specializuojasi probleminių pėdų priežiūroje, įaugusių nagų korekcijose
+              bei individualiai pritaikytuose pėdų priežiūros sprendimuose.
             </p>
 
             <ul className={styles.aboutCreds}>
@@ -75,21 +79,16 @@ export default function About({ phone }: AboutProps) {
               ))}
             </ul>
 
+            <p className={styles.aboutPhoneOnlyNote}>
+              Registruotis pas Venetą galima tik telefonu.
+            </p>
+
             <div className={styles.aboutContactRow}>
               <a href={`tel:${phone}`} className={styles.aboutPhone}>
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.01 1.18 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z" />
                 </svg>
                 {phone}
-              </a>
-              <a href="#registracija" className="btn btn-primary">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-                  <line x1="16" y1="2" x2="16" y2="6" />
-                  <line x1="8" y1="2" x2="8" y2="6" />
-                  <line x1="3" y1="10" x2="21" y2="10" />
-                </svg>
-                Registruotis vizitui
               </a>
             </div>
           </div>
@@ -110,9 +109,9 @@ export default function About({ phone }: AboutProps) {
             </p>
 
             <p className={styles.aboutBodyText}>
-              Ypatingą dėmesį Lina skiria nagų ir odos būklės vertinimui bei
-              individualiems klientų poreikiams. Ji padeda spręsti dažniausiai
-              pasitaikančias pėdų problemas ir išlaikyti pėdas sveikas bei tvarkingas.
+              Ypatingą dėmesį Lina skiria individualiems klientų poreikiams ir
+              sprendimams, padedantiems užtikrinti odos ir nagų sveikatą, tvarkingą
+              išvaizdą ir ilgalaikį rezultatą.
             </p>
 
             <ul className={styles.aboutCreds}>

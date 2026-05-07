@@ -17,6 +17,7 @@ import BookingWizard from '@/components/BookingWizard/BookingWizard'
 import Footer from '@/components/Footer'
 import ScrollRevealInit from '@/components/ScrollRevealInit'
 import { SITE_URL } from '@/lib/constants'
+import { ALL_SERVICE_ITEMS } from '@/lib/services-catalog'
 
 export const metadata: Metadata = {
   alternates: { canonical: `${SITE_URL}/` },
@@ -45,7 +46,14 @@ export default async function Home() {
     payload.findGlobal({ slug: 'clinic-settings' }) as Promise<ClinicSetting>,
   ])
 
-  const services = servicesResult.docs as Service[]
+  const allServices = servicesResult.docs as Service[]
+
+  // Veneta-only services are bookable by phone only — exclude from the wizard.
+  const venetaOnlySlugs = new Set(
+    ALL_SERVICE_ITEMS.filter((i) => i.venetaOnly && i.slug).map((i) => i.slug as string),
+  )
+  const bookableServices = allServices.filter((s) => !venetaOnlySlugs.has(s.slug))
+
   const openDays = settings.openDays ?? []
 
   // schema.org openingHours: ["Mo 09:00-18:00", "Tu 09:00-18:00", ...]
@@ -82,13 +90,13 @@ export default async function Home() {
       <Navigation />
       <main>
         <Hero phone={settings.phone} />
-        <Services services={services} />
+        <Services />
         <Trust />
         <About phone={settings.phone} />
         <Testimonials />
         <Gallery />
         <Quote />
-        <BookingWizard services={services} openDays={openDays as string[]} />
+        <BookingWizard services={bookableServices} openDays={openDays as string[]} />
         <Contact
           phone={settings.phone}
           email={settings.email}

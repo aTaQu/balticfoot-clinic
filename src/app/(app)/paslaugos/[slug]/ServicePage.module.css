@@ -96,3 +96,15 @@
   justify-content: center;
   margin-top: 1.25rem;
 }
+
+.phoneOnlyNote {
+  margin: 1rem 0 0;
+  padding: 0.7rem 0.85rem;
+  background: rgba(181, 103, 61, 0.08);
+  border-left: 3px solid var(--terra);
+  border-radius: 4px;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--soil);
+  font-style: italic;
+}

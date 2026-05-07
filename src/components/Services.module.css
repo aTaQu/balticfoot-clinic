@@ -132,3 +132,152 @@
     align-items: flex-start;
   }
 }
+
+.category {
+  margin-top: 3.5rem;
+}
+.category:first-of-type { margin-top: 0; }
+
+.categoryTitle {
+  font-family: var(--font-cormorant), 'Cormorant Garamond', serif;
+  font-size: clamp(1.5rem, 2.5vw, 1.9rem);
+  font-weight: 500;
+  color: var(--soil);
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid rgba(107, 94, 82, 0.18);
+}
+
+.categoryIntro {
+  color: var(--stone);
+  font-size: 0.92rem;
+  line-height: 1.65;
+  max-width: 760px;
+  margin-bottom: 1.5rem;
+}
+
+.itemList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 2rem;
+  padding: 1.1rem 0;
+  border-bottom: 1px solid rgba(107, 94, 82, 0.08);
+}
+.item:last-child { border-bottom: none; }
+
+.itemBody {
+  flex: 1;
+  min-width: 0;
+}
+
+.itemName {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--soil);
+  margin: 0 0 0.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.itemDescription {
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: var(--stone);
+  margin: 0.25rem 0 0;
+}
+
+.itemMeta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.4rem;
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.priceSplitList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+.priceSplitList li {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.6rem;
+  font-size: 0.85rem;
+  color: var(--stone);
+}
+.priceSplitWho { font-weight: 500; }
+.priceSplitAmount {
+  font-family: var(--font-cormorant), 'Cormorant Garamond', serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--terra);
+}
+
+.venetaBadge {
+  display: inline-block;
+  padding: 0.15rem 0.55rem;
+  background: rgba(181, 103, 61, 0.12);
+  color: var(--terra);
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.phoneLink {
+  font-size: 0.82rem;
+  color: var(--terra);
+  text-decoration: none;
+  font-weight: 500;
+}
+.phoneLink:hover { text-decoration: underline; }
+
+.readMore {
+  font-size: 0.82rem;
+  color: var(--terra);
+  text-decoration: none;
+  font-weight: 500;
+}
+.readMore:hover { text-decoration: underline; }
+
+.pricingNote {
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(107, 94, 82, 0.18);
+  font-size: 0.85rem;
+  color: var(--stone-muted);
+  font-style: italic;
+}
+
+@media (max-width: 700px) {
+  .item {
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: flex-start;
+  }
+  .itemMeta {
+    align-items: flex-start;
+    text-align: left;
+    width: 100%;
+  }
+  .priceSplitList { width: 100%; }
+}

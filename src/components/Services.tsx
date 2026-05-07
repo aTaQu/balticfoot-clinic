@@ -1,50 +1,32 @@
 import Link from 'next/link'
-import type { Service } from '../../payload-types'
-import { formatDuration } from '@/lib/format'
-import styles from './Services.module.css';
+import {
+  SERVICE_CATEGORIES,
+  VENETA_PHONE,
+  PRICING_NOTE,
+  formatPrice,
+  type ServiceItem,
+} from '@/lib/services-catalog'
+import styles from './Services.module.css'
 
-const SERVICE_ICONS: Record<string, React.ReactNode> = {
-  smiley: (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="10" />
-      <path d="M8 14s1.5 2 4 2 4-2 4-2" />
-      <line x1="9" y1="9" x2="9.01" y2="9" />
-      <line x1="15" y1="9" x2="15.01" y2="9" />
-    </svg>
-  ),
-  heart: (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" />
-    </svg>
-  ),
-  coffee: (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M18 8h1a4 4 0 010 8h-1" />
-      <path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z" />
-      <line x1="6" y1="1" x2="6" y2="4" />
-      <line x1="10" y1="1" x2="10" y2="4" />
-      <line x1="14" y1="1" x2="14" y2="4" />
-    </svg>
-  ),
-  shield: (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-      <polyline points="9 12 11 14 15 10" />
-    </svg>
-  ),
-  activity: (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
-    </svg>
-  ),
-};
-
-
-interface ServicesProps {
-  services: Service[]
+function PriceLabel({ item }: { item: ServiceItem }) {
+  if (item.price.kind === 'perSpecialist') {
+    return (
+      <ul className={styles.priceSplitList}>
+        <li>
+          <span className={styles.priceSplitWho}>Pas Venetą</span>
+          <span className={styles.priceSplitAmount}>{item.price.veneta}</span>
+        </li>
+        <li>
+          <span className={styles.priceSplitWho}>Pas Liną</span>
+          <span className={styles.priceSplitAmount}>{item.price.lina}</span>
+        </li>
+      </ul>
+    )
+  }
+  return <span className={styles.serviceCardPrice}>{formatPrice(item.price)}</span>
 }
 
-export default function Services({ services }: ServicesProps) {
+export default function Services() {
   return (
     <section className={styles.services} id="paslaugos" aria-labelledby="services-heading">
       <div className="container">
@@ -57,33 +39,46 @@ export default function Services({ services }: ServicesProps) {
           <a href="#registracija" className="btn btn-ghost">Registruotis →</a>
         </div>
 
-        <div className={styles.servicesGrid}>
-          {services.map((service, i) => (
-            <Link
-              key={service.id}
-              href={`/paslaugos/${service.slug}`}
-              className={`${styles.serviceCard} reveal reveal-delay-${i + 1}`}
-            >
-              <div className={styles.serviceIcon} aria-hidden="true">
-                {service.icon ? SERVICE_ICONS[service.icon] : null}
-              </div>
-              <h3>{service.name}</h3>
-              <p>{service.description}</p>
-              <div className={styles.serviceCardMeta}>
-                <span className={styles.serviceCardDuration}>
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <circle cx="12" cy="12" r="10" />
-                    <polyline points="12 6 12 12 16 14" />
-                  </svg>
-                  {formatDuration(service.duration)}
-                </span>
-                <span className={styles.serviceCardPrice}>{service.price} €</span>
-              </div>
-              <span className={styles.serviceCardBtn}>Skaityti daugiau →</span>
-            </Link>
-          ))}
-        </div>
+        {SERVICE_CATEGORIES.map((category) => (
+          <div key={category.label} className={`${styles.category} reveal`}>
+            <h3 className={styles.categoryTitle}>{category.label}</h3>
+            {category.intro && <p className={styles.categoryIntro}>{category.intro}</p>}
+
+            <ul className={styles.itemList}>
+              {category.items.map((item) => (
+                <li key={item.name} className={styles.item}>
+                  <div className={styles.itemBody}>
+                    <h4 className={styles.itemName}>
+                      {item.name}
+                      {item.venetaOnly && (
+                        <span className={styles.venetaBadge}>Tik telefonu</span>
+                      )}
+                    </h4>
+                    {item.shortDescription && (
+                      <p className={styles.itemDescription}>{item.shortDescription}</p>
+                    )}
+                  </div>
+
+                  <div className={styles.itemMeta}>
+                    <PriceLabel item={item} />
+                    {item.venetaOnly ? (
+                      <a href={`tel:${VENETA_PHONE.replace(/\s/g, '')}`} className={styles.phoneLink}>
+                        {VENETA_PHONE}
+                      </a>
+                    ) : item.slug ? (
+                      <Link href={`/paslaugos/${item.slug}`} className={styles.readMore}>
+                        Skaityti daugiau →
+                      </Link>
+                    ) : null}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+
+        <p className={styles.pricingNote}>{PRICING_NOTE}</p>
       </div>
     </section>
-  );
+  )
 }

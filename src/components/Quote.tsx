@@ -7,16 +7,12 @@ export default function Quote() {
         <div className={styles.quoteInner}>
           <div className={`${styles.quoteMark} reveal`} aria-hidden="true">&ldquo;</div>
           <blockquote className={`${styles.quoteText} reveal reveal-delay-1`}>
-            <p>Per daugiau nei dešimtmetį klinikinės praktikos ant sveikų pėdų
-            &bdquo;pastatėme&ldquo; šimtus žmonių, tuo pačiu užkirsdami kelią antrinėms
-            problemoms, kurias pažeistos pėdos dažnai perduoda visam kūnui. Kuomet
-            chroninės pėdų problemos išsprendžiamos, pagerėja bendra viso organizmo
-            sveikata.</p>
-            <p>Visuminis pėdų priežiūros ciklas gali iš esmės pakeisti žmogaus gyvenimą
-            tiek fizinės, tiek psichologinės sveikatos prasme.</p>
-            <p>Dar neseniai viešumoje be uždarų batų nedrįsęs pasirodyti žmogus nuo šiol
-            su malonumu ir pasitikėjimu keliaus į paplūdimį, pradės sportuoti ar
-            pasileis su draugais bėgti vaikystės pievomis.</p>
+            <p>Per daugiau nei penkiolika metų praktikos padėjome šimtams žmonių
+            atkurti pėdų komfortą, judėjimo laisvę ir pasitikėjimą savimi.</p>
+            <p>Kai išsprendžiamos ilgai varginusios pėdų problemos, keičiasi ne tik
+            savijauta, bet ir gyvenimo kokybė — žmogus vėl juda laisvai, drąsiai
+            renkasi atvirus batus, sportuoja ir mėgaujasi kasdienybe.</p>
+            <p>Pėdų sveikata prasideda nuo profesionalios priežiūros.</p>
           </blockquote>
           <footer className={`${styles.quoteFooter} reveal reveal-delay-2`}>
             <div className={styles.quoteAuthor}>Veneta Liaudanskienė</div>

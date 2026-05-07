@@ -7,6 +7,7 @@ import Footer from '@/components/Footer'
 import BookingWizard from '@/components/BookingWizard/BookingWizard'
 import ScrollRevealInit from '@/components/ScrollRevealInit'
 import { SITE_URL } from '@/lib/constants'
+import { ALL_SERVICE_ITEMS } from '@/lib/services-catalog'
 
 export const dynamic = 'force-dynamic'
 
@@ -34,7 +35,11 @@ export default async function RezervacijaPage({ searchParams }: Props) {
     payload.findGlobal({ slug: 'clinic-settings' }) as Promise<ClinicSetting>,
   ])
 
-  const services = servicesResult.docs as Service[]
+  const allServices = servicesResult.docs as Service[]
+  const venetaOnlySlugs = new Set(
+    ALL_SERVICE_ITEMS.filter((i) => i.venetaOnly && i.slug).map((i) => i.slug as string),
+  )
+  const services = allServices.filter((s) => !venetaOnlySlugs.has(s.slug))
   const openDays = (settings.openDays ?? []) as string[]
 
   return (
