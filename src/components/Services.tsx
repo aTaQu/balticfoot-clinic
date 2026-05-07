@@ -36,7 +36,12 @@ export default function Services() {
             <h2 id="services-heading">Profesionali pėdų priežiūra</h2>
             <p>Visos procedūros atliekamos steriliai, specializuotais aparatais, individualiai kiekvienam pacientui.</p>
           </div>
-          <a href="#registracija" className="btn btn-ghost">Registruotis →</a>
+          <div className={styles.headerActions}>
+            <a href="#registracija" className="btn btn-ghost">Registruotis →</a>
+            <a href={`tel:${VENETA_PHONE.replace(/\s/g, '')}`} className="btn btn-ghost">
+              Skambinti Venetai {VENETA_PHONE}
+            </a>
+          </div>
         </div>
 
         {SERVICE_CATEGORIES.map((category) => (

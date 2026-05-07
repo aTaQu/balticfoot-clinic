@@ -18,6 +18,22 @@
   max-width: 420px;
 }
 
+.headerActions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  align-items: flex-end;
+  flex-shrink: 0;
+}
+.headerActions .btn { white-space: nowrap; }
+
+@media (max-width: 700px) {
+  .headerActions {
+    align-items: stretch;
+    width: 100%;
+  }
+}
+
 .servicesGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
