@@ -16,7 +16,7 @@ export default function Gallery() {
       <div className="container">
         <div className={`${styles.galleryHeader} reveal`}>
           <div className="section-label">Galerija</div>
-          <h2 id="gallery-heading">Mūsų kabinetas</h2>
+          <h2 id="gallery-heading">Mūsų erdvės</h2>
         </div>
 
         <div className={styles.galleryGrid}>
