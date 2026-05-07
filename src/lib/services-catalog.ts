@@ -83,7 +83,7 @@ export const SERVICE_CATEGORIES: ServiceCategory[] = [
       },
       {
         name: 'Probleminių pėdų priežiūra',
-        price: { kind: 'single', text: '70–120 €' },
+        price: { kind: 'perSpecialist', veneta: '120 €', lina: '70 €' },
         venetaOnly: false,
         slug: 'medicininis-pedikiuras',
         shortDescription:
@@ -98,17 +98,17 @@ export const SERVICE_CATEGORIES: ServiceCategory[] = [
     items: [
       {
         name: 'Grybelio pažeistos odos valdymas',
-        price: { kind: 'single', text: '50–100 €' },
+        price: { kind: 'perSpecialist', veneta: '100 €', lina: '50 €' },
         venetaOnly: false,
       },
       {
         name: 'Įtrūkusių kulnų priežiūra',
-        price: { kind: 'single', text: '50–100 €' },
+        price: { kind: 'perSpecialist', veneta: '100 €', lina: '50 €' },
         venetaOnly: false,
       },
       {
         name: 'Hiperkeratozės (suragėjusio odos sluoksnio) priežiūra',
-        price: { kind: 'single', text: '70–100 €' },
+        price: { kind: 'perSpecialist', veneta: '100 €', lina: '70 €' },
         venetaOnly: false,
       },
       {
