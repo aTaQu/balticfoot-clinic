@@ -24,6 +24,31 @@ export const ClinicSettings: GlobalConfig = {
       type: 'email',
       required: true,
       label: 'El. paštas',
+      admin: {
+        description: 'Viešas kontaktinis el. paštas (rodomas svetainėje ir laiškuose pacientams).',
+      },
+    },
+    {
+      name: 'notificationEmails',
+      type: 'array',
+      required: true,
+      minRows: 1,
+      label: 'Pranešimų gavėjai',
+      labels: {
+        singular: 'Gavėjas',
+        plural: 'Gavėjai',
+      },
+      admin: {
+        description: 'El. pašto adresai, į kuriuos siunčiami pranešimai apie naujas rezervacijas, atšaukimus ir kontaktų formos užklausas.',
+      },
+      fields: [
+        {
+          name: 'email',
+          type: 'email',
+          required: true,
+          label: 'El. paštas',
+        },
+      ],
     },
     {
       name: 'address',

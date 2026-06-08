@@ -81,15 +81,17 @@ export async function createBooking(
     clinicPhone: settings.phone,
   })
 
-  void sendEmail('new-booking-alert', settings.email, {
-    patientName,
-    patientPhone,
-    patientEmail,
-    serviceName: service.name,
-    date: formattedDate,
-    time: timeSlot,
-    patientNotes,
-  })
+  for (const recipient of settings.notificationEmails) {
+    void sendEmail('new-booking-alert', recipient.email, {
+      patientName,
+      patientPhone,
+      patientEmail,
+      serviceName: service.name,
+      date: formattedDate,
+      time: timeSlot,
+      patientNotes,
+    })
+  }
 
   return {
     booking: {

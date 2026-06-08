@@ -102,9 +102,26 @@ const configPromise = buildConfig({
           workingHoursEnd: '18:00',
           slotIntervalMinutes: '30',
           openDays: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
+          notificationEmails: [
+            { email: 'veneta@podologija-siauliai.lt' },
+            { email: 'lina@podologija-siauliai.lt' },
+          ],
         },
       })
       payload.logger.info('Seeded ClinicSettings')
+    } else if (!settings.notificationEmails || settings.notificationEmails.length === 0) {
+      // Backfill notificationEmails on existing ClinicSettings rows so the new
+      // required field isn't empty after deploy.
+      await payload.updateGlobal({
+        slug: 'clinic-settings',
+        data: {
+          notificationEmails: [
+            { email: 'veneta@podologija-siauliai.lt' },
+            { email: 'lina@podologija-siauliai.lt' },
+          ],
+        },
+      })
+      payload.logger.info('Backfilled ClinicSettings.notificationEmails')
     }
 
     // ── Seed Services ─────────────────────────────────────────────────────────

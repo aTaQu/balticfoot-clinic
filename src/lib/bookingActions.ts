@@ -146,12 +146,14 @@ export async function cancelBooking(
   const serviceName = resolveServiceName(booking)
   const formattedDate = formatDateLT(booking.date)
 
-  void sendEmail('booking-cancelled-alert', settings.email, {
-    patientName: booking.patientName,
-    serviceName,
-    date: formattedDate,
-    time: booking.timeSlot,
-  })
+  for (const recipient of settings.notificationEmails) {
+    void sendEmail('booking-cancelled-alert', recipient.email, {
+      patientName: booking.patientName,
+      serviceName,
+      date: formattedDate,
+      time: booking.timeSlot,
+    })
+  }
 
   return { booking: { id: updated.id, status: updated.status } }
 }

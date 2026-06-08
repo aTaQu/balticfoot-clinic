@@ -569,7 +569,17 @@ export interface ClinicSetting {
   id: number;
   clinicName: string;
   phone: string;
+  /**
+   * Viešas kontaktinis el. paštas (rodomas svetainėje ir laiškuose pacientams).
+   */
   email: string;
+  /**
+   * El. pašto adresai, į kuriuos siunčiami pranešimai apie naujas rezervacijas, atšaukimus ir kontaktų formos užklausas.
+   */
+  notificationEmails: {
+    email: string;
+    id?: string | null;
+  }[];
   address: string;
   /**
    * Formatas: HH:MM, pvz. 09:00
@@ -595,6 +605,12 @@ export interface ClinicSettingsSelect<T extends boolean = true> {
   clinicName?: T;
   phone?: T;
   email?: T;
+  notificationEmails?:
+    | T
+    | {
+        email?: T;
+        id?: T;
+      };
   address?: T;
   workingHoursStart?: T;
   workingHoursEnd?: T;

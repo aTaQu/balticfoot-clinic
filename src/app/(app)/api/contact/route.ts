@@ -1,6 +1,8 @@
 export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
+import { getPayload } from 'payload'
+import configPromise from '@payload-config'
 import { sendEmail } from '@/lib/notifications/email'
 
 export async function POST(req: NextRequest) {
@@ -23,12 +25,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Nurodykite bent telefoną arba el. paštą.' }, { status: 400 })
   }
 
-  void sendEmail('contact-enquiry-alert', 'info@balticfoot.lt', {
-    senderName: name.trim(),
-    phone: phone?.trim() || undefined,
-    email: email?.trim() || undefined,
-    message: message.trim(),
-  })
+  const payload = await getPayload({ config: configPromise })
+  const settings = await payload.findGlobal({ slug: 'clinic-settings' })
+
+  for (const recipient of settings.notificationEmails) {
+    void sendEmail('contact-enquiry-alert', recipient.email, {
+      senderName: name.trim(),
+      phone: phone?.trim() || undefined,
+      email: email?.trim() || undefined,
+      message: message.trim(),
+    })
+  }
 
   return NextResponse.json({ ok: true })
 }
