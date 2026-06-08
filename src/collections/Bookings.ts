@@ -63,6 +63,11 @@ export const Bookings: CollectionConfig = {
       ],
       admin: {
         readOnly: true,
+        description:
+          'Laukiama — nauja rezervacija, laukianti administratoriaus veiksmo. ' +
+          'Patvirtinta — pacientas gavo patvirtinimą; laikas užimtas grafike. ' +
+          'Atmesta — atsakyta neigiamai prieš patvirtinimą. ' +
+          'Atšaukta — rezervacija nutraukta po patvirtinimo.',
       },
     },
     {
