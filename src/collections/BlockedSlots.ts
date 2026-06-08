@@ -19,6 +19,7 @@ export const BlockedSlots: CollectionConfig = {
       admin: {
         date: {
           pickerAppearance: 'dayOnly',
+          displayFormat: 'yyyy-MM-dd EEEE',
         },
       },
     },
