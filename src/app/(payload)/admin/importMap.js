@@ -21,6 +21,7 @@ import { StrikethroughFeatureClient as StrikethroughFeatureClient_e70f5e05f09f93
 import { UnderlineFeatureClient as UnderlineFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { BoldFeatureClient as BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
+import { BookingStatusCell as BookingStatusCell_9e775114996034949d76c348bb40f12a } from '@/components/admin/BookingStatusCell'
 import { BookingActionsAfterFields as BookingActionsAfterFields_08ab988ba1c1b2f06666672d8016ea16 } from '@/components/admin/BookingActions'
 import { WeekScheduleAfterDashboard as WeekScheduleAfterDashboard_6d34e7aba3170a209a484c2912f960d3 } from '@/components/admin/WeekSchedule'
 import { S3ClientUploadHandler as S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24 } from '@payloadcms/storage-s3/client'
@@ -50,6 +51,7 @@ export const importMap = {
   "@payloadcms/richtext-lexical/client#UnderlineFeatureClient": UnderlineFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#BoldFeatureClient": BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#ItalicFeatureClient": ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
+  "@/components/admin/BookingStatusCell#BookingStatusCell": BookingStatusCell_9e775114996034949d76c348bb40f12a,
   "@/components/admin/BookingActions#BookingActionsAfterFields": BookingActionsAfterFields_08ab988ba1c1b2f06666672d8016ea16,
   "@/components/admin/WeekSchedule#WeekScheduleAfterDashboard": WeekScheduleAfterDashboard_6d34e7aba3170a209a484c2912f960d3,
   "@payloadcms/storage-s3/client#S3ClientUploadHandler": S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24,

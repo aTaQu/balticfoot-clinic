@@ -68,6 +68,9 @@ export const Bookings: CollectionConfig = {
           'Patvirtinta — pacientas gavo patvirtinimą; laikas užimtas grafike. ' +
           'Atmesta — atsakyta neigiamai prieš patvirtinimą. ' +
           'Atšaukta — rezervacija nutraukta po patvirtinimo.',
+        components: {
+          Cell: '@/components/admin/BookingStatusCell#BookingStatusCell',
+        },
       },
     },
     {
