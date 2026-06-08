@@ -2,44 +2,51 @@ import type { GlobalConfig } from 'payload'
 
 export const ClinicSettings: GlobalConfig = {
   slug: 'clinic-settings',
+  label: 'Klinikos nustatymai',
   admin: {
-    group: 'Settings',
+    group: 'Nustatymai',
   },
   fields: [
     {
       name: 'clinicName',
       type: 'text',
       required: true,
+      label: 'Klinikos pavadinimas',
     },
     {
       name: 'phone',
       type: 'text',
       required: true,
+      label: 'Telefonas',
     },
     {
       name: 'email',
       type: 'email',
       required: true,
+      label: 'El. paštas',
     },
     {
       name: 'address',
       type: 'text',
       required: true,
+      label: 'Adresas',
     },
     {
       name: 'workingHoursStart',
       type: 'text',
       required: true,
+      label: 'Darbo pradžia',
       admin: {
-        description: 'Format: HH:MM, e.g. 09:00',
+        description: 'Formatas: HH:MM, pvz. 09:00',
       },
     },
     {
       name: 'workingHoursEnd',
       type: 'text',
       required: true,
+      label: 'Darbo pabaiga',
       admin: {
-        description: 'Format: HH:MM, e.g. 18:00',
+        description: 'Formatas: HH:MM, pvz. 18:00',
       },
     },
     {
@@ -47,12 +54,13 @@ export const ClinicSettings: GlobalConfig = {
       type: 'select',
       required: true,
       defaultValue: '30',
+      label: 'Laiko intervalas',
       options: [
-        { label: '30 minutės', value: '30' },
+        { label: '30 minučių', value: '30' },
         { label: '60 minučių', value: '60' },
       ],
       admin: {
-        description: 'Booking slot interval',
+        description: 'Rezervacijos laiko intervalas',
       },
     },
     {
@@ -60,6 +68,7 @@ export const ClinicSettings: GlobalConfig = {
       type: 'select',
       hasMany: true,
       required: true,
+      label: 'Darbo dienos',
       options: [
         { label: 'Pirmadienis', value: 'monday' },
         { label: 'Antradienis', value: 'tuesday' },

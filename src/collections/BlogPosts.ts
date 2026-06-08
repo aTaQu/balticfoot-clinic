@@ -15,6 +15,10 @@ function slugify(title: string): string {
 
 export const BlogPosts: CollectionConfig = {
   slug: 'blog-posts',
+  labels: {
+    singular: 'Tinklaraščio įrašas',
+    plural: 'Tinklaraščio įrašai',
+  },
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'status', 'publishedAt'],
@@ -34,14 +38,16 @@ export const BlogPosts: CollectionConfig = {
       name: 'title',
       type: 'text',
       required: true,
+      label: 'Pavadinimas',
     },
     {
       name: 'slug',
       type: 'text',
       required: true,
       unique: true,
+      label: 'URL fragmentas',
       admin: {
-        description: 'Auto-generated from title if left empty on creation',
+        description: 'Sugeneruojama automatiškai iš pavadinimo, jei kuriant paliekama tuščia',
       },
     },
     {
@@ -49,14 +55,16 @@ export const BlogPosts: CollectionConfig = {
       type: 'select',
       required: true,
       defaultValue: 'published',
+      label: 'Statusas',
       options: [
-        { label: 'Published', value: 'published' },
-        { label: 'Draft', value: 'draft' },
+        { label: 'Publikuota', value: 'published' },
+        { label: 'Juodraštis', value: 'draft' },
       ],
     },
     {
       name: 'publishedAt',
       type: 'date',
+      label: 'Publikavimo data',
       admin: {
         date: {
           pickerAppearance: 'dayAndTime',
@@ -66,23 +74,28 @@ export const BlogPosts: CollectionConfig = {
     {
       name: 'excerpt',
       type: 'textarea',
+      label: 'Anonsas',
     },
     {
       name: 'featuredImage',
       type: 'upload',
       relationTo: 'media',
+      label: 'Pagrindinė nuotrauka',
     },
     {
       name: 'body',
       type: 'richText',
+      label: 'Turinys',
     },
     {
       name: 'metaTitle',
       type: 'text',
+      label: 'SEO pavadinimas',
     },
     {
       name: 'metaDescription',
       type: 'textarea',
+      label: 'SEO aprašymas',
     },
   ],
 }

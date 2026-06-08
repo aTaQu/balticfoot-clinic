@@ -2,6 +2,7 @@ import { buildConfig } from 'payload'
 import { s3Storage } from '@payloadcms/storage-s3'
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
+import { lt } from '@payloadcms/translations/languages/lt'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
@@ -23,6 +24,10 @@ const configPromise = buildConfig({
     components: {
       afterDashboard: ['@/components/admin/WeekSchedule#WeekScheduleAfterDashboard'],
     },
+  },
+  i18n: {
+    supportedLanguages: { lt },
+    fallbackLanguage: 'lt',
   },
   plugins: [
     s3Storage({

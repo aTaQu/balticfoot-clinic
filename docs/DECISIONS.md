@@ -109,3 +109,9 @@
 - `active: true` kept explicit in seed data despite `defaultValue: true` in schema — Payload's generated types require it at call sites (`required` field)
 - `force-dynamic` on service pages and `/rezervacija` — ensures Payload price changes reflect immediately on reload without cache invalidation
 - Codebase map (`docs/codebase-map.md`) introduced for progressive agent context; updated as part of every `/phase-complete`
+
+## Phase 16 decisions
+- Admin localised to Lithuanian — `i18n: { supportedLanguages: { lt }, fallbackLanguage: 'lt' }` in `payload.config.ts`. Hard-locked to a single language: keeping `en` as a fallback risks half-translated UI (Payload chrome flips while custom labels stay LT) on a stray account-language click. Reversible — add `en` to `supportedLanguages` if non-LT staff ever joins.
+- Canonical noun **Rezervacija** chosen over **Vizitas** for the `bookings` collection — matches the patient-facing `/rezervacija` URL and the booking wizard. Recorded in `CONTEXT.md`.
+- `blocked-slots` rebranded **Nedarbo laikas** (was implicit "Blocked Slots"). AuditLog `slot_blocked`/`slot_unblocked` action labels rewritten to "Pridėtas/Pašalintas nedarbo laikas" to match. DB values unchanged (only `label` strings).
+- Field labels added inline as `label: '...'` on every field across 7 collections + global — no central `i18n.translations` dictionary. Matches "colocate over centralize" preference; central dictionary would only earn its keep with a second language.

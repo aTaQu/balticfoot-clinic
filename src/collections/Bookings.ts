@@ -2,6 +2,10 @@ import type { CollectionConfig } from 'payload'
 
 export const Bookings: CollectionConfig = {
   slug: 'bookings',
+  labels: {
+    singular: 'Rezervacija',
+    plural: 'Rezervacijos',
+  },
   admin: {
     useAsTitle: 'patientName',
     defaultColumns: ['patientName', 'service', 'date', 'timeSlot', 'status'],
@@ -13,11 +17,13 @@ export const Bookings: CollectionConfig = {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       relationTo: 'services' as any,
       required: true,
+      label: 'Paslauga',
     },
     {
       name: 'date',
       type: 'date',
       required: true,
+      label: 'Data',
       admin: {
         date: {
           pickerAppearance: 'dayOnly',
@@ -28,6 +34,7 @@ export const Bookings: CollectionConfig = {
       name: 'timeSlot',
       type: 'text',
       required: true,
+      label: 'Laikas',
       admin: {
         description: 'Pradžios laikas, pvz. "14:00"',
       },
@@ -35,6 +42,7 @@ export const Bookings: CollectionConfig = {
     {
       name: 'endTime',
       type: 'text',
+      label: 'Pabaigos laikas',
       admin: {
         description: 'Pabaigos laikas (apskaičiuojamas automatiškai)',
         readOnly: true,
@@ -45,6 +53,7 @@ export const Bookings: CollectionConfig = {
       type: 'select',
       required: true,
       defaultValue: 'pending',
+      label: 'Statusas',
       options: [
         { label: 'Laukiama', value: 'pending' },
         { label: 'Patvirtinta', value: 'confirmed' },
@@ -58,6 +67,7 @@ export const Bookings: CollectionConfig = {
     {
       name: 'rejectionReason',
       type: 'text',
+      label: 'Atmetimo priežastis',
       admin: {
         condition: (data) => data?.status === 'rejected',
         description: 'Privaloma, kai statusas "Atmesta"',
@@ -67,18 +77,22 @@ export const Bookings: CollectionConfig = {
       name: 'patientName',
       type: 'text',
       required: true,
+      label: 'Paciento vardas',
     },
     {
       name: 'patientPhone',
       type: 'text',
+      label: 'Paciento telefonas',
     },
     {
       name: 'patientEmail',
       type: 'email',
+      label: 'Paciento el. paštas',
     },
     {
       name: 'patientNotes',
       type: 'textarea',
+      label: 'Paciento pastabos',
     },
     {
       name: 'reminderSent',
@@ -98,6 +112,7 @@ export const Bookings: CollectionConfig = {
     {
       name: 'bookingActions',
       type: 'ui',
+      label: 'Veiksmai',
       admin: {
         components: {
           Field: '@/components/admin/BookingActions#BookingActionsAfterFields',

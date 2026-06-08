@@ -123,7 +123,7 @@ export function BookingActionsAfterFields() {
             fontWeight: 500,
           }}
         >
-          {loading ? 'Apdorojama…' : 'Atšaukti vizitą'}
+          {loading ? 'Apdorojama…' : 'Atšaukti rezervaciją'}
         </button>
       )}
     </div>

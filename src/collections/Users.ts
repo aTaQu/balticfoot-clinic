@@ -3,6 +3,10 @@ import type { CollectionConfig } from 'payload'
 export const Users: CollectionConfig = {
   slug: 'users',
   auth: true,
+  labels: {
+    singular: 'Vartotojas',
+    plural: 'Vartotojai',
+  },
   admin: {
     useAsTitle: 'name',
   },
@@ -11,15 +15,17 @@ export const Users: CollectionConfig = {
       name: 'name',
       type: 'text',
       required: true,
+      label: 'Vardas',
     },
     {
       name: 'role',
       type: 'select',
       required: true,
       defaultValue: 'staff',
+      label: 'Rolė',
       options: [
-        { label: 'Admin', value: 'admin' },
-        { label: 'Staff', value: 'staff' },
+        { label: 'Administratorius', value: 'admin' },
+        { label: 'Personalas', value: 'staff' },
       ],
     },
   ],

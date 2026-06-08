@@ -2,6 +2,10 @@ import type { CollectionConfig } from 'payload'
 
 export const BlockedSlots: CollectionConfig = {
   slug: 'blocked-slots',
+  labels: {
+    singular: 'Nedarbo laikas',
+    plural: 'Nedarbo laikai',
+  },
   admin: {
     useAsTitle: 'date',
     defaultColumns: ['date', 'startTime', 'endTime', 'reason', 'createdBy'],
@@ -11,6 +15,7 @@ export const BlockedSlots: CollectionConfig = {
       name: 'date',
       type: 'date',
       required: true,
+      label: 'Data',
       admin: {
         date: {
           pickerAppearance: 'dayOnly',
@@ -21,6 +26,7 @@ export const BlockedSlots: CollectionConfig = {
       name: 'startTime',
       type: 'text',
       required: true,
+      label: 'Pradžios laikas',
       admin: {
         description: 'Pradžios laikas, pvz. "09:00"',
       },
@@ -29,6 +35,7 @@ export const BlockedSlots: CollectionConfig = {
       name: 'endTime',
       type: 'text',
       required: true,
+      label: 'Pabaigos laikas',
       admin: {
         description: 'Pabaigos laikas, pvz. "12:00"',
       },
@@ -36,14 +43,16 @@ export const BlockedSlots: CollectionConfig = {
     {
       name: 'reason',
       type: 'text',
+      label: 'Priežastis',
       admin: {
-        description: 'Neprivaloma: blokavimo priežastis',
+        description: 'Neprivaloma: nedarbo priežastis',
       },
     },
     {
       name: 'createdBy',
       type: 'relationship',
       relationTo: 'users',
+      label: 'Pridėjo',
       admin: {
         readOnly: true,
       },

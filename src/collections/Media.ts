@@ -3,6 +3,10 @@ import type { CollectionConfig } from 'payload'
 export const Media: CollectionConfig = {
   slug: 'media',
   upload: true,
+  labels: {
+    singular: 'Nuotrauka',
+    plural: 'Nuotraukos',
+  },
   admin: {
     useAsTitle: 'filename',
   },
@@ -10,8 +14,9 @@ export const Media: CollectionConfig = {
     {
       name: 'alt',
       type: 'text',
+      label: 'Alternatyvus tekstas',
       admin: {
-        description: 'Alt text for accessibility (Lithuanian preferred)',
+        description: 'Alternatyvus tekstas (privaloma prieinamumui)',
       },
     },
   ],

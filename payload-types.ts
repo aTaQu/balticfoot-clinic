@@ -165,7 +165,7 @@ export interface User {
 export interface Media {
   id: number;
   /**
-   * Alt text for accessibility (Lithuanian preferred)
+   * Alternatyvus tekstas (privaloma prieinamumui)
    */
   alt?: string | null;
   updatedAt: string;
@@ -188,15 +188,15 @@ export interface Service {
   id: number;
   name: string;
   /**
-   * URL-safe identifier, e.g. aparatinis-pedikyuras
+   * URL fragmentas, pvz. aparatinis-pedikiuras
    */
   slug: string;
   /**
-   * Price in EUR
+   * Kaina (EUR)
    */
   price: number;
   /**
-   * Duration in minutes
+   * Trukmė (minutėmis)
    */
   duration: number;
   description?: string | null;
@@ -214,7 +214,7 @@ export interface BlogPost {
   id: number;
   title: string;
   /**
-   * Auto-generated from title if left empty on creation
+   * Sugeneruojama automatiškai iš pavadinimo, jei kuriant paliekama tuščia
    */
   slug: string;
   status: 'published' | 'draft';
@@ -287,7 +287,7 @@ export interface BlockedSlot {
    */
   endTime: string;
   /**
-   * Neprivaloma: blokavimo priežastis
+   * Neprivaloma: nedarbo priežastis
    */
   reason?: string | null;
   createdBy?: (number | null) | User;
@@ -572,15 +572,15 @@ export interface ClinicSetting {
   email: string;
   address: string;
   /**
-   * Format: HH:MM, e.g. 09:00
+   * Formatas: HH:MM, pvz. 09:00
    */
   workingHoursStart: string;
   /**
-   * Format: HH:MM, e.g. 18:00
+   * Formatas: HH:MM, pvz. 18:00
    */
   workingHoursEnd: string;
   /**
-   * Booking slot interval
+   * Rezervacijos laiko intervalas
    */
   slotIntervalMinutes: '30' | '60';
   openDays: ('monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday')[];
