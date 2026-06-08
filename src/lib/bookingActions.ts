@@ -115,7 +115,12 @@ export async function cancelBooking(
   payload: Payload,
   bookingId: number,
   userId: number,
+  cancellationReason: string,
 ): Promise<BookingActionResult> {
+  if (!cancellationReason?.trim()) {
+    return { error: 'cancellationReason is required', status: 400 }
+  }
+
   let booking: Booking
   try {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -133,25 +138,39 @@ export async function cancelBooking(
   const updated = await payload.update({
     collection: BOOKINGS as any,
     id: bookingId,
-    data: { status: 'cancelled' },
+    data: { status: 'cancelled', cancellationReason: cancellationReason.trim() },
   })
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   await payload.create({
     collection: AUDIT_LOG as any,
-    data: { user: userId, action: 'cancelled', booking: bookingId },
+    data: { user: userId, action: 'cancelled', booking: bookingId, note: cancellationReason.trim() },
   })
 
   const settings = await payload.findGlobal({ slug: 'clinic-settings' })
   const serviceName = resolveServiceName(booking)
   const formattedDate = formatDateLT(booking.date)
 
+  // Patient-facing cancellation notice
+  if (booking.patientEmail) {
+    void sendEmail('booking-cancelled', booking.patientEmail, {
+      patientName: booking.patientName ?? '',
+      serviceName,
+      date: formattedDate,
+      time: booking.timeSlot,
+      clinicPhone: settings.phone,
+      cancellationReason: cancellationReason.trim(),
+    })
+  }
+
+  // Owner alert
   for (const recipient of settings.notificationEmails) {
     void sendEmail('booking-cancelled-alert', recipient.email, {
       patientName: booking.patientName,
       serviceName,
       date: formattedDate,
       time: booking.timeSlot,
+      cancellationReason: cancellationReason.trim(),
     })
   }
 

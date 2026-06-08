@@ -151,7 +151,7 @@ describe('cancelBooking', () => {
   it('changes confirmed booking to cancelled and writes AuditLog', async () => {
     const booking = await createPendingBooking('15:00')
     await confirmBooking(payload, booking.id as number, adminUserId)
-    const result = await cancelBooking(payload, booking.id as number, adminUserId)
+    const result = await cancelBooking(payload, booking.id as number, adminUserId, 'Veneta serga')
 
     expect('error' in result).toBe(false)
     if ('error' in result) return
@@ -160,6 +160,7 @@ describe('cancelBooking', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const updated = await payload.findByID({ collection: 'bookings' as any, id: booking.id })
     expect(updated.status).toBe('cancelled')
+    expect(updated.cancellationReason).toBe('Veneta serga')
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const logs = await payload.find({
@@ -171,17 +172,26 @@ describe('cancelBooking', () => {
     const cancelLog = logs.docs.find((l) => l.action === 'cancelled')
     expect(cancelLog).toBeDefined()
     expect(cancelLog?.user).toBe(adminUserId)
+    expect(cancelLog?.note).toBe('Veneta serga')
+  })
+
+  it('returns 400 when cancellationReason is empty', async () => {
+    const booking = await createPendingBooking('15:30')
+    await confirmBooking(payload, booking.id as number, adminUserId)
+    const result = await cancelBooking(payload, booking.id as number, adminUserId, '   ')
+    expect('error' in result).toBe(true)
+    if ('error' in result) expect(result.status).toBe(400)
   })
 
   it('returns 409 when booking is pending (not confirmed)', async () => {
     const booking = await createPendingBooking('16:00')
-    const result = await cancelBooking(payload, booking.id as number, adminUserId)
+    const result = await cancelBooking(payload, booking.id as number, adminUserId, 'Veneta serga')
     expect('error' in result).toBe(true)
     if ('error' in result) expect(result.status).toBe(409)
   })
 
   it('returns 404 for non-existent booking', async () => {
-    const result = await cancelBooking(payload, 999999999, adminUserId)
+    const result = await cancelBooking(payload, 999999999, adminUserId, 'Veneta serga')
     expect('error' in result).toBe(true)
     if ('error' in result) expect(result.status).toBe(404)
   })

@@ -262,6 +262,10 @@ export interface Booking {
    * Privaloma, kai statusas "Atmesta"
    */
   rejectionReason?: string | null;
+  /**
+   * Privaloma, kai statusas "Atšaukta"
+   */
+  cancellationReason?: string | null;
   patientName: string;
   patientPhone?: string | null;
   patientEmail?: string | null;
@@ -487,6 +491,7 @@ export interface BookingsSelect<T extends boolean = true> {
   endTime?: T;
   status?: T;
   rejectionReason?: T;
+  cancellationReason?: T;
   patientName?: T;
   patientPhone?: T;
   patientEmail?: T;

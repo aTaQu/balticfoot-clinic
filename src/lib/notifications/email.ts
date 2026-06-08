@@ -1,8 +1,9 @@
 import { render } from '@react-email/render'
-import type { EmailTemplate, EmailData, BookingEmailData, BookingRejectedEmailData, NewBookingAlertEmailData, BookingCancelledAlertEmailData, ContactEnquiryAlertEmailData } from './types'
+import type { EmailTemplate, EmailData, BookingEmailData, BookingRejectedEmailData, BookingCancelledEmailData, NewBookingAlertEmailData, BookingCancelledAlertEmailData, ContactEnquiryAlertEmailData } from './types'
 import { BookingReceivedEmail } from './templates/BookingReceivedEmail'
 import { BookingConfirmedEmail } from './templates/BookingConfirmedEmail'
 import { BookingRejectedEmail } from './templates/BookingRejectedEmail'
+import { BookingCancelledEmail } from './templates/BookingCancelledEmail'
 import { BookingReminderEmail } from './templates/BookingReminderEmail'
 import { NewBookingAlertEmail } from './templates/NewBookingAlertEmail'
 import { BookingCancelledAlertEmail } from './templates/BookingCancelledAlertEmail'
@@ -12,6 +13,7 @@ const SUBJECTS: Record<EmailTemplate, string> = {
   'booking-received':         'Vizito užklausa gauta — Baltic Foot',
   'booking-confirmed':        'Vizitas patvirtintas — Baltic Foot',
   'booking-rejected':         'Dėl jūsų vizito užklausos — Baltic Foot',
+  'booking-cancelled':        'Jūsų vizitas atšauktas — Baltic Foot',
   'booking-reminder':         'Primename apie rytojaus vizitą — Baltic Foot',
   'new-booking-alert':        'Nauja vizito užklausa',
   'booking-cancelled-alert':  'Vizitas atšauktas',
@@ -24,6 +26,7 @@ const TEMPLATES: Record<EmailTemplate, (data: EmailData) => React.ReactElement> 
   'booking-received':        (d) => BookingReceivedEmail(d as BookingEmailData),
   'booking-confirmed':       (d) => BookingConfirmedEmail(d as BookingEmailData),
   'booking-rejected':        (d) => BookingRejectedEmail(d as BookingRejectedEmailData),
+  'booking-cancelled':       (d) => BookingCancelledEmail(d as BookingCancelledEmailData),
   'booking-reminder':        (d) => BookingReminderEmail(d as BookingEmailData),
   'new-booking-alert':       (d) => NewBookingAlertEmail(d as NewBookingAlertEmailData),
   'booking-cancelled-alert': (d) => BookingCancelledAlertEmail(d as BookingCancelledAlertEmailData),

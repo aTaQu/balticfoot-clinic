@@ -12,7 +12,10 @@ export async function POST(
     const parsed = await parseAdminRequest(request, params)
     if ('response' in parsed) return parsed.response
 
-    const result = await cancelBooking(parsed.payload, parsed.bookingId, parsed.userId)
+    const body = await request.json() as Record<string, unknown>
+    const cancellationReason = typeof body.cancellationReason === 'string' ? body.cancellationReason : ''
+
+    const result = await cancelBooking(parsed.payload, parsed.bookingId, parsed.userId, cancellationReason)
 
     if ('error' in result) {
       return NextResponse.json({ error: result.error }, { status: result.status })

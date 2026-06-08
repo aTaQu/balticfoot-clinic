@@ -2,6 +2,7 @@ export type EmailTemplate =
   | 'booking-received'
   | 'booking-confirmed'
   | 'booking-rejected'
+  | 'booking-cancelled'
   | 'booking-reminder'
   | 'new-booking-alert'
   | 'booking-cancelled-alert'
@@ -19,6 +20,10 @@ export interface BookingRejectedEmailData extends BookingEmailData {
   rejectionReason: string
 }
 
+export interface BookingCancelledEmailData extends BookingEmailData {
+  cancellationReason: string
+}
+
 export interface NewBookingAlertEmailData {
   patientName: string
   patientPhone: string
@@ -34,6 +39,7 @@ export interface BookingCancelledAlertEmailData {
   serviceName: string
   date: string
   time: string
+  cancellationReason: string
 }
 
 export interface ContactEnquiryAlertEmailData {
@@ -46,6 +52,7 @@ export interface ContactEnquiryAlertEmailData {
 export type EmailData =
   | BookingEmailData
   | BookingRejectedEmailData
+  | BookingCancelledEmailData
   | NewBookingAlertEmailData
   | BookingCancelledAlertEmailData
   | ContactEnquiryAlertEmailData

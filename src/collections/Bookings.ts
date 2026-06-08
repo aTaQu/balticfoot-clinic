@@ -75,6 +75,15 @@ export const Bookings: CollectionConfig = {
       },
     },
     {
+      name: 'cancellationReason',
+      type: 'text',
+      label: 'Atšaukimo priežastis',
+      admin: {
+        condition: (data) => data?.status === 'cancelled',
+        description: 'Privaloma, kai statusas "Atšaukta"',
+      },
+    },
+    {
       name: 'patientName',
       type: 'text',
       required: true,

@@ -9,6 +9,7 @@ export function BookingActionsAfterFields() {
   const status = useFormFields(([fields]) => fields?.status?.value as string | undefined)
   const router = useRouter()
   const [rejectionReason, setRejectionReason] = useState('')
+  const [cancellationReason, setCancellationReason] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -20,7 +21,9 @@ export function BookingActionsAfterFields() {
     setLoading(true)
     setError(null)
     try {
-      const body = action === 'reject' ? JSON.stringify({ rejectionReason }) : undefined
+      let body: string | undefined
+      if (action === 'reject') body = JSON.stringify({ rejectionReason })
+      else if (action === 'cancel') body = JSON.stringify({ cancellationReason })
       const res = await fetch(`/api/admin/bookings/${id}/${action}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -109,22 +112,43 @@ export function BookingActionsAfterFields() {
       )}
 
       {status === 'confirmed' && (
-        <button
-          type="button"
-          disabled={loading}
-          onClick={() => callAction('cancel')}
-          style={{
-            padding: '0.5rem 1.25rem',
-            background: 'var(--theme-elevation-400)',
-            color: '#fff',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer',
-            fontWeight: 500,
-          }}
-        >
-          {loading ? 'Apdorojama…' : 'Atšaukti rezervaciją'}
-        </button>
+        <div>
+          <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>
+            Atšaukimo priežastis
+          </label>
+          <input
+            type="text"
+            value={cancellationReason}
+            onChange={(e) => setCancellationReason(e.target.value)}
+            placeholder="Nurodykite priežastį…"
+            style={{
+              width: '100%',
+              maxWidth: '400px',
+              padding: '0.4rem 0.75rem',
+              border: '1px solid var(--theme-elevation-300)',
+              borderRadius: '4px',
+              marginBottom: '0.5rem',
+            }}
+          />
+          <button
+            type="button"
+            disabled={loading || !cancellationReason.trim()}
+            onClick={() => callAction('cancel')}
+            style={{
+              display: 'block',
+              padding: '0.5rem 1.25rem',
+              background: 'var(--theme-elevation-400)',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: cancellationReason.trim() ? 'pointer' : 'not-allowed',
+              fontWeight: 500,
+              opacity: cancellationReason.trim() ? 1 : 0.5,
+            }}
+          >
+            {loading ? 'Apdorojama…' : 'Atšaukti rezervaciją'}
+          </button>
+        </div>
       )}
     </div>
   )
