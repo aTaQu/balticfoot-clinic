@@ -29,10 +29,7 @@ export function BookingStatusCell({ cellData }: Props) {
   return (
     <span
       title={info.description}
-      style={{
-        cursor: 'help',
-        borderBottom: '1px dotted currentColor',
-      }}
+      style={{ cursor: 'help' }}
     >
       {info.label}
     </span>
