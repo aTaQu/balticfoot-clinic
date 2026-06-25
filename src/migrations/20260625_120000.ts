@@ -4,8 +4,10 @@ import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-postgres'
 // opt-in `availability_windows` (Darbo laikai) model, and add '15' to the slot
 // interval enum. See docs/DECISIONS.md → "Availability inversion".
 //
-// Pre-launch drop & recreate: an old "blocked" row means the inverse as an
-// "open" row, so no data is carried over.
+// Drop & recreate: blocked<->open is a semantic inversion (an old "blocked" row
+// can't become an "open" one), so existing blocked_slots rows are intentionally
+// discarded rather than migrated. The site is live; cutover is default-closed
+// until the owner publishes Darbo laikai windows.
 
 export async function up({ db }: MigrateUpArgs): Promise<void> {
   await db.execute(sql`
