@@ -1,5 +1,5 @@
 import type { Payload } from 'payload'
-import type { Booking, Service, BlockedSlot } from '../../payload-types'
+import type { Booking, Service, AvailabilityWindow } from '../../payload-types'
 
 export interface ScheduledBooking {
   id: number
@@ -9,25 +9,22 @@ export interface ScheduledBooking {
   endTime: string | null
 }
 
-export interface ScheduledBlock {
+export interface ScheduledWindow {
   id: number
   startTime: string
   endTime: string
-  reason: string | null
+  note: string | null
 }
 
 export interface ScheduleDay {
   date: string
   bookings: ScheduledBooking[]
-  blocks: ScheduledBlock[]
+  windows: ScheduledWindow[]
 }
 
 export interface ScheduleResult {
   days: ScheduleDay[]
 }
-
-const BOOKINGS = 'bookings' as const
-const BLOCKED_SLOTS = 'blocked-slots' as const
 
 /** Add `days` calendar days to a YYYY-MM-DD string, returning YYYY-MM-DD. */
 function addDays(isoDate: string, days: number): string {
@@ -49,10 +46,11 @@ export async function getSchedule(
 ): Promise<ScheduleResult> {
   const to = addDays(from, days)
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [bookingsResult, blocksResult] = await Promise.all([
+  // Confirmed bookings + open windows (Darbo laikai) run in parallel — no data
+  // dependency between them.
+  const [bookingsResult, windowsResult] = await Promise.all([
     payload.find({
-      collection: BOOKINGS as any,
+      collection: 'bookings',
       where: {
         and: [
           { date: { greater_than_equal: from } },
@@ -63,9 +61,8 @@ export async function getSchedule(
       limit: 1000,
       depth: 1,
     }),
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     payload.find({
-      collection: BLOCKED_SLOTS as any,
+      collection: 'availability-windows',
       where: {
         and: [
           { date: { greater_than_equal: from } },
@@ -81,7 +78,7 @@ export async function getSchedule(
   const dayMap = new Map<string, ScheduleDay>()
   for (let i = 0; i < days; i++) {
     const d = addDays(from, i)
-    dayMap.set(d, { date: d, bookings: [], blocks: [] })
+    dayMap.set(d, { date: d, bookings: [], windows: [] })
   }
 
   for (const b of bookingsResult.docs as Booking[]) {
@@ -101,22 +98,22 @@ export async function getSchedule(
     })
   }
 
-  for (const block of blocksResult.docs as BlockedSlot[]) {
-    const dateKey = toDateString(block.date)
+  for (const w of windowsResult.docs as AvailabilityWindow[]) {
+    const dateKey = toDateString(w.date)
     const day = dayMap.get(dateKey)
     if (!day) continue
-    day.blocks.push({
-      id: block.id as number,
-      startTime: block.startTime,
-      endTime: block.endTime,
-      reason: block.reason ?? null,
+    day.windows.push({
+      id: w.id as number,
+      startTime: w.startTime,
+      endTime: w.endTime,
+      note: w.note ?? null,
     })
   }
 
-  // Sort bookings and blocks by time within each day
+  // Sort bookings and windows by time within each day
   for (const day of dayMap.values()) {
     day.bookings.sort((a, b) => a.timeSlot.localeCompare(b.timeSlot))
-    day.blocks.sort((a, b) => a.startTime.localeCompare(b.startTime))
+    day.windows.sort((a, b) => a.startTime.localeCompare(b.startTime))
   }
 
   return { days: Array.from(dayMap.values()) }

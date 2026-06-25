@@ -11,7 +11,7 @@ import { Media } from './src/collections/Media'
 import { Services } from './src/collections/Services'
 import { BlogPosts } from './src/collections/BlogPosts'
 import { Bookings } from './src/collections/Bookings'
-import { BlockedSlots } from './src/collections/BlockedSlots'
+import { AvailabilityWindows } from './src/collections/AvailabilityWindows'
 import { AuditLog } from './src/collections/AuditLog'
 import { ClinicSettings } from './src/globals/ClinicSettings'
 
@@ -46,7 +46,7 @@ const configPromise = buildConfig({
       },
     }),
   ],
-  collections: [Users, Media, Services, BlogPosts, Bookings, BlockedSlots, AuditLog],
+  collections: [Users, Media, Services, BlogPosts, Bookings, AvailabilityWindows, AuditLog],
   globals: [ClinicSettings],
   db: postgresAdapter({
     pool: {

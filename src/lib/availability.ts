@@ -1,10 +1,5 @@
 import type { Payload } from 'payload'
 
-const DAYS_OF_WEEK = [
-  'sunday', 'monday', 'tuesday', 'wednesday',
-  'thursday', 'friday', 'saturday',
-] as const
-
 export type Slot = { time: string; available: boolean }
 export type AvailabilityOk = { slots: Slot[] }
 export type AvailabilityErr = { error: string; status: 400 | 404 }
@@ -48,53 +43,42 @@ export async function getAvailability(
   }
 
   const duration = serviceResult.docs[0].duration
-  const openDays = (settings.openDays ?? []) as string[]
   const slotInterval = parseInt(settings.slotIntervalMinutes ?? '30', 10)
-  const dayStart = timeToMinutes(settings.workingHoursStart)
-  const dayEnd = timeToMinutes(settings.workingHoursEnd)
 
-  // Parse date parts in UTC to avoid timezone shifts
-  const [y, mo, d] = date.split('-').map(Number)
-  const dayOfWeek = DAYS_OF_WEEK[new Date(Date.UTC(y, mo - 1, d)).getUTCDay()]
-
-  if (!openDays.includes(dayOfWeek)) {
-    return { slots: [] }
-  }
-
-  const [bookingsResult, blockedResult] = await Promise.all([
+  // Default-closed model: bookable slots come ONLY from open windows
+  // (Darbo laikai). Confirmed/pending bookings subtract from them.
+  const [windowsResult, bookingsResult] = await Promise.all([
+    payload.find({
+      collection: 'availability-windows',
+      where: { date: { equals: date } },
+      limit: 200,
+    }),
     payload.find({
       collection: 'bookings',
       where: { date: { equals: date }, status: { in: ['pending', 'confirmed'] } },
       limit: 200,
     }),
-    payload.find({
-      collection: 'blocked-slots',
-      where: { date: { equals: date } },
-      limit: 200,
-    }),
   ])
 
-  const occupied: [number, number][] = [
-    ...bookingsResult.docs.flatMap((b) => {
-      if (!b.timeSlot || !b.endTime) return []
-      return [[timeToMinutes(b.timeSlot), timeToMinutes(b.endTime)] as [number, number]]
-    }),
-    ...blockedResult.docs.flatMap((b) => {
-      if (!b.startTime || !b.endTime) return []
-      return [[timeToMinutes(b.startTime), timeToMinutes(b.endTime)] as [number, number]]
-    }),
-  ]
+  const occupied: [number, number][] = bookingsResult.docs.flatMap((b) => {
+    if (!b.timeSlot || !b.endTime) return []
+    return [[timeToMinutes(b.timeSlot), timeToMinutes(b.endTime)] as [number, number]]
+  })
 
   const slots: Slot[] = []
-  for (let start = dayStart; start < dayEnd; start += slotInterval) {
-    const end = start + duration
-    if (end > dayEnd) {
-      slots.push({ time: minutesToTime(start), available: false })
-      continue
+  for (const w of windowsResult.docs) {
+    if (!w.startTime || !w.endTime) continue
+    const winStart = timeToMinutes(w.startTime)
+    const winEnd = timeToMinutes(w.endTime)
+    // Snap the first candidate up to the clock grid (multiples of the interval).
+    const first = Math.ceil(winStart / slotInterval) * slotInterval
+    for (let start = first; start + duration <= winEnd; start += slotInterval) {
+      const end = start + duration
+      const available = !occupied.some(([os, oe]) => overlaps(start, end, os, oe))
+      slots.push({ time: minutesToTime(start), available })
     }
-    const available = !occupied.some(([os, oe]) => overlaps(start, end, os, oe))
-    slots.push({ time: minutesToTime(start), available })
   }
 
+  slots.sort((a, b) => a.time.localeCompare(b.time))
   return { slots }
 }

@@ -34,6 +34,8 @@ Read **one** of these before writing the corresponding code type — don't read 
 - **`formatDateLT`** — lives in `src/lib/format.ts`. Don't add it elsewhere.
 - **CRLF on this devcontainer** — WSL2/Windows writes CRLF to the working tree. `.gitattributes` normalises on commit. Always `git add <specific files>` — never `git add .` — to avoid staging line-ending-only noise.
 
+- **Dev/test DB syncs via Payload `push`, not the migration chain** — booting payload (incl. vitest) reconciles schema via dev push. A collection rename/drop makes push ask an **interactive** "create or rename?" question that **hangs** under `docker exec` (no TTY). To land a schema change for the test loop, apply the transition SQL directly (`psql`, mirroring Payload's deterministic table/index naming) so push sees no diff — then commit a hand-written migration file (modelled on an existing one) as the **prod** artifact. The migration files are for prod (`payload migrate`); they are not what syncs the dev DB.
+
 ---
 
 ## Route → File
@@ -74,10 +76,10 @@ Read **one** of these before writing the corresponding code type — don't read 
 | `services` | `src/collections/Services.ts` | `name`, `slug`, `price`, `duration` (min), `description`, `shortDescription`, `icon`, `active` |
 | `blog-posts` | `src/collections/BlogPosts.ts` | `title`, `slug` (auto), `body` (Lexical), `status` (published\|draft), `publishedAt` |
 | `bookings` | `src/collections/Bookings.ts` | `service` (rel), `date`, `timeSlot`, `endTime` (computed, nullable), `status` (pending\|confirmed\|rejected\|cancelled), `patientName/Phone/Email`, `gdprConsent` |
-| `blocked-slots` | `src/collections/BlockedSlots.ts` | `date`, `startTime`, `endTime`, `reason`, `createdBy` (rel → users) |
+| `availability-windows` | `src/collections/AvailabilityWindows.ts` | `date`, `startTime`, `endTime`, `note`, `createdBy` (rel → users) — open windows (**Darbo laikai**); default-closed availability model |
 | `audit-log` | `src/collections/AuditLog.ts` | `user` (rel), `action` (confirmed\|rejected\|cancelled\|rescheduled\|slot_blocked\|slot_unblocked), `booking` (rel, optional), `note` — **read-only in admin** |
 | `media` | `src/collections/Media.ts` | Upload collection, 5 MB limit, stored in `/public/media` |
-| `clinic-settings` | `src/globals/ClinicSettings.ts` | `clinicName`, `phone`, `email`, `address`, `workingHoursStart/End`, `slotIntervalMinutes` ('30'\|'60'), `openDays` |
+| `clinic-settings` | `src/globals/ClinicSettings.ts` | `clinicName`, `phone`, `email`, `address`, `workingHoursStart/End` (**advertising-only** since the inversion), `slotIntervalMinutes` ('15'\|'30'\|'60'), `openDays` (**advertising-only**) |
 
 **How to fetch in a Server Component:**
 ```ts
@@ -166,7 +168,7 @@ formatDuration(minutes: number): string      // 90 → "1,5 val."
 getAvailability(payload, date: string, serviceSlug: string): Promise<AvailabilityResult>
 // AvailabilityResult = { slots: { time: string, available: boolean }[] } | { error: string, status: 400|404 }
 ```
-Algorithm: fetches ClinicSettings + service duration + PENDING/CONFIRMED bookings + BlockedSlots, marks slots unavailable if `[slot, slot+duration)` overlaps any booking/block or exceeds `workingHoursEnd`.
+Algorithm (**default-closed**): bookable slots come ONLY from open windows (`availability-windows`). For each window, candidate starts snap to the clock grid (multiples of `slotIntervalMinutes`); a slot is emitted when `[slot, slot+duration)` fits fully inside the window and overlaps no PENDING/CONFIRMED booking. No windows on a date → no slots. `workingHours`/`openDays` no longer gate availability.
 
 ### `src/lib/bookings.ts`
 ```ts
@@ -179,11 +181,11 @@ Validates → re-checks availability (race guard) → creates `pending` booking 
 ```ts
 getSchedule(payload, from: string, days: number): Promise<ScheduleResult>
 // ScheduleResult = { days: ScheduleDay[] }
-// ScheduleDay = { date: string, bookings: ScheduledBooking[], blocks: ScheduledBlock[] }
+// ScheduleDay = { date: string, bookings: ScheduledBooking[], windows: ScheduledWindow[] }
 // ScheduledBooking = { id, patientName, serviceName, timeSlot, endTime }
-// ScheduledBlock = { id, startTime, endTime, reason }
+// ScheduledWindow = { id, startTime, endTime, note }
 ```
-Only CONFIRMED bookings appear. Queries bookings + blocked-slots in parallel via `Promise.all`. Days sorted chronologically, entries within each day sorted by time.
+Only CONFIRMED bookings appear. Queries bookings + availability-windows in parallel via `Promise.all`. Days sorted chronologically, entries within each day sorted by time. A day with no windows is "closed" (shown as **Uždaryta** in the dashboard widget).
 
 ### `src/lib/reminders.ts`
 ```ts

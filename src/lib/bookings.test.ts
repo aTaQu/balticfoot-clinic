@@ -30,7 +30,7 @@ beforeAll(async () => {
 })
 
 afterEach(async () => {
-  // Clean up test bookings for the test date
+  // Clean up test bookings and windows for the test date
   const bookings = await payload.find({
     collection: 'bookings',
     where: { date: { equals: MON } },
@@ -39,17 +39,36 @@ afterEach(async () => {
   await Promise.all(
     bookings.docs.map((b) => payload.delete({ collection: 'bookings', id: b.id })),
   )
+
+  const windows = await payload.find({
+    collection: 'availability-windows',
+    where: { date: { equals: MON } },
+    limit: 200,
+  })
+  await Promise.all(
+    windows.docs.map((w) => payload.delete({ collection: 'availability-windows', id: w.id })),
+  )
 })
+
+// Open a window so the slot is bookable — default-closed means createBooking's
+// availability re-check rejects any slot outside a Darbo laikas window.
+async function createWindow(startTime = '09:00', endTime = '18:00') {
+  return payload.create({
+    collection: 'availability-windows',
+    data: { date: MON, startTime, endTime },
+  })
+}
 
 describe('createBooking', () => {
   it('valid input creates a pending booking and returns summary', async () => {
+    await createWindow()
     const result = await createBooking(payload, VALID_INPUT)
     expect('error' in result).toBe(false)
     if ('error' in result) return
 
     expect(result.booking.date).toBe(MON)
     expect(result.booking.timeSlot).toBe('09:00')
-    expect(result.booking.serviceName).toBe('Įaugusio nago gydymas')
+    expect(result.booking.serviceName).toBe('Įaugusio nago korekcija')
 
     // Verify it's actually in the DB with status pending
     const found = await payload.findByID({ collection: 'bookings', id: result.booking.id })
@@ -69,14 +88,9 @@ describe('createBooking', () => {
     if ('error' in result) expect(result.status).toBe(400)
   })
 
-  it('missing patientPhone returns 400', async () => {
-    const result = await createBooking(payload, { ...VALID_INPUT, patientPhone: '' })
-    expect('error' in result).toBe(true)
-    if ('error' in result) expect(result.status).toBe(400)
-  })
-
-  it('missing patientEmail returns 400', async () => {
-    const result = await createBooking(payload, { ...VALID_INPUT, patientEmail: '' })
+  it('missing both phone and email returns 400', async () => {
+    // bookings.ts requires at least one contact method, not both individually.
+    const result = await createBooking(payload, { ...VALID_INPUT, patientPhone: '', patientEmail: '' })
     expect('error' in result).toBe(true)
     if ('error' in result) expect(result.status).toBe(400)
   })
@@ -101,6 +115,7 @@ describe('createBooking', () => {
   })
 
   it('race condition: second booking for same slot returns 409', async () => {
+    await createWindow()
     // First booking succeeds
     const first = await createBooking(payload, VALID_INPUT)
     expect('error' in first).toBe(false)

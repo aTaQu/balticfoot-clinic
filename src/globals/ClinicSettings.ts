@@ -81,6 +81,7 @@ export const ClinicSettings: GlobalConfig = {
       defaultValue: '30',
       label: 'Laiko intervalas',
       options: [
+        { label: '15 minučių', value: '15' },
         { label: '30 minučių', value: '30' },
         { label: '60 minučių', value: '60' },
       ],

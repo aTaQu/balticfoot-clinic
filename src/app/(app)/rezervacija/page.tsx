@@ -50,7 +50,7 @@ export default async function RezervacijaPage({ searchParams }: Props) {
         <BookingWizard
           services={services}
           preselectedSlug={serviceSlug ?? null}
-          openDays={openDays}
+          phone={settings.phone}
         />
       </main>
       <Footer

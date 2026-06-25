@@ -6,10 +6,6 @@ import { formatDuration } from '@/lib/format'
 import type { Service } from '../../../payload-types'
 import styles from './BookingWizard.module.css'
 
-const DAY_NAMES = [
-  'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday',
-] as const
-
 const SERVICE_ICONS: Record<string, React.ReactNode> = {
   smiley: (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
@@ -85,10 +81,10 @@ function toISODate(d: Date): string {
 interface BookingWizardProps {
   services: Service[]
   preselectedSlug?: string | null
-  openDays?: string[]
+  phone: string
 }
 
-export default function BookingWizard({ services, preselectedSlug, openDays = [] }: BookingWizardProps) {
+export default function BookingWizard({ services, preselectedSlug, phone }: BookingWizardProps) {
   const [step, setStep] = useState(1)
   const [state, setState] = useState<BookingState>(INITIAL_STATE)
   const [submitted, setSubmitted] = useState(false)
@@ -128,11 +124,6 @@ export default function BookingWizard({ services, preselectedSlug, openDays = []
       .catch(() => setSlots([]))
       .finally(() => setSlotsLoading(false))
   }, [state.date, state.service])
-
-  const isOpenDay = useCallback(
-    (date: Date) => openDays.includes(DAY_NAMES[date.getDay()]),
-    [openDays],
-  )
 
   const shake = useCallback(() => {
     const el = wizardRef.current
@@ -241,7 +232,7 @@ export default function BookingWizard({ services, preselectedSlug, openDays = []
       key: `d-${d}`,
       d,
       date,
-      disabled: isPast || !isOpenDay(date),
+      disabled: isPast,
       isToday,
       isSelected,
     })
@@ -415,7 +406,10 @@ export default function BookingWizard({ services, preselectedSlug, openDays = []
                             ))}
                           </div>
                         ) : slots.length === 0 ? (
-                          <p className={styles.timePlaceholder}>Šią dieną laisvų laikų nėra.</p>
+                          <p className={styles.timePlaceholder}>
+                            Šią dieną laisvų laikų nėra. Dėl vizito skambinkite{' '}
+                            <a href={`tel:${phone}`}>{phone}</a>.
+                          </p>
                         ) : (
                           <div className={styles.timeGrid} role="radiogroup" aria-label="Laiko pasirinkimas">
                             {slots.map((slot) => {
