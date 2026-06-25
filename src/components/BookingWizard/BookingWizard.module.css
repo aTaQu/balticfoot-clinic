@@ -298,6 +298,25 @@
 .calDay.selected { background: var(--terra); color: #fff; }
 .calDay.disabled { color: rgba(107, 94, 82, 0.22); cursor: default; }
 .calDay.empty { cursor: default; }
+.calDay.available:not(.selected):not(.disabled) { font-weight: 600; position: relative; }
+.calDay.available:not(.selected):not(.disabled)::after {
+  content: '';
+  position: absolute;
+  bottom: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--sage);
+}
+.calHint {
+  margin-top: 0.75rem;
+  font-size: 0.8rem;
+  color: var(--sage);
+  line-height: 1.4;
+}
+.calHint a { color: var(--terra); font-weight: 600; }
 
 /* Time slots */
 .timeSection {}

@@ -52,6 +52,7 @@ Read **one** of these before writing the corresponding code type — don't read 
 | `/rezervacija` | `src/app/(app)/rezervacija/page.tsx` | Dynamic, reads `?service=` param |
 | `/admin/[[...segments]]` | `src/app/(payload)/admin/[[...segments]]/page.tsx` | Payload admin UI |
 | `/api/availability` | `src/app/(app)/api/availability/route.ts` | `force-dynamic`, GET only |
+| `/api/availability/dates` | `src/app/(app)/api/availability/dates/route.ts` | `force-dynamic`, GET only, `?service=&from=&days=` → dates with a free slot |
 | `/api/bookings` | `src/app/(app)/api/bookings/route.ts` | `force-dynamic`, POST only |
 | `/api/admin/bookings/[id]/confirm` | `src/app/(app)/api/admin/bookings/[id]/confirm/route.ts` | POST, requires Payload session |
 | `/api/admin/bookings/[id]/reject` | `src/app/(app)/api/admin/bookings/[id]/reject/route.ts` | POST, requires Payload session |
@@ -105,7 +106,7 @@ All components live in `src/components/`. Each has a co-located `.module.css`.
 | `Trust` | Trust signals strip | none |
 | `Quote` | Pull-quote block | none |
 | `Gallery` | Photo gallery | none |
-| `BookingWizard` | Multi-step booking form — fetches live services + availability; empty-date phone CTA; calendar blocks only past dates (not `openDays`) | `services`, `preselectedSlug?`, `phone` |
+| `BookingWizard` | Multi-step booking form; calendar enables/accents only dates with a free slot (`/api/availability/dates`), auto-jumps to + preselects the next open day, phone CTA when none | `services`, `preselectedSlug?`, `phone` |
 | `BookingActions` | Payload admin `AfterFields` — confirm/reject/cancel buttons | rendered via `admin.components.edit.AfterFields` in `Bookings` collection |
 | `WeekSchedule` | Payload admin `AfterDashboard` — 7-day widget: open windows (blue) + confirmed bookings (green); empty days show **Uždaryta** | registered via `admin.components.afterDashboard` in `payload.config.ts` |
 | `ScrollRevealInit` | Mounts scroll-reveal animations | none |
@@ -169,6 +170,11 @@ getAvailability(payload, date: string, serviceSlug: string): Promise<Availabilit
 // AvailabilityResult = { slots: { time: string, available: boolean }[] } | { error: string, status: 400|404 }
 ```
 Algorithm (**default-closed**): bookable slots come ONLY from open windows (`availability-windows`). For each window, candidate starts snap to the clock grid (multiples of `slotIntervalMinutes`); a slot is emitted when `[slot, slot+duration)` fits fully inside the window and overlaps no PENDING/CONFIRMED booking. No windows on a date → no slots. `workingHours`/`openDays` no longer gate availability.
+```ts
+getAvailableDates(payload, from: string, days: number, serviceSlug: string): Promise<AvailableDatesResult>
+// AvailableDatesResult = { dates: string[] } | { error: string, status: 400|404 }
+```
+Returns the dates in `[from, from+days)` that have ≥1 **free** slot for the service (batched — 2 queries, computed in memory; shares `computeDaySlots` with `getAvailability`). Powers the booking calendar: enable/accent only bookable days and auto-jump to the next open one.
 
 ### `src/lib/bookings.ts`
 ```ts

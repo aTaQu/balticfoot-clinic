@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll, afterEach } from 'vitest'
 import { getPayload, type Payload } from 'payload'
 import configPromise from '@payload-config'
-import { getAvailability } from './availability'
+import { getAvailability, getAvailableDates } from './availability'
 
 // Dates far in the future to avoid conflicts with real bookings.
 // Calculated at module load so tests are deterministic.
@@ -183,5 +183,49 @@ describe('getAvailability', () => {
     const result = await getAvailability(payload, '15-04-2026', SVC_30)
     expect('error' in result).toBe(true)
     if ('error' in result) expect(result.status).toBe(400)
+  })
+})
+
+describe('getAvailableDates', () => {
+  it('returns no dates when the range has no windows', async () => {
+    const result = await getAvailableDates(payload, '2099-01-01', 14, SVC_30)
+    expect('error' in result).toBe(false)
+    if ('error' in result) return
+
+    expect(result.dates).toEqual([])
+  })
+
+  it('includes a date that has an open window with a free slot', async () => {
+    await createWindow('10:00', '12:00') // MON
+    const result = await getAvailableDates(payload, '2099-01-01', 14, SVC_30)
+    if ('error' in result) throw new Error(result.error)
+
+    expect(result.dates).toEqual([MON])
+  })
+
+  it('excludes a date whose only window is fully booked', async () => {
+    await createWindow('09:00', '09:30') // MON — exactly one 30-min slot
+    await createBooking('09:00', SVC_30, 'confirmed') // takes it
+    const result = await getAvailableDates(payload, '2099-01-01', 14, SVC_30)
+    if ('error' in result) throw new Error(result.error)
+
+    expect(result.dates).toEqual([])
+  })
+
+  it('excludes a date whose window is too short for the service', async () => {
+    await createWindow('09:00', '09:20') // 20 min, 30-min service
+    const result = await getAvailableDates(payload, '2099-01-01', 14, SVC_30)
+    if ('error' in result) throw new Error(result.error)
+
+    expect(result.dates).toEqual([])
+  })
+
+  it('returns dates sorted, including non-working weekdays', async () => {
+    await createWindow('10:00', '11:00', MON)
+    await createWindow('10:00', '11:00', SUN) // Sunday still counts
+    const result = await getAvailableDates(payload, '2099-01-01', 14, SVC_30)
+    if ('error' in result) throw new Error(result.error)
+
+    expect(result.dates).toEqual([SUN, MON].sort())
   })
 })

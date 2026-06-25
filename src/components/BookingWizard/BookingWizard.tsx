@@ -63,7 +63,7 @@ const STEP_LABELS = ['Paslauga', 'Data ir laikas', 'Jūsų duomenys', 'Patvirtin
 
 type CalDay =
   | { type: 'empty'; key: string }
-  | { type: 'day'; key: string; d: number; date: Date; disabled: boolean; isToday: boolean; isSelected: boolean }
+  | { type: 'day'; key: string; d: number; date: Date; disabled: boolean; isAvailable: boolean; isToday: boolean; isSelected: boolean }
 
 function getTodayDate(): Date {
   const d = new Date()
@@ -94,6 +94,8 @@ export default function BookingWizard({ services, preselectedSlug, phone }: Book
   const [gdprError, setGdprError] = useState(false)
   const [slots, setSlots] = useState<{ time: string; available: boolean }[]>([])
   const [slotsLoading, setSlotsLoading] = useState(false)
+  const [availableDates, setAvailableDates] = useState<Set<string>>(new Set())
+  const [datesLoading, setDatesLoading] = useState(false)
 
   const todayDate = useRef<Date>(getTodayDate()).current
   const [calYear, setCalYear] = useState(() => new Date().getFullYear())
@@ -124,6 +126,42 @@ export default function BookingWizard({ services, preselectedSlug, phone }: Book
       .catch(() => setSlots([]))
       .finally(() => setSlotsLoading(false))
   }, [state.date, state.service])
+
+  // Default-closed: fetch which upcoming dates actually have a free slot for the
+  // chosen service, then jump the calendar to (and preselect) the next open day.
+  useEffect(() => {
+    if (!state.service) {
+      setAvailableDates(new Set())
+      return
+    }
+    const controller = new AbortController()
+    const slug = state.service.slug
+    const from = toISODate(todayDate)
+    setDatesLoading(true)
+    fetch(`/api/availability/dates?service=${slug}&from=${from}&days=120`, { signal: controller.signal })
+      .then((r) => r.json())
+      .then((data: { dates?: string[] }) => {
+        const list = data.dates ?? []
+        setAvailableDates(new Set(list))
+        const next = list[0] // sorted ascending → earliest open day
+        if (next) {
+          const [y, mo, d] = next.split('-').map(Number)
+          const dt = new Date(y, mo - 1, d)
+          dt.setHours(0, 0, 0, 0)
+          setCalYear(y)
+          setCalMonth(mo - 1)
+          setState((prev) => ({ ...prev, date: dt, time: null }))
+        }
+      })
+      .catch((err: unknown) => {
+        if (err instanceof Error && err.name === 'AbortError') return
+        setAvailableDates(new Set())
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setDatesLoading(false)
+      })
+    return () => controller.abort()
+  }, [state.service, todayDate])
 
   const shake = useCallback(() => {
     const el = wizardRef.current
@@ -221,7 +259,9 @@ export default function BookingWizard({ services, preselectedSlug, phone }: Book
   for (let d = 1; d <= daysInMonth; d++) {
     const date = new Date(calYear, calMonth, d)
     date.setHours(0, 0, 0, 0)
+    const dateStr = toISODate(date)
     const isPast = date <= todayDate
+    const isAvailable = availableDates.has(dateStr)
     const isToday = date.getTime() === todayDate.getTime()
     const isSelected =
       state.date?.getFullYear() === calYear &&
@@ -232,7 +272,8 @@ export default function BookingWizard({ services, preselectedSlug, phone }: Book
       key: `d-${d}`,
       d,
       date,
-      disabled: isPast,
+      disabled: isPast || datesLoading || !isAvailable,
+      isAvailable: isAvailable && !datesLoading,
       isToday,
       isSelected,
     })
@@ -367,6 +408,7 @@ export default function BookingWizard({ services, preselectedSlug, phone }: Book
                                 cell.disabled ? styles.disabled : '',
                                 cell.isToday ? styles.today : '',
                                 cell.isSelected ? styles.selected : '',
+                                cell.isAvailable ? styles.available : '',
                               ].filter(Boolean).join(' ')
                               return (
                                 <div
@@ -390,6 +432,25 @@ export default function BookingWizard({ services, preselectedSlug, phone }: Book
                           </div>
                         </div>
                       </div>
+                      {state.service && (
+                        <p className={styles.calHint}>
+                          {datesLoading
+                            ? 'Tikrinami laisvi laikai…'
+                            : availableDates.size === 0
+                              ? (
+                                <>
+                                  Šiuo metu laisvų laikų internetu nėra. Skambinkite{' '}
+                                  <a href={`tel:${phone}`}>{phone}</a>.
+                                </>
+                              )
+                              : (
+                                <>
+                                  Rodomos tik dienos su laisvais laikais. Nerandate tinkamo?{' '}
+                                  Skambinkite <a href={`tel:${phone}`}>{phone}</a>.
+                                </>
+                              )}
+                        </p>
+                      )}
                       <div className={styles.timeSection}>
                         <div className={styles.timeSectionLabel}>Laisvi laikai</div>
                         {!state.date ? (
