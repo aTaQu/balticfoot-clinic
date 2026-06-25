@@ -34,6 +34,8 @@ Read **one** of these before writing the corresponding code type — don't read 
 - **`formatDateLT`** — lives in `src/lib/format.ts`. Don't add it elsewhere.
 - **CRLF on this devcontainer** — WSL2/Windows writes CRLF to the working tree. `.gitattributes` normalises on commit. Always `git add <specific files>` — never `git add .` — to avoid staging line-ending-only noise.
 
+- **Dev/test DB syncs via Payload `push`, not the migration chain** — booting payload (incl. vitest) reconciles schema via dev push. A collection rename/drop makes push ask an **interactive** "create or rename?" question that **hangs** under `docker exec` (no TTY). To land a schema change for the test loop, apply the transition SQL directly (`psql`, mirroring Payload's deterministic table/index naming) so push sees no diff — then commit a hand-written migration file (modelled on an existing one) as the **prod** artifact. The migration files are for prod (`payload migrate`); they are not what syncs the dev DB.
+
 ---
 
 ## Route → File
@@ -50,6 +52,7 @@ Read **one** of these before writing the corresponding code type — don't read 
 | `/rezervacija` | `src/app/(app)/rezervacija/page.tsx` | Dynamic, reads `?service=` param |
 | `/admin/[[...segments]]` | `src/app/(payload)/admin/[[...segments]]/page.tsx` | Payload admin UI |
 | `/api/availability` | `src/app/(app)/api/availability/route.ts` | `force-dynamic`, GET only |
+| `/api/availability/dates` | `src/app/(app)/api/availability/dates/route.ts` | `force-dynamic`, GET only, `?service=&from=&days=` → dates with a free slot |
 | `/api/bookings` | `src/app/(app)/api/bookings/route.ts` | `force-dynamic`, POST only |
 | `/api/admin/bookings/[id]/confirm` | `src/app/(app)/api/admin/bookings/[id]/confirm/route.ts` | POST, requires Payload session |
 | `/api/admin/bookings/[id]/reject` | `src/app/(app)/api/admin/bookings/[id]/reject/route.ts` | POST, requires Payload session |
@@ -74,10 +77,10 @@ Read **one** of these before writing the corresponding code type — don't read 
 | `services` | `src/collections/Services.ts` | `name`, `slug`, `price`, `duration` (min), `description`, `shortDescription`, `icon`, `active` |
 | `blog-posts` | `src/collections/BlogPosts.ts` | `title`, `slug` (auto), `body` (Lexical), `status` (published\|draft), `publishedAt` |
 | `bookings` | `src/collections/Bookings.ts` | `service` (rel), `date`, `timeSlot`, `endTime` (computed, nullable), `status` (pending\|confirmed\|rejected\|cancelled), `patientName/Phone/Email`, `gdprConsent` |
-| `blocked-slots` | `src/collections/BlockedSlots.ts` | `date`, `startTime`, `endTime`, `reason`, `createdBy` (rel → users) |
+| `availability-windows` | `src/collections/AvailabilityWindows.ts` | `date`, `startTime`, `endTime`, `note`, `createdBy` (rel → users) — open windows (**Darbo laikai**); default-closed availability model |
 | `audit-log` | `src/collections/AuditLog.ts` | `user` (rel), `action` (confirmed\|rejected\|cancelled\|rescheduled\|slot_blocked\|slot_unblocked), `booking` (rel, optional), `note` — **read-only in admin** |
 | `media` | `src/collections/Media.ts` | Upload collection, 5 MB limit, stored in `/public/media` |
-| `clinic-settings` | `src/globals/ClinicSettings.ts` | `clinicName`, `phone`, `email`, `address`, `workingHoursStart/End`, `slotIntervalMinutes` ('30'\|'60'), `openDays` |
+| `clinic-settings` | `src/globals/ClinicSettings.ts` | `clinicName`, `phone`, `email`, `address`, `workingHoursStart/End` (**advertising-only** since the inversion), `slotIntervalMinutes` ('15'\|'30'\|'60'), `openDays` (**advertising-only**) |
 
 **How to fetch in a Server Component:**
 ```ts
@@ -103,12 +106,12 @@ All components live in `src/components/`. Each has a co-located `.module.css`.
 | `Trust` | Trust signals strip | none |
 | `Quote` | Pull-quote block | none |
 | `Gallery` | Photo gallery | none |
-| `BookingWizard` | Multi-step booking form — fetches live services + availability | none |
+| `BookingWizard` | Multi-step booking form; calendar enables/accents only dates with a free slot (`/api/availability/dates`), auto-jumps to + preselects the next open day, phone CTA when none | `services`, `preselectedSlug?`, `phone` |
 | `BookingActions` | Payload admin `AfterFields` — confirm/reject/cancel buttons | rendered via `admin.components.edit.AfterFields` in `Bookings` collection |
-| `WeekSchedule` | Payload admin `AfterDashboard` — 7-day read-only schedule widget | registered via `admin.components.afterDashboard` in `payload.config.ts` |
+| `WeekSchedule` | Payload admin `AfterDashboard` — 7-day widget: open windows (blue) + confirmed bookings (green); empty days show **Uždaryta** | registered via `admin.components.afterDashboard` in `payload.config.ts` |
 | `ScrollRevealInit` | Mounts scroll-reveal animations | none |
 
-**Footer nav links** are currently homepage fragment links (`#paslaugos`, `#registracija`, etc.) — not yet updated for multi-page structure.
+**Footer nav links** use site-wide `<Link>` routes (`/`, `/#paslaugos`, `/blog/`, `/rezervacija/`).
 
 ---
 
@@ -166,7 +169,12 @@ formatDuration(minutes: number): string      // 90 → "1,5 val."
 getAvailability(payload, date: string, serviceSlug: string): Promise<AvailabilityResult>
 // AvailabilityResult = { slots: { time: string, available: boolean }[] } | { error: string, status: 400|404 }
 ```
-Algorithm: fetches ClinicSettings + service duration + PENDING/CONFIRMED bookings + BlockedSlots, marks slots unavailable if `[slot, slot+duration)` overlaps any booking/block or exceeds `workingHoursEnd`.
+Algorithm (**default-closed**): bookable slots come ONLY from open windows (`availability-windows`). For each window, candidate starts snap to the clock grid (multiples of `slotIntervalMinutes`); a slot is emitted when `[slot, slot+duration)` fits fully inside the window and overlaps no PENDING/CONFIRMED booking. No windows on a date → no slots. `workingHours`/`openDays` no longer gate availability.
+```ts
+getAvailableDates(payload, from: string, days: number, serviceSlug: string): Promise<AvailableDatesResult>
+// AvailableDatesResult = { dates: string[] } | { error: string, status: 400|404 }
+```
+Returns the dates in `[from, from+days)` that have ≥1 **free** slot for the service (batched — 2 queries, computed in memory; shares `computeDaySlots` with `getAvailability`). Powers the booking calendar: enable/accent only bookable days and auto-jump to the next open one.
 
 ### `src/lib/bookings.ts`
 ```ts
@@ -179,11 +187,11 @@ Validates → re-checks availability (race guard) → creates `pending` booking 
 ```ts
 getSchedule(payload, from: string, days: number): Promise<ScheduleResult>
 // ScheduleResult = { days: ScheduleDay[] }
-// ScheduleDay = { date: string, bookings: ScheduledBooking[], blocks: ScheduledBlock[] }
+// ScheduleDay = { date: string, bookings: ScheduledBooking[], windows: ScheduledWindow[] }
 // ScheduledBooking = { id, patientName, serviceName, timeSlot, endTime }
-// ScheduledBlock = { id, startTime, endTime, reason }
+// ScheduledWindow = { id, startTime, endTime, note }
 ```
-Only CONFIRMED bookings appear. Queries bookings + blocked-slots in parallel via `Promise.all`. Days sorted chronologically, entries within each day sorted by time.
+Only CONFIRMED bookings appear. Queries bookings + availability-windows in parallel via `Promise.all`. Days sorted chronologically, entries within each day sorted by time. A day with no windows is "closed" (shown as **Uždaryta** in the dashboard widget).
 
 ### `src/lib/reminders.ts`
 ```ts
@@ -238,8 +246,7 @@ Authenticates via `payload.auth()`, parses `[id]` param. Check `'response' in re
 
 ---
 
-## What's NOT built yet (as of Phase 15)
+## What's NOT built yet
 
-- Footer navigation updated for multi-page structure — deferred (Phase 16)
 - `NEXT_PUBLIC_SITE_URL` env var set on Railway — deployment step before go-live
 - `BASE_URL` in `sitemap.ts`/`robots.ts` not unified with `SITE_URL` from `constants.ts` — same env var, two names; consolidation deferred

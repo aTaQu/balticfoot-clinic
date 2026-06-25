@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll, afterEach } from 'vitest'
 import { getPayload, type Payload } from 'payload'
 import configPromise from '@payload-config'
-import { getAvailability } from './availability'
+import { getAvailability, getAvailableDates } from './availability'
 
 // Dates far in the future to avoid conflicts with real bookings.
 // Calculated at module load so tests are deterministic.
@@ -11,8 +11,8 @@ function nextWeekdayUTC(targetDay: number, fromISO = '2099-01-01'): string {
   return d.toISOString().split('T')[0]
 }
 
-const MON = nextWeekdayUTC(1) // Monday — in openDays
-const SUN = nextWeekdayUTC(0) // Sunday — not in openDays
+const MON = nextWeekdayUTC(1) // Monday
+const SUN = nextWeekdayUTC(0) // Sunday
 
 // 30-min service (iaugusio-nago-gydymas), 2h service (medicininis-pedikiuras)
 const SVC_30 = 'iaugusio-nago-gydymas'
@@ -28,7 +28,7 @@ beforeAll(async () => {
 })
 
 afterEach(async () => {
-  // Delete all test bookings and blocked slots for the test dates
+  // Delete all test bookings and availability windows for the test dates
   for (const date of [MON, SUN]) {
     const bookings = await payload.find({
       collection: 'bookings',
@@ -37,12 +37,14 @@ afterEach(async () => {
     })
     await Promise.all(bookings.docs.map((b) => payload.delete({ collection: 'bookings', id: b.id })))
 
-    const blocked = await payload.find({
-      collection: 'blocked-slots',
+    const windows = await payload.find({
+      collection: 'availability-windows',
       where: { date: { equals: date } },
       limit: 200,
     })
-    await Promise.all(blocked.docs.map((b) => payload.delete({ collection: 'blocked-slots', id: b.id })))
+    await Promise.all(
+      windows.docs.map((w) => payload.delete({ collection: 'availability-windows', id: w.id })),
+    )
   }
 })
 
@@ -64,100 +66,98 @@ async function createBooking(timeSlot: string, serviceSlug = SVC_30, status = 'p
   })
 }
 
-// Helper to create a test blocked slot
-async function createBlock(startTime: string, endTime: string) {
+// Helper to open an availability window (Darbo laikas)
+async function createWindow(startTime: string, endTime: string, date = MON) {
   return payload.create({
-    collection: 'blocked-slots',
-    data: {
-      date: MON,
-      startTime,
-      endTime,
-      createdBy: adminUserId,
-    },
+    collection: 'availability-windows',
+    data: { date, startTime, endTime, createdBy: adminUserId },
   })
 }
 
 describe('getAvailability', () => {
-  it('returns all slots available on an empty day', async () => {
+  it('empty day with no windows returns no slots (default closed)', async () => {
     const result = await getAvailability(payload, MON, SVC_30)
     expect('error' in result).toBe(false)
     if ('error' in result) return
 
-    expect(result.slots.length).toBeGreaterThan(0)
-    expect(result.slots.every((s) => s.available)).toBe(true)
-    // 09:00–18:00 at 30-min intervals = 18 slots
-    expect(result.slots).toHaveLength(18)
-    expect(result.slots[0].time).toBe('09:00')
-    expect(result.slots[result.slots.length - 1].time).toBe('17:30')
+    expect(result.slots).toHaveLength(0)
   })
 
-  it('PENDING booking blocks correct duration-aware range (30-min service)', async () => {
-    await createBooking('10:00', SVC_30, 'pending')
+  it('a single window exposes only the slots inside it, all available', async () => {
+    await createWindow('14:00', '16:00') // 2h window, 30-min service @ 30-min interval
     const result = await getAvailability(payload, MON, SVC_30)
     if ('error' in result) throw new Error(result.error)
 
-    const byTime = Object.fromEntries(result.slots.map((s) => [s.time, s.available]))
-    expect(byTime['09:30']).toBe(true)   // ends at 10:00, no overlap
-    expect(byTime['10:00']).toBe(false)  // exact overlap
-    expect(byTime['10:30']).toBe(true)   // starts after booking ends (10:30 > 10:30 is false → no overlap)
-  })
-
-  it('CONFIRMED booking blocks correct duration-aware range', async () => {
-    await createBooking('14:00', SVC_30, 'confirmed')
-    const result = await getAvailability(payload, MON, SVC_30)
-    if ('error' in result) throw new Error(result.error)
-
-    const byTime = Object.fromEntries(result.slots.map((s) => [s.time, s.available]))
-    expect(byTime['13:30']).toBe(true)
-    expect(byTime['14:00']).toBe(false)
-    expect(byTime['14:30']).toBe(true)
-  })
-
-  it('REJECTED and CANCELLED bookings do not block slots', async () => {
-    await createBooking('10:00', SVC_30, 'rejected')
-    await createBooking('12:00', SVC_30, 'cancelled')
-    const result = await getAvailability(payload, MON, SVC_30)
-    if ('error' in result) throw new Error(result.error)
-
+    expect(result.slots.map((s) => s.time)).toEqual(['14:00', '14:30', '15:00', '15:30'])
     expect(result.slots.every((s) => s.available)).toBe(true)
   })
 
-  it('BlockedSlot blocks the correct range', async () => {
-    await createBlock('11:00', '12:00')
+  it('a booking inside a window removes only the overlapping slot', async () => {
+    await createWindow('14:00', '16:00')
+    await createBooking('14:30', SVC_30, 'confirmed') // occupies 14:30–15:00
     const result = await getAvailability(payload, MON, SVC_30)
     if ('error' in result) throw new Error(result.error)
 
     const byTime = Object.fromEntries(result.slots.map((s) => [s.time, s.available]))
-    expect(byTime['10:30']).toBe(true)  // 10:30–11:00 does not overlap 11:00–12:00 (touching endpoints, not overlapping)
-    expect(byTime['11:00']).toBe(false) // 11:00–11:30 overlaps 11:00–12:00 ✓
-    expect(byTime['11:30']).toBe(false) // 11:30–12:00 overlaps 11:00–12:00 ✓
-    expect(byTime['12:00']).toBe(true)  // 12:00–12:30 does not overlap 11:00–12:00
+    expect(byTime['14:00']).toBe(true)
+    expect(byTime['14:30']).toBe(false) // booked
+    expect(byTime['15:00']).toBe(true)
+    expect(byTime['15:30']).toBe(true)
   })
 
-  it('2h service is unavailable in last 90 min of working day', async () => {
-    const result = await getAvailability(payload, MON, SVC_120)
-    if ('error' in result) throw new Error(result.error)
-
-    const byTime = Object.fromEntries(result.slots.map((s) => [s.time, s.available]))
-    expect(byTime['16:00']).toBe(true)  // 16:00 + 120min = 18:00 ≤ 18:00 ✓
-    expect(byTime['16:30']).toBe(false) // 16:30 + 120min = 18:30 > 18:00
-    expect(byTime['17:00']).toBe(false)
-    expect(byTime['17:30']).toBe(false)
-  })
-
-  it('full-day block returns all slots unavailable', async () => {
-    await createBlock('09:00', '18:00')
-    const result = await getAvailability(payload, MON, SVC_30)
-    if ('error' in result) throw new Error(result.error)
-
-    expect(result.slots.every((s) => !s.available)).toBe(true)
-  })
-
-  it('date outside openDays returns empty slots array', async () => {
+  it('a window on a non-working weekday still produces slots (windows are sole authority)', async () => {
+    await createWindow('10:00', '11:00', SUN) // Sunday — formerly a closed day
     const result = await getAvailability(payload, SUN, SVC_30)
     if ('error' in result) throw new Error(result.error)
 
+    expect(result.slots.map((s) => s.time)).toEqual(['10:00', '10:30'])
+  })
+
+  it('15-min interval exposes quarter-hour starts inside a window', async () => {
+    const original = await payload.findGlobal({ slug: 'clinic-settings' })
+    await payload.updateGlobal({ slug: 'clinic-settings', data: { slotIntervalMinutes: '15' } })
+    try {
+      await createWindow('09:00', '10:00')
+      const result = await getAvailability(payload, MON, SVC_30)
+      if ('error' in result) throw new Error(result.error)
+      expect(result.slots.map((s) => s.time)).toEqual(['09:00', '09:15', '09:30'])
+    } finally {
+      await payload.updateGlobal({
+        slug: 'clinic-settings',
+        data: { slotIntervalMinutes: original.slotIntervalMinutes ?? '30' },
+      })
+    }
+  })
+
+  it('snaps an off-grid window start up to the clock grid', async () => {
+    const original = await payload.findGlobal({ slug: 'clinic-settings' })
+    await payload.updateGlobal({ slug: 'clinic-settings', data: { slotIntervalMinutes: '15' } })
+    try {
+      await createWindow('14:20', '15:50') // off-grid start — first slot should be 14:30
+      const result = await getAvailability(payload, MON, SVC_30)
+      if ('error' in result) throw new Error(result.error)
+      expect(result.slots.map((s) => s.time)).toEqual(['14:30', '14:45', '15:00', '15:15'])
+    } finally {
+      await payload.updateGlobal({
+        slug: 'clinic-settings',
+        data: { slotIntervalMinutes: original.slotIntervalMinutes ?? '30' },
+      })
+    }
+  })
+
+  it('a service that does not fit inside the window yields no slots', async () => {
+    await createWindow('09:00', '10:00') // 1h window
+    const result = await getAvailability(payload, MON, SVC_120) // 2h service
+    if ('error' in result) throw new Error(result.error)
     expect(result.slots).toHaveLength(0)
+  })
+
+  it('multiple windows in a day are unioned and time-ordered', async () => {
+    await createWindow('14:00', '15:00')
+    await createWindow('09:00', '10:00')
+    const result = await getAvailability(payload, MON, SVC_30)
+    if ('error' in result) throw new Error(result.error)
+    expect(result.slots.map((s) => s.time)).toEqual(['09:00', '09:30', '14:00', '14:30'])
   })
 
   it('unknown service slug returns 404', async () => {
@@ -184,22 +184,48 @@ describe('getAvailability', () => {
     expect('error' in result).toBe(true)
     if ('error' in result) expect(result.status).toBe(400)
   })
+})
 
-  it('slotIntervalMinutes change is reflected in slot count', async () => {
-    // Temporarily switch to 60-min intervals — 09:00–18:00 = 9 slots instead of 18
-    const original = await payload.findGlobal({ slug: 'clinic-settings' })
-    await payload.updateGlobal({ slug: 'clinic-settings', data: { slotIntervalMinutes: '60' } })
-    try {
-      const result = await getAvailability(payload, MON, SVC_30)
-      if ('error' in result) throw new Error(result.error)
-      expect(result.slots).toHaveLength(9)
-      expect(result.slots[0].time).toBe('09:00')
-      expect(result.slots[8].time).toBe('17:00')
-    } finally {
-      await payload.updateGlobal({
-        slug: 'clinic-settings',
-        data: { slotIntervalMinutes: original.slotIntervalMinutes ?? '30' },
-      })
-    }
+describe('getAvailableDates', () => {
+  it('returns no dates when the range has no windows', async () => {
+    const result = await getAvailableDates(payload, '2099-01-01', 14, SVC_30)
+    expect('error' in result).toBe(false)
+    if ('error' in result) return
+
+    expect(result.dates).toEqual([])
+  })
+
+  it('includes a date that has an open window with a free slot', async () => {
+    await createWindow('10:00', '12:00') // MON
+    const result = await getAvailableDates(payload, '2099-01-01', 14, SVC_30)
+    if ('error' in result) throw new Error(result.error)
+
+    expect(result.dates).toEqual([MON])
+  })
+
+  it('excludes a date whose only window is fully booked', async () => {
+    await createWindow('09:00', '09:30') // MON — exactly one 30-min slot
+    await createBooking('09:00', SVC_30, 'confirmed') // takes it
+    const result = await getAvailableDates(payload, '2099-01-01', 14, SVC_30)
+    if ('error' in result) throw new Error(result.error)
+
+    expect(result.dates).toEqual([])
+  })
+
+  it('excludes a date whose window is too short for the service', async () => {
+    await createWindow('09:00', '09:20') // 20 min, 30-min service
+    const result = await getAvailableDates(payload, '2099-01-01', 14, SVC_30)
+    if ('error' in result) throw new Error(result.error)
+
+    expect(result.dates).toEqual([])
+  })
+
+  it('returns dates sorted, including non-working weekdays', async () => {
+    await createWindow('10:00', '11:00', MON)
+    await createWindow('10:00', '11:00', SUN) // Sunday still counts
+    const result = await getAvailableDates(payload, '2099-01-01', 14, SVC_30)
+    if ('error' in result) throw new Error(result.error)
+
+    expect(result.dates).toEqual([SUN, MON].sort())
   })
 })

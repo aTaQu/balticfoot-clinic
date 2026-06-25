@@ -6,10 +6,6 @@ import { formatDuration } from '@/lib/format'
 import type { Service } from '../../../payload-types'
 import styles from './BookingWizard.module.css'
 
-const DAY_NAMES = [
-  'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday',
-] as const
-
 const SERVICE_ICONS: Record<string, React.ReactNode> = {
   smiley: (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
@@ -67,7 +63,7 @@ const STEP_LABELS = ['Paslauga', 'Data ir laikas', 'Jūsų duomenys', 'Patvirtin
 
 type CalDay =
   | { type: 'empty'; key: string }
-  | { type: 'day'; key: string; d: number; date: Date; disabled: boolean; isToday: boolean; isSelected: boolean }
+  | { type: 'day'; key: string; d: number; date: Date; disabled: boolean; isAvailable: boolean; isToday: boolean; isSelected: boolean }
 
 function getTodayDate(): Date {
   const d = new Date()
@@ -85,10 +81,10 @@ function toISODate(d: Date): string {
 interface BookingWizardProps {
   services: Service[]
   preselectedSlug?: string | null
-  openDays?: string[]
+  phone: string
 }
 
-export default function BookingWizard({ services, preselectedSlug, openDays = [] }: BookingWizardProps) {
+export default function BookingWizard({ services, preselectedSlug, phone }: BookingWizardProps) {
   const [step, setStep] = useState(1)
   const [state, setState] = useState<BookingState>(INITIAL_STATE)
   const [submitted, setSubmitted] = useState(false)
@@ -98,6 +94,8 @@ export default function BookingWizard({ services, preselectedSlug, openDays = []
   const [gdprError, setGdprError] = useState(false)
   const [slots, setSlots] = useState<{ time: string; available: boolean }[]>([])
   const [slotsLoading, setSlotsLoading] = useState(false)
+  const [availableDates, setAvailableDates] = useState<Set<string>>(new Set())
+  const [datesLoading, setDatesLoading] = useState(false)
 
   const todayDate = useRef<Date>(getTodayDate()).current
   const [calYear, setCalYear] = useState(() => new Date().getFullYear())
@@ -129,10 +127,41 @@ export default function BookingWizard({ services, preselectedSlug, openDays = []
       .finally(() => setSlotsLoading(false))
   }, [state.date, state.service])
 
-  const isOpenDay = useCallback(
-    (date: Date) => openDays.includes(DAY_NAMES[date.getDay()]),
-    [openDays],
-  )
+  // Default-closed: fetch which upcoming dates actually have a free slot for the
+  // chosen service, then jump the calendar to (and preselect) the next open day.
+  useEffect(() => {
+    if (!state.service) {
+      setAvailableDates(new Set())
+      return
+    }
+    const controller = new AbortController()
+    const slug = state.service.slug
+    const from = toISODate(todayDate)
+    setDatesLoading(true)
+    fetch(`/api/availability/dates?service=${slug}&from=${from}&days=120`, { signal: controller.signal })
+      .then((r) => r.json())
+      .then((data: { dates?: string[] }) => {
+        const list = data.dates ?? []
+        setAvailableDates(new Set(list))
+        const next = list[0] // sorted ascending → earliest open day
+        if (next) {
+          const [y, mo, d] = next.split('-').map(Number)
+          const dt = new Date(y, mo - 1, d)
+          dt.setHours(0, 0, 0, 0)
+          setCalYear(y)
+          setCalMonth(mo - 1)
+          setState((prev) => ({ ...prev, date: dt, time: null }))
+        }
+      })
+      .catch((err: unknown) => {
+        if (err instanceof Error && err.name === 'AbortError') return
+        setAvailableDates(new Set())
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setDatesLoading(false)
+      })
+    return () => controller.abort()
+  }, [state.service, todayDate])
 
   const shake = useCallback(() => {
     const el = wizardRef.current
@@ -230,7 +259,9 @@ export default function BookingWizard({ services, preselectedSlug, openDays = []
   for (let d = 1; d <= daysInMonth; d++) {
     const date = new Date(calYear, calMonth, d)
     date.setHours(0, 0, 0, 0)
+    const dateStr = toISODate(date)
     const isPast = date <= todayDate
+    const isAvailable = availableDates.has(dateStr)
     const isToday = date.getTime() === todayDate.getTime()
     const isSelected =
       state.date?.getFullYear() === calYear &&
@@ -241,7 +272,8 @@ export default function BookingWizard({ services, preselectedSlug, openDays = []
       key: `d-${d}`,
       d,
       date,
-      disabled: isPast || !isOpenDay(date),
+      disabled: isPast || datesLoading || !isAvailable,
+      isAvailable: isAvailable && !datesLoading,
       isToday,
       isSelected,
     })
@@ -376,6 +408,7 @@ export default function BookingWizard({ services, preselectedSlug, openDays = []
                                 cell.disabled ? styles.disabled : '',
                                 cell.isToday ? styles.today : '',
                                 cell.isSelected ? styles.selected : '',
+                                cell.isAvailable ? styles.available : '',
                               ].filter(Boolean).join(' ')
                               return (
                                 <div
@@ -399,6 +432,25 @@ export default function BookingWizard({ services, preselectedSlug, openDays = []
                           </div>
                         </div>
                       </div>
+                      {state.service && (
+                        <p className={styles.calHint}>
+                          {datesLoading
+                            ? 'Tikrinami laisvi laikai…'
+                            : availableDates.size === 0
+                              ? (
+                                <>
+                                  Šiuo metu laisvų laikų internetu nėra. Skambinkite{' '}
+                                  <a href={`tel:${phone}`}>{phone}</a>.
+                                </>
+                              )
+                              : (
+                                <>
+                                  Rodomos tik dienos su laisvais laikais. Nerandate tinkamo?{' '}
+                                  Skambinkite <a href={`tel:${phone}`}>{phone}</a>.
+                                </>
+                              )}
+                        </p>
+                      )}
                       <div className={styles.timeSection}>
                         <div className={styles.timeSectionLabel}>Laisvi laikai</div>
                         {!state.date ? (
@@ -415,7 +467,10 @@ export default function BookingWizard({ services, preselectedSlug, openDays = []
                             ))}
                           </div>
                         ) : slots.length === 0 ? (
-                          <p className={styles.timePlaceholder}>Šią dieną laisvų laikų nėra.</p>
+                          <p className={styles.timePlaceholder}>
+                            Šią dieną laisvų laikų nėra. Dėl vizito skambinkite{' '}
+                            <a href={`tel:${phone}`}>{phone}</a>.
+                          </p>
                         ) : (
                           <div className={styles.timeGrid} role="radiogroup" aria-label="Laiko pasirinkimas">
                             {slots.map((slot) => {

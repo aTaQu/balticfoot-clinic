@@ -22,36 +22,29 @@ let adminUserId: number
 
 beforeAll(async () => {
   payload = await getPayload({ config: configPromise })
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const services = await payload.find({ collection: 'services' as any, where: { active: { equals: true } }, limit: 1 })
+  const services = await payload.find({ collection: 'services', where: { active: { equals: true } }, limit: 1 })
   serviceId = services.docs[0].id as number
   const users = await payload.find({ collection: 'users', limit: 1 })
   adminUserId = users.docs[0].id as number
 })
 
 afterEach(async () => {
-  // Clean up bookings for both test dates
+  // Clean up bookings and availability windows for both test dates
   for (const date of [DATE_0, DATE_1]) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const bookings = await payload.find({
-      collection: 'bookings' as any,
+      collection: 'bookings',
+      where: { date: { equals: date } },
+      limit: 200,
+    })
+    await Promise.all(bookings.docs.map((b) => payload.delete({ collection: 'bookings', id: b.id })))
+
+    const windows = await payload.find({
+      collection: 'availability-windows',
       where: { date: { equals: date } },
       limit: 200,
     })
     await Promise.all(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      bookings.docs.map((b) => payload.delete({ collection: 'bookings' as any, id: b.id })),
-    )
-    // Clean up blocked slots
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const blocks = await payload.find({
-      collection: 'blocked-slots' as any,
-      where: { date: { equals: date } },
-      limit: 200,
-    })
-    await Promise.all(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      blocks.docs.map((bl) => payload.delete({ collection: 'blocked-slots' as any, id: bl.id })),
+      windows.docs.map((w) => payload.delete({ collection: 'availability-windows', id: w.id })),
     )
   }
 })
@@ -59,9 +52,8 @@ afterEach(async () => {
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
 async function createConfirmedBooking(date = DATE_0, timeSlot = '10:00') {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return payload.create({
-    collection: 'bookings' as any,
+    collection: 'bookings',
     data: {
       service: serviceId,
       date,
@@ -76,9 +68,8 @@ async function createConfirmedBooking(date = DATE_0, timeSlot = '10:00') {
 }
 
 async function createPendingBooking(date = DATE_0, timeSlot = '11:00') {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return payload.create({
-    collection: 'bookings' as any,
+    collection: 'bookings',
     data: {
       service: serviceId,
       date,
@@ -92,15 +83,14 @@ async function createPendingBooking(date = DATE_0, timeSlot = '11:00') {
   })
 }
 
-async function createBlockedSlot(date = DATE_0, startTime = '13:00', endTime = '14:00', reason?: string) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function createWindow(date = DATE_0, startTime = '13:00', endTime = '14:00', note?: string) {
   return payload.create({
-    collection: 'blocked-slots' as any,
+    collection: 'availability-windows',
     data: {
       date,
       startTime,
       endTime,
-      reason: reason ?? null,
+      note: note ?? null,
       createdBy: adminUserId,
     },
   })
@@ -128,27 +118,27 @@ describe('getSchedule', () => {
     expect(result.days[0].bookings).toHaveLength(0)
   })
 
-  it('blocked slot appears in the correct day blocks array', async () => {
-    await createBlockedSlot(DATE_0, '14:00', '15:00', 'Pietų pertrauka')
+  it('open window appears in the correct day windows array', async () => {
+    await createWindow(DATE_0, '14:00', '15:00', 'Tik šią savaitę')
     const result = await getSchedule(payload, DATE_0, 1)
 
-    expect(result.days[0].blocks).toHaveLength(1)
-    expect(result.days[0].blocks[0].startTime).toBe('14:00')
-    expect(result.days[0].blocks[0].endTime).toBe('15:00')
-    expect(result.days[0].blocks[0].reason).toBe('Pietų pertrauka')
+    expect(result.days[0].windows).toHaveLength(1)
+    expect(result.days[0].windows[0].startTime).toBe('14:00')
+    expect(result.days[0].windows[0].endTime).toBe('15:00')
+    expect(result.days[0].windows[0].note).toBe('Tik šią savaitę')
   })
 
-  it('empty day returns { date, bookings: [], blocks: [] }', async () => {
+  it('empty day returns { date, bookings: [], windows: [] }', async () => {
     const result = await getSchedule(payload, DATE_0, 1)
 
     expect(result.days).toHaveLength(1)
     expect(result.days[0].bookings).toHaveLength(0)
-    expect(result.days[0].blocks).toHaveLength(0)
+    expect(result.days[0].windows).toHaveLength(0)
   })
 
   it('date range spanning multiple days returns correct structure', async () => {
     await createConfirmedBooking(DATE_0, '10:00')
-    await createBlockedSlot(DATE_1, '09:00', '09:30')
+    await createWindow(DATE_1, '09:00', '09:30')
     const result = await getSchedule(payload, DATE_0, 2)
 
     expect(result.days).toHaveLength(2)
@@ -158,25 +148,23 @@ describe('getSchedule', () => {
 
     expect(day0).toBeDefined()
     expect(day0!.bookings).toHaveLength(1)
-    expect(day0!.blocks).toHaveLength(0)
+    expect(day0!.windows).toHaveLength(0)
 
     expect(day1).toBeDefined()
     expect(day1!.bookings).toHaveLength(0)
-    expect(day1!.blocks).toHaveLength(1)
-    expect(day1!.blocks[0].startTime).toBe('09:00')
+    expect(day1!.windows).toHaveLength(1)
+    expect(day1!.windows[0].startTime).toBe('09:00')
   })
 
-  it('blocked slot still blocks availability (integration with getAvailability)', async () => {
-    // This verifies that Phase 7 availability still respects BlockedSlots
-    // created in Phase 10 — the two features are orthogonal but must stay in sync.
+  it('an open window enables availability (integration with getAvailability)', async () => {
+    // The dashboard schedule and the availability algorithm must read the same
+    // source of truth — availability-windows. A window shown here is bookable there.
     const { getAvailability } = await import('./availability')
-    await createBlockedSlot(DATE_0, '09:00', '18:00', 'Visą dieną')
+    await createWindow(DATE_0, '09:00', '18:00')
     const avResult = await getAvailability(payload, DATE_0, 'medicininis-pedikiuras')
-    if ('error' in avResult) {
-      // Date might fall on a weekend or closed day — skip rather than fail
-      return
-    }
-    const allUnavailable = avResult.slots.every((s) => !s.available)
-    expect(allUnavailable).toBe(true)
+    if ('error' in avResult) throw new Error(avResult.error)
+
+    expect(avResult.slots.length).toBeGreaterThan(0)
+    expect(avResult.slots.some((s) => s.available)).toBe(true)
   })
 })

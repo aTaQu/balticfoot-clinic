@@ -47,9 +47,30 @@ export function WeekScheduleAfterDashboard() {
         background: 'var(--theme-elevation-50)',
       }}
     >
-      <h2 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '1.25rem' }}>
+      <h2 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '0.75rem' }}>
         Savaitės grafikas
       </h2>
+
+      <div
+        style={{
+          display: 'flex',
+          gap: '1rem',
+          marginBottom: '1.25rem',
+          fontSize: '0.75rem',
+          color: 'var(--theme-elevation-600)',
+        }}
+      >
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
+          <span style={{ width: 10, height: 10, borderRadius: 2, background: '#2563eb', display: 'inline-block' }} />
+          Darbo laikas
+        </span>
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
+          <span
+            style={{ width: 10, height: 10, borderRadius: 2, background: 'var(--theme-success-500)', display: 'inline-block' }}
+          />
+          Rezervacija
+        </span>
+      </div>
 
       {error && (
         <p style={{ color: 'var(--theme-error-500)' }}>{error}</p>
@@ -78,7 +99,7 @@ export function WeekScheduleAfterDashboard() {
 }
 
 function DayColumn({ day }: { day: ScheduleDay }) {
-  const hasItems = day.bookings.length > 0 || day.blocks.length > 0
+  const isClosed = day.windows.length === 0
   return (
     <div
       style={{
@@ -101,9 +122,27 @@ function DayColumn({ day }: { day: ScheduleDay }) {
       </div>
 
       <div style={{ padding: '0.5rem 0.6rem', fontSize: '0.75rem' }}>
-        {!hasItems && (
-          <span style={{ color: 'var(--theme-elevation-400)' }}>—</span>
+        {isClosed && day.bookings.length === 0 && (
+          <span style={{ color: 'var(--theme-elevation-400)' }}>Uždaryta</span>
         )}
+
+        {day.windows.map((w) => (
+          <div
+            key={`w-${w.id}`}
+            style={{
+              marginBottom: '0.4rem',
+              padding: '0.3rem 0.4rem',
+              background: 'var(--theme-elevation-50)',
+              borderRadius: '3px',
+              borderLeft: '3px solid #2563eb',
+            }}
+          >
+            <div style={{ fontWeight: 600 }}>{w.startTime}–{w.endTime}</div>
+            {w.note && (
+              <div style={{ opacity: 0.7, fontSize: '0.7rem' }}>{w.note}</div>
+            )}
+          </div>
+        ))}
 
         {day.bookings.map((b) => (
           <div
@@ -119,24 +158,6 @@ function DayColumn({ day }: { day: ScheduleDay }) {
             <div style={{ fontWeight: 600 }}>{b.timeSlot}{b.endTime ? `–${b.endTime}` : ''}</div>
             <div style={{ opacity: 0.85 }}>{b.patientName}</div>
             <div style={{ opacity: 0.7, fontSize: '0.7rem' }}>{b.serviceName}</div>
-          </div>
-        ))}
-
-        {day.blocks.map((block) => (
-          <div
-            key={`bl-${block.id}`}
-            style={{
-              marginBottom: '0.4rem',
-              padding: '0.3rem 0.4rem',
-              background: 'var(--theme-error-100, #fee2e2)',
-              borderRadius: '3px',
-              borderLeft: '3px solid var(--theme-error-500)',
-            }}
-          >
-            <div style={{ fontWeight: 600 }}>{block.startTime}–{block.endTime}</div>
-            {block.reason && (
-              <div style={{ opacity: 0.7, fontSize: '0.7rem' }}>{block.reason}</div>
-            )}
           </div>
         ))}
       </div>

@@ -17,11 +17,23 @@ A bookable service offered by the clinic (e.g. konsultacija, medicininis
 pedikiūras). A Rezervacija references exactly one Paslauga. Defined by name,
 price, duration in minutes, and a URL slug.
 
-**Nedarbo laikas** (pl. **Nedarbo laikai**):
-A range of time when no Rezervacija can be made — vacation, lunch break, staff
-meeting, etc. Backed by the `blocked-slots` collection. Blocks slot availability
-identically to a confirmed Rezervacija.
-_Avoid_: Užblokuotas laikas, Užimtas laikas.
+**Darbo laikas** (pl. **Darbo laikai**):
+A specific date + time range the owner publishes as open for online booking.
+The clinic's default state is **closed**: no slot is bookable online unless it
+falls fully inside a Darbo laikas window *and* isn't already taken by a
+Rezervacija. Backed by the `availability-windows` collection. The exact inverse
+of the former "blocked time" model — the owner exposes her free slots rather
+than carving out busy ones, because the paper notebook is the primary
+appointment book. **Register difference:** the owner manages *Darbo laikai* in
+the admin; the patient never sees that term — the booking wizard shows the
+resulting slots under **Laisvi laikai** ("available times"). Same concept, two
+audiences.
+_Avoid (as the admin/canonical name)_: Nedarbo laikas, Priėmimo laikas, Laisvas
+laikas. (_Laisvi laikai_ is reserved for the patient-facing label above, not an
+alias for the admin term.)
+_Not to be confused with_ the advertising-only **Darbo dienos** / **Darbo
+pradžia–pabaiga** in Klinikos nustatymai (see that entry and Flagged
+ambiguities).
 
 **Vartotojas** (pl. **Vartotojai**):
 An admin user who can sign into the Payload admin (Veneta, Lina). Has a role of
@@ -29,9 +41,11 @@ An admin user who can sign into the Payload admin (Veneta, Lina). Has a role of
 
 **Audito įrašas** (pl. **Audito žurnalas**):
 An immutable record of a status-changing action a Vartotojas performed on a
-Rezervacija or Nedarbo laikas (confirmed, rejected, cancelled, rescheduled,
-slot_blocked, slot_unblocked). Written programmatically only — never editable
-in the admin UI.
+Rezervacija (confirmed, rejected, cancelled, rescheduled). Written
+programmatically only — never editable in the admin UI. The action enum also
+carries two legacy values, `slot_blocked` / `slot_unblocked`, that predate the
+Darbo laikai model and are never written — retained only to avoid an enum
+migration.
 
 **Tinklaraščio įrašas** (pl. **Tinklaraščio įrašai**):
 A long-form article on the public blog (`/blog/[slug]`). Has a draft/published
@@ -42,12 +56,22 @@ An uploaded image (max 5 MB). Currently consumed only by Tinklaraščio įrašas
 the featured image. Backed by the `media` collection.
 
 **Klinikos nustatymai** (always plural — a Payload global):
-The clinic's contact details, working hours, slot interval, and open days.
-Single record; consumed by the public site, email templates, and the
-availability algorithm.
+The clinic's contact details, advertised working hours, slot interval, and open
+days. Single record. Since the move to Darbo laikai, **Darbo dienos** (open
+days) and **Darbo pradžia/pabaiga** (working hours) are *display-only* — they
+feed the public footer's "our hours" text but no longer gate bookability.
+**Laiko intervalas** (slot interval) still defines the step between bookable
+start times inside a Darbo laikas window.
 
 ### Flagged ambiguities
 
 - **"Vizitas" in `BookingActions.tsx:127`** ("Atšaukti vizitą") — pre-dates this
   glossary. To be replaced with "Atšaukti rezervaciją" in the admin-translation
   pass.
+
+- **"Darbo laikai" vs "Darbo dienos" / "Darbo pradžia–pabaiga"** — same _darbo_
+  root, different concepts. *Darbo laikai* (the `availability-windows`
+  collection) is the authoritative, per-date bookable availability. *Darbo
+  dienos* / *Darbo pradžia–pabaiga* (Klinikos nustatymai) are advertising copy
+  only. Flagged because the labels invite conflation; revisit the settings
+  labels if real-world confusion surfaces.

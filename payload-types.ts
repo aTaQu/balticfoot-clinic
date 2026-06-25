@@ -72,7 +72,7 @@ export interface Config {
     services: Service;
     'blog-posts': BlogPost;
     bookings: Booking;
-    'blocked-slots': BlockedSlot;
+    'availability-windows': AvailabilityWindow;
     'audit-log': AuditLog;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
@@ -86,7 +86,7 @@ export interface Config {
     services: ServicesSelect<false> | ServicesSelect<true>;
     'blog-posts': BlogPostsSelect<false> | BlogPostsSelect<true>;
     bookings: BookingsSelect<false> | BookingsSelect<true>;
-    'blocked-slots': BlockedSlotsSelect<false> | BlockedSlotsSelect<true>;
+    'availability-windows': AvailabilityWindowsSelect<false> | AvailabilityWindowsSelect<true>;
     'audit-log': AuditLogSelect<false> | AuditLogSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -257,6 +257,9 @@ export interface Booking {
    * Pabaigos laikas (apskaičiuojamas automatiškai)
    */
   endTime?: string | null;
+  /**
+   * Laukiama — nauja rezervacija, laukianti administratoriaus veiksmo. Patvirtinta — pacientas gavo patvirtinimą; laikas užimtas grafike. Atmesta — atsakyta neigiamai prieš patvirtinimą. Atšaukta — rezervacija nutraukta po patvirtinimo.
+   */
   status: 'pending' | 'confirmed' | 'rejected' | 'cancelled';
   /**
    * Privaloma, kai statusas "Atmesta"
@@ -277,23 +280,23 @@ export interface Booking {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "blocked-slots".
+ * via the `definition` "availability-windows".
  */
-export interface BlockedSlot {
+export interface AvailabilityWindow {
   id: number;
   date: string;
   /**
-   * Pradžios laikas, pvz. "09:00"
+   * Atidaryta nuo, pvz. „09:00".
    */
   startTime: string;
   /**
-   * Pabaigos laikas, pvz. "12:00"
+   * Atidaryta iki, pvz. „12:00".
    */
   endTime: string;
   /**
-   * Neprivaloma: nedarbo priežastis
+   * Neprivaloma pastaba (pvz. „tik šią savaitę").
    */
-  reason?: string | null;
+  note?: string | null;
   createdBy?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
@@ -356,8 +359,8 @@ export interface PayloadLockedDocument {
         value: number | Booking;
       } | null)
     | ({
-        relationTo: 'blocked-slots';
-        value: number | BlockedSlot;
+        relationTo: 'availability-windows';
+        value: number | AvailabilityWindow;
       } | null)
     | ({
         relationTo: 'audit-log';
@@ -503,13 +506,13 @@ export interface BookingsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "blocked-slots_select".
+ * via the `definition` "availability-windows_select".
  */
-export interface BlockedSlotsSelect<T extends boolean = true> {
+export interface AvailabilityWindowsSelect<T extends boolean = true> {
   date?: T;
   startTime?: T;
   endTime?: T;
-  reason?: T;
+  note?: T;
   createdBy?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -597,7 +600,7 @@ export interface ClinicSetting {
   /**
    * Rezervacijos laiko intervalas
    */
-  slotIntervalMinutes: '30' | '60';
+  slotIntervalMinutes: '15' | '30' | '60';
   openDays: ('monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday')[];
   updatedAt?: string | null;
   createdAt?: string | null;

@@ -1,14 +1,14 @@
 import type { CollectionConfig } from 'payload'
 
-export const BlockedSlots: CollectionConfig = {
-  slug: 'blocked-slots',
+export const AvailabilityWindows: CollectionConfig = {
+  slug: 'availability-windows',
   labels: {
-    singular: 'Nedarbo laikas',
-    plural: 'Nedarbo laikai',
+    singular: 'Darbo laikas',
+    plural: 'Darbo laikai',
   },
   admin: {
     useAsTitle: 'date',
-    defaultColumns: ['date', 'startTime', 'endTime', 'reason', 'createdBy'],
+    defaultColumns: ['date', 'startTime', 'endTime', 'note', 'createdBy'],
   },
   fields: [
     {
@@ -29,7 +29,7 @@ export const BlockedSlots: CollectionConfig = {
       required: true,
       label: 'Pradžios laikas',
       admin: {
-        description: 'Pradžios laikas, pvz. "09:00"',
+        description: 'Atidaryta nuo, pvz. „09:00".',
       },
     },
     {
@@ -38,15 +38,15 @@ export const BlockedSlots: CollectionConfig = {
       required: true,
       label: 'Pabaigos laikas',
       admin: {
-        description: 'Pabaigos laikas, pvz. "12:00"',
+        description: 'Atidaryta iki, pvz. „12:00".',
       },
     },
     {
-      name: 'reason',
+      name: 'note',
       type: 'text',
-      label: 'Priežastis',
+      label: 'Pastaba',
       admin: {
-        description: 'Neprivaloma: nedarbo priežastis',
+        description: 'Neprivaloma pastaba (pvz. „tik šią savaitę").',
       },
     },
     {
