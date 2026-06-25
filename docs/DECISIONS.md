@@ -36,6 +36,7 @@
 - Phase 14 (GDPR + SEO Polish): Complete 2026-03-30
 - Phase 15 (Go-Live Polish): Complete 2026-03-30
 - Phase 16 (Pre-Launch): Started 2026-03-30
+- Phase 17 (Availability Inversion — Darbo laikai): Complete 2026-06-25
 
 ## Phase 4 decisions
 - `page.tsx` made async Server Component — fetches Services + ClinicSettings at request time (no static generation, ensures Payload changes reflect immediately on reload)

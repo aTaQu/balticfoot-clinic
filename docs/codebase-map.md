@@ -105,12 +105,12 @@ All components live in `src/components/`. Each has a co-located `.module.css`.
 | `Trust` | Trust signals strip | none |
 | `Quote` | Pull-quote block | none |
 | `Gallery` | Photo gallery | none |
-| `BookingWizard` | Multi-step booking form — fetches live services + availability | none |
+| `BookingWizard` | Multi-step booking form — fetches live services + availability; empty-date phone CTA; calendar blocks only past dates (not `openDays`) | `services`, `preselectedSlug?`, `phone` |
 | `BookingActions` | Payload admin `AfterFields` — confirm/reject/cancel buttons | rendered via `admin.components.edit.AfterFields` in `Bookings` collection |
-| `WeekSchedule` | Payload admin `AfterDashboard` — 7-day read-only schedule widget | registered via `admin.components.afterDashboard` in `payload.config.ts` |
+| `WeekSchedule` | Payload admin `AfterDashboard` — 7-day widget: open windows (blue) + confirmed bookings (green); empty days show **Uždaryta** | registered via `admin.components.afterDashboard` in `payload.config.ts` |
 | `ScrollRevealInit` | Mounts scroll-reveal animations | none |
 
-**Footer nav links** are currently homepage fragment links (`#paslaugos`, `#registracija`, etc.) — not yet updated for multi-page structure.
+**Footer nav links** use site-wide `<Link>` routes (`/`, `/#paslaugos`, `/blog/`, `/rezervacija/`).
 
 ---
 
@@ -240,8 +240,7 @@ Authenticates via `payload.auth()`, parses `[id]` param. Check `'response' in re
 
 ---
 
-## What's NOT built yet (as of Phase 15)
+## What's NOT built yet
 
-- Footer navigation updated for multi-page structure — deferred (Phase 16)
 - `NEXT_PUBLIC_SITE_URL` env var set on Railway — deployment step before go-live
 - `BASE_URL` in `sitemap.ts`/`robots.ts` not unified with `SITE_URL` from `constants.ts` — same env var, two names; consolidation deferred
