@@ -89,16 +89,27 @@ export async function getAvailability(
   const slotInterval = parseInt(settings.slotIntervalMinutes ?? '30', 10)
 
   // Default-closed model: bookable slots come ONLY from open windows
-  // (Darbo laikai). Confirmed/pending bookings subtract from them.
+  // (Darbo laikai). Confirmed/pending bookings subtract from them. Query the
+  // full UTC day rather than `equals`: the admin day-picker can store a date at
+  // a non-midnight timestamp, which `equals` misses but a [day, day+1) range
+  // catches (as getAvailableDates / getSchedule do). For bookings this also
+  // guards against a missed row silently allowing a double-book.
+  const dayAfter = addDays(date, 1)
   const [windowsResult, bookingsResult] = await Promise.all([
     payload.find({
       collection: 'availability-windows',
-      where: { date: { equals: date } },
+      where: { and: [{ date: { greater_than_equal: date } }, { date: { less_than: dayAfter } }] },
       limit: 200,
     }),
     payload.find({
       collection: 'bookings',
-      where: { date: { equals: date }, status: { in: ['pending', 'confirmed'] } },
+      where: {
+        and: [
+          { date: { greater_than_equal: date } },
+          { date: { less_than: dayAfter } },
+          { status: { in: ['pending', 'confirmed'] } },
+        ],
+      },
       limit: 200,
     }),
   ])

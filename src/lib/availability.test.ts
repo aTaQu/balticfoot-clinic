@@ -174,6 +174,22 @@ describe('getAvailability', () => {
     expect(result.slots.map((s) => s.time)).toEqual(['13:00', '13:30'])
   })
 
+  it('finds a window stored at a non-midnight timestamp (admin day-picker)', async () => {
+    // The admin day-picker can persist the date at a non-midnight time; the
+    // per-date lookup must still find it (matches getAvailableDates' range).
+    const w = await payload.create({
+      collection: 'availability-windows',
+      data: { date: `${MON}T12:00:00.000Z`, startTime: '10:00', endTime: '11:00' },
+    })
+    try {
+      const result = await getAvailability(payload, MON, SVC_30)
+      if ('error' in result) throw new Error(result.error)
+      expect(result.slots.map((s) => s.time)).toEqual(['10:00', '10:30'])
+    } finally {
+      await payload.delete({ collection: 'availability-windows', id: w.id })
+    }
+  })
+
   it('unknown service slug returns 404', async () => {
     const result = await getAvailability(payload, MON, 'does-not-exist')
     expect('error' in result).toBe(true)
