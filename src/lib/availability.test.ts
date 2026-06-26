@@ -160,6 +160,20 @@ describe('getAvailability', () => {
     expect(result.slots.map((s) => s.time)).toEqual(['09:00', '09:30', '14:00', '14:30'])
   })
 
+  it('parses window times typed with a dot or no minutes, not only HH:MM', async () => {
+    await createWindow('17.00', '18.30') // owner-entered format (period), like the live data
+    const result = await getAvailability(payload, MON, SVC_30)
+    if ('error' in result) throw new Error(result.error)
+    expect(result.slots.map((s) => s.time)).toEqual(['17:00', '17:30', '18:00'])
+  })
+
+  it('parses an hours-only window time like "13"', async () => {
+    await createWindow('13', '14')
+    const result = await getAvailability(payload, MON, SVC_30)
+    if ('error' in result) throw new Error(result.error)
+    expect(result.slots.map((s) => s.time)).toEqual(['13:00', '13:30'])
+  })
+
   it('unknown service slug returns 404', async () => {
     const result = await getAvailability(payload, MON, 'does-not-exist')
     expect('error' in result).toBe(true)

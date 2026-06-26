@@ -29,7 +29,7 @@ export const AvailabilityWindows: CollectionConfig = {
       required: true,
       label: 'Pradžios laikas',
       admin: {
-        description: 'Atidaryta nuo, pvz. „09:00".',
+        description: 'Atidaryta nuo. Formatas: 9:00, 09:00 arba 9.00.',
       },
     },
     {
@@ -38,7 +38,7 @@ export const AvailabilityWindows: CollectionConfig = {
       required: true,
       label: 'Pabaigos laikas',
       admin: {
-        description: 'Atidaryta iki, pvz. „12:00".',
+        description: 'Atidaryta iki. Formatas: 12:00 arba 12.00.',
       },
     },
     {

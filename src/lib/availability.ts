@@ -8,9 +8,18 @@ export type AvailabilityResult = AvailabilityOk | AvailabilityErr
 export type AvailableDatesOk = { dates: string[] }
 export type AvailableDatesResult = AvailableDatesOk | AvailabilityErr
 
+// Tolerant of the formats a non-technical owner actually types for a window
+// time: "17:00", "17.00", "17,00", "17" (hours only), or "1700". Returns NaN
+// for anything unparseable (that window then yields no slots).
 function timeToMinutes(time: string): number {
-  const [h, m] = time.split(':').map(Number)
-  return h * 60 + m
+  const t = time.trim()
+  let m = t.match(/^(\d{1,2})[:.,](\d{1,2})$/) // 17:00 / 17.00 / 17,00
+  if (m) return parseInt(m[1], 10) * 60 + parseInt(m[2], 10)
+  m = t.match(/^(\d{1,2})$/) // 13  → 13:00
+  if (m) return parseInt(m[1], 10) * 60
+  m = t.match(/^(\d{1,2})(\d{2})$/) // 1700 → 17:00
+  if (m) return parseInt(m[1], 10) * 60 + parseInt(m[2], 10)
+  return NaN
 }
 
 function minutesToTime(minutes: number): string {
