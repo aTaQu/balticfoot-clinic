@@ -654,3 +654,9 @@
   .timeGrid { grid-template-columns: repeat(3, 1fr); }
   .confirmRow { flex-direction: column; gap: 0.15rem; }
 }
+
+/* Below 460px two service cards no longer fit — drop to a single column
+   so the second card can't overflow the viewport. */
+@media (max-width: 460px) {
+  .svcGrid { grid-template-columns: 1fr; }
+}
