@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { parseTimeToMinutes } from '../lib/time'
 
 export const AvailabilityWindows: CollectionConfig = {
   slug: 'availability-windows',
@@ -31,6 +32,12 @@ export const AvailabilityWindows: CollectionConfig = {
       admin: {
         description: 'Atidaryta nuo. Formatas: 9:00, 09:00 arba 9.00.',
       },
+      validate: (value: unknown): true | string => {
+        if (typeof value !== 'string' || parseTimeToMinutes(value) === null) {
+          return 'Neteisingas laiko formatas (pvz. 9:00 arba 9.00).'
+        }
+        return true
+      },
     },
     {
       name: 'endTime',
@@ -39,6 +46,18 @@ export const AvailabilityWindows: CollectionConfig = {
       label: 'Pabaigos laikas',
       admin: {
         description: 'Atidaryta iki. Formatas: 12:00 arba 12.00.',
+      },
+      validate: (value: unknown, options: { siblingData?: { startTime?: unknown } }): true | string => {
+        if (typeof value !== 'string' || parseTimeToMinutes(value) === null) {
+          return 'Neteisingas laiko formatas (pvz. 12:00 arba 12.00).'
+        }
+        const startRaw = options?.siblingData?.startTime
+        const start = typeof startRaw === 'string' ? parseTimeToMinutes(startRaw) : null
+        const end = parseTimeToMinutes(value)
+        if (start !== null && end !== null && end <= start) {
+          return 'Pabaigos laikas turi būti vėlesnis už pradžios laiką.'
+        }
+        return true
       },
     },
     {

@@ -243,3 +243,31 @@ describe('getAvailableDates', () => {
     expect(result.dates).toEqual([SUN, MON].sort())
   })
 })
+
+describe('AvailabilityWindows validation', () => {
+  it('rejects a window whose end is not after its start', async () => {
+    await expect(
+      payload.create({
+        collection: 'availability-windows',
+        data: { date: MON, startTime: '14:00', endTime: '13:00' },
+      }),
+    ).rejects.toThrow()
+  })
+
+  it('rejects a window with an unparseable time', async () => {
+    await expect(
+      payload.create({
+        collection: 'availability-windows',
+        data: { date: MON, startTime: 'rytas', endTime: '12:00' },
+      }),
+    ).rejects.toThrow()
+  })
+
+  it('accepts dot-format times in the correct order', async () => {
+    const w = await payload.create({
+      collection: 'availability-windows',
+      data: { date: MON, startTime: '11.30', endTime: '13.00' },
+    })
+    expect(w.id).toBeTruthy()
+  })
+})

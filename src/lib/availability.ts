@@ -1,4 +1,5 @@
 import type { Payload } from 'payload'
+import { parseTimeToMinutes } from './time'
 
 export type Slot = { time: string; available: boolean }
 export type AvailabilityOk = { slots: Slot[] }
@@ -7,20 +8,6 @@ export type AvailabilityResult = AvailabilityOk | AvailabilityErr
 
 export type AvailableDatesOk = { dates: string[] }
 export type AvailableDatesResult = AvailableDatesOk | AvailabilityErr
-
-// Tolerant of the formats a non-technical owner actually types for a window
-// time: "17:00", "17.00", "17,00", "17" (hours only), or "1700". Returns NaN
-// for anything unparseable (that window then yields no slots).
-function timeToMinutes(time: string): number {
-  const t = time.trim()
-  let m = t.match(/^(\d{1,2})[:.,](\d{1,2})$/) // 17:00 / 17.00 / 17,00
-  if (m) return parseInt(m[1], 10) * 60 + parseInt(m[2], 10)
-  m = t.match(/^(\d{1,2})$/) // 13  → 13:00
-  if (m) return parseInt(m[1], 10) * 60
-  m = t.match(/^(\d{1,2})(\d{2})$/) // 1700 → 17:00
-  if (m) return parseInt(m[1], 10) * 60 + parseInt(m[2], 10)
-  return NaN
-}
 
 function minutesToTime(minutes: number): string {
   const h = Math.floor(minutes / 60)
@@ -50,7 +37,8 @@ type WindowLike = { startTime?: string | null; endTime?: string | null }
 /**
  * Default-closed slot computation for a single day: emit clock-grid slots that
  * fit fully inside an open window, flagging each unavailable if it overlaps a
- * booking. Shared by `getAvailability` (one date) and `getAvailableDates` (range).
+ * booking. Windows with an unparseable time are skipped. Shared by
+ * `getAvailability` (one date) and `getAvailableDates` (range).
  */
 function computeDaySlots(
   windows: WindowLike[],
@@ -60,9 +48,9 @@ function computeDaySlots(
 ): Slot[] {
   const slots: Slot[] = []
   for (const w of windows) {
-    if (!w.startTime || !w.endTime) continue
-    const winStart = timeToMinutes(w.startTime)
-    const winEnd = timeToMinutes(w.endTime)
+    const winStart = parseTimeToMinutes(w.startTime ?? '')
+    const winEnd = parseTimeToMinutes(w.endTime ?? '')
+    if (winStart === null || winEnd === null) continue
     // Snap the first candidate up to the clock grid (multiples of the interval).
     const first = Math.ceil(winStart / slotInterval) * slotInterval
     for (let start = first; start + duration <= winEnd; start += slotInterval) {
@@ -116,8 +104,9 @@ export async function getAvailability(
   ])
 
   const occupied: [number, number][] = bookingsResult.docs.flatMap((b) => {
-    if (!b.timeSlot || !b.endTime) return []
-    return [[timeToMinutes(b.timeSlot), timeToMinutes(b.endTime)] as [number, number]]
+    const s = parseTimeToMinutes(b.timeSlot ?? '')
+    const e = parseTimeToMinutes(b.endTime ?? '')
+    return s === null || e === null ? [] : [[s, e] as [number, number]]
   })
 
   return { slots: computeDaySlots(windowsResult.docs, occupied, duration, slotInterval) }
@@ -185,9 +174,11 @@ export async function getAvailableDates(
 
   const occupiedByDate = new Map<string, [number, number][]>()
   for (const b of bookingsResult.docs) {
-    if (!b.timeSlot || !b.endTime) continue
+    const s = parseTimeToMinutes(b.timeSlot ?? '')
+    const e = parseTimeToMinutes(b.endTime ?? '')
+    if (s === null || e === null) continue
     const key = toDateString(b.date)
-    const entry: [number, number] = [timeToMinutes(b.timeSlot), timeToMinutes(b.endTime)]
+    const entry: [number, number] = [s, e]
     const arr = occupiedByDate.get(key)
     if (arr) arr.push(entry)
     else occupiedByDate.set(key, [entry])
