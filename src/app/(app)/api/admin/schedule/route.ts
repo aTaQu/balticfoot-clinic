@@ -21,8 +21,8 @@ export async function GET(request: NextRequest) {
 
     const daysParam = searchParams.get('days')
     const days = daysParam ? parseInt(daysParam, 10) : 7
-    if (isNaN(days) || days < 1 || days > 14) {
-      return NextResponse.json({ error: '"days" must be between 1 and 14' }, { status: 400 })
+    if (isNaN(days) || days < 1 || days > 35) {
+      return NextResponse.json({ error: '"days" must be between 1 and 35' }, { status: 400 })
     }
 
     const result = await getSchedule(payload, from, days)

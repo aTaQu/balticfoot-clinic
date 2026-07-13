@@ -7,6 +7,7 @@ export interface ScheduledBooking {
   serviceName: string
   timeSlot: string
   endTime: string | null
+  status: 'pending' | 'confirmed'
 }
 
 export interface ScheduledWindow {
@@ -55,7 +56,9 @@ export async function getSchedule(
         and: [
           { date: { greater_than_equal: from } },
           { date: { less_than: to } },
-          { status: { equals: 'confirmed' } },
+          // Pending Rezervacijos block slots identically to confirmed ones, so the
+          // planning schedule surfaces both (pending rendered amber downstream).
+          { status: { in: ['pending', 'confirmed'] } },
         ],
       },
       limit: 1000,
@@ -95,6 +98,7 @@ export async function getSchedule(
       serviceName,
       timeSlot: b.timeSlot,
       endTime: b.endTime ?? null,
+      status: b.status as 'pending' | 'confirmed',
     })
   }
 
