@@ -83,6 +83,27 @@ async function createPendingBooking(date = DATE_0, timeSlot = '11:00') {
   })
 }
 
+async function createBookingWithStatus(
+  status: 'rejected' | 'cancelled',
+  date = DATE_0,
+  timeSlot = '12:00',
+) {
+  return payload.create({
+    collection: 'bookings',
+    data: {
+      service: serviceId,
+      date,
+      timeSlot,
+      status,
+      ...(status === 'rejected' ? { rejectionReason: 'Testas' } : { cancellationReason: 'Testas' }),
+      patientName: 'Ponas Negalioja',
+      patientPhone: '+37060000003',
+      patientEmail: 'schedule-excluded@example.com',
+      gdprConsent: true,
+    },
+  })
+}
+
 async function createWindow(date = DATE_0, startTime = '13:00', endTime = '14:00', note?: string) {
   return payload.create({
     collection: 'availability-windows',
@@ -109,10 +130,24 @@ describe('getSchedule', () => {
     expect(result.days[0].bookings[0].timeSlot).toBe('09:00')
     expect(result.days[0].bookings[0].patientName).toBe('Ponas Testas')
     expect(result.days[0].bookings[0].serviceName).toBeTruthy()
+    expect(result.days[0].bookings[0].status).toBe('confirmed')
   })
 
-  it('pending booking does NOT appear in schedule', async () => {
+  it('pending booking appears in schedule carrying status "pending"', async () => {
+    // Pending Rezervacijos block their slot identically to confirmed ones, so the
+    // planning schedule must surface them (rendered amber) — a slot that looks open
+    // but is actually requested would mislead the owner.
     await createPendingBooking(DATE_0, '11:00')
+    const result = await getSchedule(payload, DATE_0, 1)
+
+    expect(result.days[0].bookings).toHaveLength(1)
+    expect(result.days[0].bookings[0].timeSlot).toBe('11:00')
+    expect(result.days[0].bookings[0].status).toBe('pending')
+  })
+
+  it('rejected and cancelled bookings do NOT appear in schedule', async () => {
+    await createBookingWithStatus('rejected', DATE_0, '12:00')
+    await createBookingWithStatus('cancelled', DATE_0, '13:00')
     const result = await getSchedule(payload, DATE_0, 1)
 
     expect(result.days[0].bookings).toHaveLength(0)
